@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { LIDO, DAI, _RAY } from "./Constants.sol";
+import { LIDO, DAI, _RAY, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 
-import { IDsrManager } from "./interfaces/IDsrManager.sol";
 import { IPot } from "./interfaces/IPot.sol";
-import { IWithdrawalQueueERC721 } from "./interfaces/IWithdrawalQueueERC721.sol";
 
 import { MakerMath } from "./lib/MakerMath.sol";
 
@@ -15,10 +13,6 @@ import { MakerMath } from "./lib/MakerMath.sol";
  * and DAI so users can withdraw their funds without delay, while maximizing the staking yield.
  */
 abstract contract StakingManager {
-    IDsrManager public constant DSR_MANAGER = IDsrManager(0x373238337Bfe1146fb49989fc222523f83081dDb);
-    IWithdrawalQueueERC721 public constant LIDO_WITHDRAWAL_ERC721 =
-        IWithdrawalQueueERC721(0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1);
-
     bool public autoStake;
     address public staker;
 

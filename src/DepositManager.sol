@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { DAI, LIDO, USDC, USDT, _RAY } from "./Constants.sol";
+import { DAI, LIDO, USDC, USDT, _RAY, CURVE_3POOL, PSM } from "./Constants.sol";
 import { WrappedToken } from "./WrappedToken.sol";
-
-import { ICurve3Pool } from "./interfaces/ICurve3Pool.sol";
-import { IDssPsm } from "./interfaces/IDssPsm.sol";
 
 import { MakerMath } from "./lib/MakerMath.sol";
 
@@ -15,9 +12,6 @@ import { MakerMath } from "./lib/MakerMath.sol";
  * DAI and calculates how much of the corresponding wrapped token to mint.
  */
 contract DepositManager {
-    ICurve3Pool public constant CURVE_3POOL = ICurve3Pool(0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7);
-    IDssPsm public constant PSM = IDssPsm(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A);
-
     uint256 public constant _BASIS_POINTS = 10_000;
     address public constant _INITIAL_TOKEN_HOLDER = 0x000000000000000000000000000000000000dEaD;
 

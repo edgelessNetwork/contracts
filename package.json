@@ -43,6 +43,7 @@
   "scripts": {
     "clean": "rm -rf cache out",
     "build": "forge build",
+    "deploy:goerli": "npx hardhat deploy --network goerli",
     "lint": "npm run lint:sol && npm run prettier:check",
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check **/*.{json,md,yml} --ignore-path=.prettierignore",
