@@ -57,9 +57,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     function setUp() public virtual {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
-            urlOrAlias: string(
-                abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)
-                ),
+            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
 
@@ -376,7 +374,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     }
 
     function test_MintingDAIWithDeposit(uint64 amount) external {
-        vm.assume(amount != 0);
+        amount = uint64(bound(amount, 1e18, type(uint64).max));
         deal(address(DAI), depositor, amount);
 
         vm.startPrank(depositor);
@@ -410,7 +408,9 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     )
         external
     {
-        vm.assume(ethAmount != 0 && lidoAmount != 0 && depositorAmount != 0);
+        ethAmount = uint64(bound(ethAmount, 1e6, type(uint64).max));
+        lidoAmount = uint64(bound(lidoAmount, 1e6, type(uint64).max));
+        depositorAmount = uint64(bound(depositorAmount, 1e6, type(uint64).max));
 
         uint96 total = uint96(ethAmount) + uint96(lidoAmount);
 
@@ -474,28 +474,32 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(LIDO.balanceOf(address(edgelessDeposit)), 0, "Edgeless should have `amount` of eth after withdrawing");
     }
 
-    function test_setStakerAsOwner() external {
+    function test_setStakerAsOwner(address randomStaker) external {
+        randomStaker = address(uint160(bound(uint256(uint160(randomStaker)), 1, type(uint160).max)));
         vm.startPrank(owner);
-        edgelessDeposit.setStaker(owner);
-        assertEq(edgelessDeposit.staker(), owner);
+        edgelessDeposit.setStaker(randomStaker);
+        assertEq(edgelessDeposit.staker(), randomStaker);
     }
 
-    function test_setStakerAsRandom() external {
+    function test_setStakerAsRandom(address randomStaker) external {
+        randomStaker = address(uint160(bound(uint256(uint160(randomStaker)), 1, type(uint160).max)));
         vm.startPrank(depositor);
         vm.expectRevert();
-        edgelessDeposit.setStaker(depositor);
+        edgelessDeposit.setStaker(randomStaker);
     }
 
-    function test_setL1StandardBridgeAsOwner() external {
+    function test_setL1StandardBridgeAsOwner(address randomOwner) external {
+        randomOwner = address(uint160(bound(uint256(uint160(randomOwner)), 1, type(uint160).max)));
         vm.startPrank(owner);
-        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(address(4)));
-        assertEq(address(edgelessDeposit.l1standardBridge()), address(4));
+        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(randomOwner));
+        assertEq(address(edgelessDeposit.l1standardBridge()), randomOwner);
     }
 
-    function test_setL1StandardBridgeAsRandom() external {
+    function test_setL1StandardBridgeAsRandom(address randomL1BridgeAddress) external {
+        randomL1BridgeAddress = address(uint160(bound(uint256(uint160(randomL1BridgeAddress)), 1, type(uint160).max)));
         vm.startPrank(depositor);
         vm.expectRevert();
-        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(address(4)));
+        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(randomL1BridgeAddress));
     }
 
     function test_setBridgePauseAsOwner() external {
@@ -504,10 +508,39 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(edgelessDeposit.bridgePaused(), false);
     }
 
-    function test_setBridgePauseAsRandom() external {
-        vm.startPrank(depositor);
+    function test_setBridgePauseAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
         vm.expectRevert();
         edgelessDeposit.setBridgePause(false);
+    }
+
+    function test_setL2EthAsOwner(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(owner);
+        edgelessDeposit.setL2Eth(randomAddress);
+        assertEq(edgelessDeposit.l2ETH(), randomAddress);
+    }
+
+    function test_setL2EthAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setL2Eth(randomAddress);
+    }
+
+    function test_setL2USDAsOwner(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(owner);
+        edgelessDeposit.setL2USD(randomAddress);
+        assertEq(edgelessDeposit.l2USD(), randomAddress);
+    }
+
+    function test_setL2USDAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setL2USD(randomAddress);
     }
 
     function test_Upgradability() external { }

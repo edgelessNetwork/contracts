@@ -26,6 +26,12 @@ const config: HardhatUserConfig = {
       url: "https://eth-goerli.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
       chainId: 5,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    },
+    sepolia: {
+      deploy: ["./deploy/sepolia/"],
+      url: "https://eth-sepolia.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
+      chainId: 11155111,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
     }
   },
   namedAccounts: {
