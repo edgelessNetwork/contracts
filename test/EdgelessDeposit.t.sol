@@ -58,7 +58,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
             urlOrAlias: string(
-                abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/7Azt6l3Ys70v7YYIm10Qk19FNCqPN4SY", alchemyApiKey)
+                abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)
                 ),
             blockNumber: FORK_BLOCK_NUMBER
         });
