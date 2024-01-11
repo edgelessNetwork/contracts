@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { DAI, LIDO, USDC, USDT } from "./Constants.sol";
+import { DAI, LIDO, USDC, USDT, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 
 import { DepositManager } from "./DepositManager.sol";
 import { StakingManager } from "./StakingManager.sol";
@@ -15,7 +15,6 @@ import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 import { console2 } from "forge-std/src/console2.sol";
-
 
 /**
  * @title EdgelessDeposit
