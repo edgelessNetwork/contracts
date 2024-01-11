@@ -506,12 +506,40 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(edgelessDeposit.bridgePaused(), false);
     }
 
-    // function test_setBridgePauseAsRandom(address randomAddress) external {
-    //     randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
-    //     vm.startPrank(randomAddress);
-    //     vm.expectRevert();
-    //     edgelessDeposit.setBridgePause(false);
-    // }
+    function test_setBridgePauseAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setBridgePause(false);
+    }
+
+    function test_setL2EthAsOwner(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(owner);
+        edgelessDeposit.setL2Eth(randomAddress);
+        assertEq(edgelessDeposit.l2ETH(), randomAddress);
+    }
+
+    function test_setL2EthAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setL2Eth(randomAddress);
+    }
+
+    function test_setL2USDAsOwner(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(owner);
+        edgelessDeposit.setL2USD(randomAddress);
+        assertEq(edgelessDeposit.l2USD(), randomAddress);
+    }
+
+    function test_setL2USDAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setL2USD(randomAddress);
+    }
 
     function test_Upgradability() external { }
 
