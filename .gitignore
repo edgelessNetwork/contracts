@@ -1,0 +1,34 @@
+# directories
+cache
+coverage
+node_modules
+out
+
+# files
+*.env
+*.log
+.DS_Store
+.pnp.*
+lcov.info
+pnpm-lock.yaml
+yarn.lock
+
+# broadcasts
+!broadcast
+broadcast/*
+broadcast/*/31337/
+
+node_modules
+.env
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
