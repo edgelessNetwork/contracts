@@ -39,6 +39,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     event RecievedLidoWithdrawal(uint256 amount);
     event SetBridgePause(bool bridgePaused);
     event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
+    event SetL2Eth(address l2Eth);
+    event SetL2USD(address l2USD);
     event WithdrawEth(address indexed from, address indexed to, uint256 ethAmountWithdrew, uint256 burnAmount);
     event WithdrawUSD(address indexed from, address indexed to, uint256 usdAmountWithdrew, uint256 burnAmount);
 
@@ -261,6 +263,26 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
         if (address(_l1standardBridge) == address(0)) revert ZeroAddress();
         l1standardBridge = _l1standardBridge;
         emit SetL1StandardBridge(_l1standardBridge);
+    }
+
+    /**
+     * @notice Set the address of the L2 Wrapped Eth contract
+     * @param _l2Eth Address of the L2 Wrapped Eth contract
+     */
+    function setL2Eth(address _l2Eth) external onlyOwner {
+        if (address(_l2Eth) == address(0)) revert ZeroAddress();
+        l2ETH = _l2Eth;
+        emit SetL2Eth(_l2Eth);
+    }
+
+    /**
+     * @notice Set the address of the L2 Wrapped USD contract
+     * @param _l2USD Address of the L2 Wrapped USD contract
+     */
+    function setL2USD(address _l2USD) external onlyOwner {
+        if (address(_l2USD) == address(0)) revert ZeroAddress();
+        l2USD = _l2USD;
+        emit SetL2USD(_l2USD);
     }
 
     /**
