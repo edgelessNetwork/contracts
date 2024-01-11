@@ -32,6 +32,12 @@ const config: HardhatUserConfig = {
       url: "https://eth-sepolia.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
       chainId: 11155111,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    },
+    edgelessTestnet: {
+      deploy: ["./deploy/edgelessTestnet/"],
+      url: "https://edgeless-op.rpc.caldera.xyz/http",
+      chainId: 2067124,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
     }
   },
   namedAccounts: {
