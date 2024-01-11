@@ -14,6 +14,9 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
+import { console2 } from "forge-std/src/console2.sol";
+
+
 /**
  * @title EdgelessDeposit
  * @notice EdgelessDeposit is a contract that allows users to deposit ETH, USDC, USDT, or DAI and
@@ -148,7 +151,6 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      * @notice Deposit USDC to the USD pool with a permit signature
      * @dev USDC is converted to DAI using Maker DssPsm
      * @param usdcAmount Amount to deposit in USDC (usd)
-     * @param allowance Allowance amount
      * @param deadline Permit signature deadline timestamp
      * @param v Permit signature v parameter
      * @param r Permit signature r parameter
@@ -157,7 +159,6 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     function depositUSDCWithPermit(
         address to,
         uint256 usdcAmount,
-        uint256 allowance,
         uint256 deadline,
         uint8 v,
         bytes32 r,
@@ -165,8 +166,31 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     )
         external
     {
-        USDC.permit(msg.sender, address(this), allowance, deadline, v, r, s);
+        USDC.permit(msg.sender, address(this), usdcAmount, deadline, v, r, s);
         depositUSDC(to, usdcAmount);
+    }
+
+    /**
+     * @notice Deposit STETH with a permit signature
+     * @dev USDC is converted to DAI using Maker DssPsm
+     * @param stEthAmount Amount to deposit in USDC (usd)
+     * @param deadline Permit signature deadline timestamp
+     * @param v Permit signature v parameter
+     * @param r Permit signature r parameter
+     * @param s Permit signature s parameter
+     */
+    function depositStEthWithPermit(
+        address to,
+        uint256 stEthAmount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    )
+        external
+    {
+        LIDO.permit(msg.sender, address(this), stEthAmount, deadline, v, r, s);
+        depositStEth(to, stEthAmount);
     }
 
     /**
@@ -283,7 +307,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      * @param amount Amount of wrapped tokens to mint
      */
     function mintUSDBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        uint256 maxMint = totalUSDBalance() - wrappedUSD.totalSupply();
+        uint256 maxMint = totalUSDBalanceNoUpdate() - wrappedUSD.totalSupply();
         if (maxMint > amount) {
             revert MaxMintExceeded();
         }

@@ -19,6 +19,8 @@ import { IUSDT } from "../src/interfaces/IUSDT.sol";
 import { IUSDC } from "../src/interfaces/IUSDC.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 
+import { Permit, SigUtils } from "./SigUtils.sol";
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
@@ -26,6 +28,8 @@ interface IERC20 {
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
 contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
+    using SigUtils for Permit;
+
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
     WrappedToken internal wrappedUSD;
@@ -46,13 +50,16 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
 
     address public owner = makeAddr("Edgeless owner");
     address public depositor = makeAddr("Depositor");
+    uint256 public depositorKey = uint256(keccak256(abi.encodePacked("Depositor")));
     address public staker = makeAddr("Staker");
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            urlOrAlias: string(
+                abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/7Azt6l3Ys70v7YYIm10Qk19FNCqPN4SY", alchemyApiKey)
+                ),
             blockNumber: FORK_BLOCK_NUMBER
         });
 
@@ -186,6 +193,95 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
     }
 
+    function test_DAIDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e25);
+        deal(address(DAI), depositor, amount);
+        vm.startPrank(depositor);
+
+        // Deposit DAI
+        DAI.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDAI(depositor, amount);
+
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, amount - 2);
+        assertAlmostEq(DAI.balanceOf(depositor), amount, 2, "Depositor should have `amount` of DAI after withdrawing");
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
+    }
+
+    function test_StEthPermitDeposit(uint64 amount) external {
+        vm.assume(amount > 1 gwei);
+        mintStETH(depositor, amount);
+        vm.startPrank(depositor);
+
+        // Deposit Eth
+        Permit memory permit = Permit({
+            owner: depositor,
+            spender: address(edgelessDeposit),
+            value: amount,
+            nonce: LIDO.nonces(depositor),
+            deadline: type(uint256).max,
+            allowed: true
+        });
+        bytes32 digest = permit.getTypedDataHash(LIDO.DOMAIN_SEPARATOR());
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
+        edgelessDeposit.depositStEthWithPermit(permit.owner, permit.value, permit.deadline, v, r, s);
+
+        assertAlmostEq(
+            wrappedEth.balanceOf(depositor),
+            amount,
+            2,
+            "Depositor should have amount wrapped stablecoin after withdrawing"
+        );
+    }
+
+    function test_USDCPermitDeposit(uint256 amount) external {
+        amount = bound(amount, 1e6, 1e13);
+        deal(address(USDC), depositor, amount);
+        vm.startPrank(depositor);
+        // Deposit USDC
+
+        Permit memory permit = Permit({
+            owner: depositor,
+            spender: address(edgelessDeposit),
+            value: amount,
+            nonce: USDC.nonces(depositor),
+            deadline: type(uint256).max,
+            allowed: true
+        });
+        bytes32 digest = permit.getTypedDataHash(USDC.DOMAIN_SEPARATOR());
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
+        edgelessDeposit.depositUSDCWithPermit(permit.owner, permit.value, permit.deadline, v, r, s);
+
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor),
+            amount * 10 ** 12,
+            2,
+            "Depositor should have amount wrapped stablecoin after withdrawing"
+        );
+    }
+
+    function test_DAIPermitDeposit(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e25);
+        deal(address(DAI), depositor, amount);
+        vm.startPrank(depositor);
+
+        // Deposit DAI
+        Permit memory permit = Permit({
+            owner: depositor,
+            spender: address(edgelessDeposit),
+            value: amount,
+            nonce: DAI.nonces(depositor),
+            deadline: type(uint256).max,
+            allowed: true
+        });
+        bytes32 digest = permit.getTypedDaiDataHashWithPermitTypeHash(DAI.DOMAIN_SEPARATOR(), DAI.PERMIT_TYPEHASH());
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
+        edgelessDeposit.depositDAIWithPermit(permit.owner, permit.value, permit.nonce, permit.deadline, v, r, s);
+    }
+
     function test_USDTDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e6, 1e13);
         deal(address(USDT), depositor, amount);
@@ -211,24 +307,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
             wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
         );
         assertAlmostEq(USDT.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdt after withdrawing");
-        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
-    }
-
-    function test_DAIDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e25);
-        deal(address(DAI), depositor, amount);
-        vm.startPrank(depositor);
-
-        // Deposit DAI
-        DAI.approve(address(edgelessDeposit), amount);
-        edgelessDeposit.depositDAI(depositor, amount);
-
-        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
-        edgelessDeposit.withdrawUSD(depositor, amount - 2);
-        assertAlmostEq(DAI.balanceOf(depositor), amount, 2, "Depositor should have `amount` of DAI after withdrawing");
-        assertAlmostEq(
-            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
-        );
         assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
     }
 
@@ -287,6 +365,29 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         vm.startPrank(owner);
         edgelessDeposit.mintEthBasedOnStakedAmount(owner, amount);
         assertEq(wrappedEth.balanceOf(owner), amount);
+    }
+
+    function test_MintingDAI(uint64 amount) external {
+        vm.assume(amount != 0);
+        deal(address(DAI), address(edgelessDeposit), amount);
+        vm.startPrank(owner);
+        edgelessDeposit.mintUSDBasedOnStakedAmount(owner, amount);
+        assertEq(wrappedUSD.balanceOf(owner), amount);
+    }
+
+    function test_MintingDAIWithDeposit(uint64 amount) external {
+        vm.assume(amount != 0);
+        deal(address(DAI), depositor, amount);
+
+        vm.startPrank(depositor);
+        DAI.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDAI(depositor, amount);
+        vm.stopPrank();
+        deal(address(DAI), address(edgelessDeposit), amount);
+        vm.startPrank(owner);
+        edgelessDeposit.mintUSDBasedOnStakedAmount(owner, amount);
+        assertEq(wrappedUSD.balanceOf(owner), amount);
+        assertEq(wrappedUSD.balanceOf(depositor), amount);
     }
 
     function test_MintingETHAndLido(uint64 ethAmount, uint64 lidoAmount) external {
@@ -373,7 +474,41 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(LIDO.balanceOf(address(edgelessDeposit)), 0, "Edgeless should have `amount` of eth after withdrawing");
     }
 
-    function test_Ownership() external { }
+    function test_setStakerAsOwner() external {
+        vm.startPrank(owner);
+        edgelessDeposit.setStaker(owner);
+        assertEq(edgelessDeposit.staker(), owner);
+    }
+
+    function test_setStakerAsRandom() external {
+        vm.startPrank(depositor);
+        vm.expectRevert();
+        edgelessDeposit.setStaker(depositor);
+    }
+
+    function test_setL1StandardBridgeAsOwner() external {
+        vm.startPrank(owner);
+        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(address(4)));
+        assertEq(address(edgelessDeposit.l1standardBridge()), address(4));
+    }
+
+    function test_setL1StandardBridgeAsRandom() external {
+        vm.startPrank(depositor);
+        vm.expectRevert();
+        edgelessDeposit.setL1StandardBridge(IL1StandardBridge(address(4)));
+    }
+
+    function test_setBridgePauseAsOwner() external {
+        vm.startPrank(owner);
+        edgelessDeposit.setBridgePause(false);
+        assertEq(edgelessDeposit.bridgePaused(), false);
+    }
+
+    function test_setBridgePauseAsRandom() external {
+        vm.startPrank(depositor);
+        vm.expectRevert();
+        edgelessDeposit.setBridgePause(false);
+    }
 
     function test_Upgradability() external { }
 
