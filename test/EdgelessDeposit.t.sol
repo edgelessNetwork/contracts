@@ -374,7 +374,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     }
 
     function test_MintingDAIWithDeposit(uint64 amount) external {
-        vm.assume(amount != 0);
+        amount = uint64(bound(amount, 1e18, type(uint64).max));
         deal(address(DAI), depositor, amount);
 
         vm.startPrank(depositor);
@@ -408,7 +408,9 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     )
         external
     {
-        vm.assume(ethAmount != 0 && lidoAmount != 0 && depositorAmount != 0);
+        ethAmount = uint64(bound(ethAmount, 1e6, type(uint64).max));
+        lidoAmount = uint64(bound(lidoAmount, 1e6, type(uint64).max));
+        depositorAmount = uint64(bound(depositorAmount, 1e6, type(uint64).max));
 
         uint96 total = uint96(ethAmount) + uint96(lidoAmount);
 
@@ -506,12 +508,12 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(edgelessDeposit.bridgePaused(), false);
     }
 
-    // function test_setBridgePauseAsRandom(address randomAddress) external {
-    //     randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
-    //     vm.startPrank(randomAddress);
-    //     vm.expectRevert();
-    //     edgelessDeposit.setBridgePause(false);
-    // }
+    function test_setBridgePauseAsRandom(address randomAddress) external {
+        randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
+        vm.startPrank(randomAddress);
+        vm.expectRevert();
+        edgelessDeposit.setBridgePause(false);
+    }
 
     function test_Upgradability() external { }
 
