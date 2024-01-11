@@ -68,8 +68,6 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped ETH", "ewETH");
         wrappedUSD = new WrappedToken(address(this), "Edgeless Wrapped USD", "ewUSD");
         l1standardBridge = _l1standardBridge;
-        l2ETH = _l2Eth;
-        l2USD = _l2USD;
         bridgePaused = true;
         _setAutoStake(true);
         _setStaker(_staker);
