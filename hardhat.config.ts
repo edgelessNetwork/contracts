@@ -98,7 +98,18 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY!
-    }
+    },
+    customChains: [
+      {
+        network: "edgelessSepoliaTestnet",
+        chainId: 2067124,
+        urls: {
+          apiURL: "https://edgeless-op.explorer.caldera.xyz/api/v2/",
+          browserURL: "https://edgeless-op.explorer.caldera.xyz/"
+        }
+      }
+    ]
+
   }
 };
 
