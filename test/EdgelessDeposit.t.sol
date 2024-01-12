@@ -64,9 +64,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         vm.startPrank(owner);
 
         address implementation = address(new EdgelessDeposit());
-        bytes memory data = abi.encodeCall(
-            EdgelessDeposit.initialize, (owner, staker, IL1StandardBridge(address(1)), address(2), address(3))
-        );
+        bytes memory data = abi.encodeCall(EdgelessDeposit.initialize, (owner, staker, IL1StandardBridge(address(1))));
         console2.logBytes(data);
         address payable proxy = payable(address(new ERC1967Proxy(implementation, data)));
         edgelessDeposit = EdgelessDeposit(proxy);

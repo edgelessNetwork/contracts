@@ -48,20 +48,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     error TransferFailed(bytes data);
     error ZeroAddress();
 
-    function initialize(
-        address _owner,
-        address _staker,
-        IL1StandardBridge _l1standardBridge,
-        address _l2Eth,
-        address _l2USD
-    )
-        external
-        initializer
-    {
-        if (
-            address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)
-                || _l2Eth == address(0) || _l2USD == address(0)
-        ) {
+    function initialize(address _owner, address _staker, IL1StandardBridge _l1standardBridge) external initializer {
+        if (address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)) {
             revert ZeroAddress();
         }
 

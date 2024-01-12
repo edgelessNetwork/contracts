@@ -4,37 +4,21 @@ import * as WrappedTokenArtifact from "../../artifacts/src/WrappedToken.sol/Wrap
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre
-    const { deploy, read, save } = deployments
-    const { deployer, owner, staker, l1StandardBridge, l2Eth, l2USD } = await getNamedAccounts()
+    const { deploy } = deployments
+    const { deployer, l2StandardBridge, l1Eth, l1USD } = await getNamedAccounts()
 
-    await deploy('EdgelessDeposit', {
+    await deploy('Edgeless Wrapped ETH', {
+        contract: "OptimismMintableERC20",
         from: deployer,
-        proxy: {
-            proxyContract: 'UUPS',
-            execute: {
-                init: {
-                    methodName: 'initialize',
-                    args: [
-                        owner,
-                        staker,
-                        l1StandardBridge,
-                        l2Eth,
-                        l2USD
-                    ],
-                },
-            },
-        },
+        args: [l2StandardBridge, l1Eth, "Edgeless Wrapped ETH", "ewETH"],
         skipIfAlreadyDeployed: true,
     });
 
-    await save("Edgeless Wrapped ETH", {
-        address: await read("EdgelessDeposit", "wrappedEth"),
-        abi: WrappedTokenArtifact["abi"]
-    });
-
-    await save("Edgeless Wrapped USD", {
-        address: await read("EdgelessDeposit", "wrappedUSD"),
-        abi: WrappedTokenArtifact["abi"]
+    await deploy('Edgeless Wrapped USD', {
+        contract: "OptimismMintableERC20",
+        from: deployer,
+        args: [l2StandardBridge, l1USD, "Edgeless Wrapped USD", "ewUSD"],
+        skipIfAlreadyDeployed: true,
     });
 
     await hre.run("etherscan-verify", {
