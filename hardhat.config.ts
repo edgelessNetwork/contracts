@@ -73,23 +73,23 @@ const config: HardhatUserConfig = {
     },
     l1Eth: {
       goerli: "",
-      sepolia: "0xEEb9Ae98f5836f8bD86BbcC74C4C061Dd509e924",
-      edgelessSepoliaTestnet: "0xEEb9Ae98f5836f8bD86BbcC74C4C061Dd509e924"
+      sepolia: "0x62b4B558971b6C6054C195602Fc32ae5939bF471",
+      edgelessSepoliaTestnet: "0x62b4B558971b6C6054C195602Fc32ae5939bF471"
     },
     l1USD: {
       goerli: "",
-      sepolia: "0xba3155FFd8d429f170b53175c116260331354fBA",
-      edgelessSepoliaTestnet: "0xba3155FFd8d429f170b53175c116260331354fBA"
+      sepolia: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA",
+      edgelessSepoliaTestnet: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA"
     },
     l2Eth: {
       goerli: "",
-      sepolia: "0xB15E872916fD7e8fdDf9b8e6913F1dd180568cDC",
-      edgelessSepoliaTestnet: "0xB15E872916fD7e8fdDf9b8e6913F1dd180568cDC"
+      sepolia: "0x2305C316529e4c97510E72B18673168e1C22a927",
+      edgelessSepoliaTestnet: "0x2305C316529e4c97510E72B18673168e1C22a927"
     },
     l2USD: {
       goerli: "",
-      sepolia: "0x18B9AB778d618A4fE4af565b8dA37e21273c636D",
-      edgelessSepoliaTestnet: "0x18B9AB778d618A4fE4af565b8dA37e21273c636D"
+      sepolia: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2",
+      edgelessSepoliaTestnet: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2"
     }
   },
   paths: {
