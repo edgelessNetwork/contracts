@@ -20,7 +20,7 @@ import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgrade
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, UUPSUpgradeable {
-    bool public bridgePaused;
+    bool public autoBridge;
     address public l2ETH;
     address public l2USD;
     WrappedToken public wrappedEth;
@@ -35,7 +35,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     event MintWrappedETH(address indexed to, uint256 amount);
     event MintWrappedUSD(address indexed to, uint256 amount);
     event RecievedLidoWithdrawal(uint256 amount);
-    event SetBridgePause(bool bridgePaused);
+    event SetAutoBridge(bool autoBridge);
     event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
     event SetL2Eth(address l2Eth);
     event SetL2USD(address l2USD);
@@ -56,8 +56,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped ETH", "ewETH");
         wrappedUSD = new WrappedToken(address(this), "Edgeless Wrapped USD", "ewUSD");
         l1standardBridge = _l1standardBridge;
-        bridgePaused = true;
-        _setAutoStake(true);
+        autoBridge = false;
+        _setAutoStake(false);
         _setStaker(_staker);
         __Ownable_init(_owner);
     }
@@ -287,11 +287,11 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
 
     /**
      * @notice Pause autobridging of wrapped tokens to the Edgeless L2
-     * @param _bridgePaused True to pause autobridging, false to unpause
+     * @param _autoBridge True to pause autobridging, false to unpause
      */
-    function setBridgePause(bool _bridgePaused) external onlyOwner {
-        bridgePaused = _bridgePaused;
-        emit SetBridgePause(_bridgePaused);
+    function setAutoBridge(bool _autoBridge) external onlyOwner {
+        autoBridge = _autoBridge;
+        emit SetAutoBridge(_autoBridge);
     }
 
     /**
@@ -328,7 +328,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
 
     function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {
-        if (!bridgePaused) {
+        if (autoBridge) {
             l1standardBridge.depositERC20To(address(wrappedToken), l2WrappedToken, to, amount, 0, "");
         }
     }

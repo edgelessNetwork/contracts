@@ -62,7 +62,7 @@ const config: HardhatUserConfig = {
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     l1StandardBridge: {
-      goerli: "",
+      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       sepolia: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04",
       edgelessSepoliaTestnet: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04"
     },

@@ -71,6 +71,10 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
 
         wrappedEth = edgelessDeposit.wrappedEth();
         wrappedUSD = edgelessDeposit.wrappedUSD();
+        edgelessDeposit.setAutoBridge(false);
+        vm.stopPrank();
+        vm.prank(staker);
+        edgelessDeposit.setAutoStake(true);
 
         vm.label(address(wrappedEth), "wrappedEth");
         vm.label(address(wrappedUSD), "wrappedUSD");
@@ -500,17 +504,17 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         edgelessDeposit.setL1StandardBridge(IL1StandardBridge(randomL1BridgeAddress));
     }
 
-    function test_setBridgePauseAsOwner() external {
+    function test_setAutoBridgeAsOwner() external {
         vm.startPrank(owner);
-        edgelessDeposit.setBridgePause(false);
-        assertEq(edgelessDeposit.bridgePaused(), false);
+        edgelessDeposit.setAutoBridge(false);
+        assertEq(edgelessDeposit.autoBridge(), false);
     }
 
-    function test_setBridgePauseAsRandom(address randomAddress) external {
+    function test_setAutoBridgeAsRandom(address randomAddress) external {
         randomAddress = address(uint160(bound(uint256(uint160(randomAddress)), 1, type(uint160).max)));
         vm.startPrank(randomAddress);
         vm.expectRevert();
-        edgelessDeposit.setBridgePause(false);
+        edgelessDeposit.setAutoBridge(false);
     }
 
     function test_setL2EthAsOwner(address randomAddress) external {
