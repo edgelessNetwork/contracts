@@ -33,8 +33,8 @@ const config: HardhatUserConfig = {
       chainId: 11155111,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
     },
-    edgelessTestnet: {
-      deploy: ["./deploy/edgelessTestnet/"],
+    edgelessSepoliaTestnet: {
+      deploy: ["./deploy/edgelessSepoliaTestnet/"],
       url: "https://edgeless-op.rpc.caldera.xyz/http",
       chainId: 2067124,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
@@ -44,37 +44,37 @@ const config: HardhatUserConfig = {
     deployer: {
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      edgelessTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     owner: {
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      edgelessTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     staker: {
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      edgelessTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     l1StandardBridge: {
       goerli: "",
       sepolia: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04",
-      edgelessTestnet: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04"
+      edgelessSepoliaTestnet: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04"
     },
     l2StandardBridge: {
       goerli: "0x4200000000000000000000000000000000000010",
       sepolia: "0x4200000000000000000000000000000000000010",
-      edgelessTestnet: "0x4200000000000000000000000000000000000010"
+      edgelessSepoliaTestnet: "0x4200000000000000000000000000000000000010"
     },
     l1Eth: {
       goerli: "",
       sepolia: "0x73Cb27e3c1a15860b4a6BD1BB4a133c9B3dE9598",
-      edgelessTestnet: "0x73Cb27e3c1a15860b4a6BD1BB4a133c9B3dE9598"
+      edgelessSepoliaTestnet: "0x73Cb27e3c1a15860b4a6BD1BB4a133c9B3dE9598"
     },
     l1USD: {
       goerli: "",
       sepolia: "0x68F67eA08ce0E82E572Cee45123Aa7bB91576B7B",
-      edgelessTestnet: "0x68F67eA08ce0E82E572Cee45123Aa7bB91576B7B"
+      edgelessSepoliaTestnet: "0x68F67eA08ce0E82E572Cee45123Aa7bB91576B7B"
     },
     l2Eth: {
 

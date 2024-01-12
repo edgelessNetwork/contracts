@@ -17,9 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
                     args: [
                         owner,
                         staker,
-                        l1StandardBridge,
-                        l2Eth,
-                        l2USD
+                        l1StandardBridge
                     ],
                 },
             },
