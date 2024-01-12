@@ -329,6 +329,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
 
     function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {
         if (autoBridge) {
+            wrappedToken.approve(address(l1standardBridge), amount);
             l1standardBridge.depositERC20To(address(wrappedToken), l2WrappedToken, to, amount, 0, "");
         }
     }
