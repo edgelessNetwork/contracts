@@ -6,8 +6,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { getOrNull, execute, log } = deployments
     const { deployer, l2Eth, l2USD } = await getNamedAccounts()
 
-    const edgelessWrappedETH = await getOrNull("EdgelessDeposit");
-    if (edgelessWrappedETH) {
+    const EdgelessDeposit = await getOrNull("EdgelessDeposit");
+    if (EdgelessDeposit) {
         await execute("EdgelessDeposit", { from: deployer, log: true }, "setL2Eth", l2Eth);
         await execute("EdgelessDeposit", { from: deployer, log: true }, "setL2USD", l2USD);
     } else {
@@ -16,4 +16,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.skip = async () => true;
+// func.skip = async () => true;

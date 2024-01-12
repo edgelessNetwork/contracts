@@ -73,23 +73,23 @@ const config: HardhatUserConfig = {
     },
     l1Eth: {
       goerli: "",
-      sepolia: "0x07F9ffb22e08E2BEba460C0987942A84F805D8fB",
-      edgelessSepoliaTestnet: "0x07F9ffb22e08E2BEba460C0987942A84F805D8fB"
+      sepolia: "0x2f43f89AbBaFB18BB96C54e331F6621254a1a3D2",
+      edgelessSepoliaTestnet: "0x2f43f89AbBaFB18BB96C54e331F6621254a1a3D2"
     },
     l1USD: {
       goerli: "",
-      sepolia: "0xB861581E9842f4D9e4b324BA1F052f18b758b48E",
-      edgelessSepoliaTestnet: "0xB861581E9842f4D9e4b324BA1F052f18b758b48E"
+      sepolia: "0xF6980515A5d2AEab2d56F499Ac1a78F68f8b73e7",
+      edgelessSepoliaTestnet: "0xF6980515A5d2AEab2d56F499Ac1a78F68f8b73e7"
     },
     l2Eth: {
       goerli: "",
-      sepolia: "0x7B4967b3d08a5fc7693d981dfc5bDC574399FAef",
-      edgelessSepoliaTestnet: "0x7B4967b3d08a5fc7693d981dfc5bDC574399FAef"
+      sepolia: "0x61b2b6Dd094272844c793E63B5aC3094Fe807C62",
+      edgelessSepoliaTestnet: "0x61b2b6Dd094272844c793E63B5aC3094Fe807C62"
     },
     l2USD: {
       goerli: "",
-      sepolia: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2",
-      edgelessSepoliaTestnet: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2"
+      sepolia: "0x0c28a1EF0ccdD15cFd82C291bb0873a283F86da1",
+      edgelessSepoliaTestnet: "0x0c28a1EF0ccdD15cFd82C291bb0873a283F86da1"
     }
   },
   paths: {
@@ -98,7 +98,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY!,
-      edgelessSepoliaTestnet: "a"
+      edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter "
     },
     customChains: [
       {
