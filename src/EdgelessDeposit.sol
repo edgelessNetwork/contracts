@@ -334,13 +334,29 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
         }
     }
 
+    /**
+     * @dev If autobridge, we mint thhe wrapped token to this contract so we can transfer it from '
+     * this contract to the l1standardbridge contract. Otherwise, we mint it to the user
+     */
     function _mintAndStakeEth(address to, uint256 amount) internal {
         if (autoStake) _stakeETH(amount);
-        wrappedEth.mint(to, amount);
+        if (autoBridge) {
+            wrappedEth.mint(address(this), amount);
+        } else {
+            wrappedEth.mint(to, amount);
+        }
     }
 
+    /**
+     * @dev If autobridge, we mint thhe wrapped token to this contract so we can transfer it from '
+     * this contract to the l1standardbridge contract. Otherwise, we mint it to the user
+     */
     function _mintAndStakeUSD(address to, uint256 amount) internal {
         if (autoStake) _stakeDAI(amount);
-        wrappedUSD.mint(to, amount);
+        if (autoBridge) {
+            wrappedUSD.mint(address(this), amount);
+        } else {
+            wrappedUSD.mint(to, amount);
+        }
     }
 }
