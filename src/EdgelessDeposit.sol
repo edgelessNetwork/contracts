@@ -21,8 +21,6 @@ import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgrade
  */
 contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, UUPSUpgradeable {
     bool public bridgePaused;
-    bool public l2EthSet = false;
-    bool public l2USDSet = false;
     address public l2ETH;
     address public l2USD;
     WrappedToken public wrappedEth;
@@ -259,9 +257,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
         if (address(_l2Eth) == address(0)) revert ZeroAddress();
-        if (l2EthSet) revert L2EthSet();
+        if (l2ETH != address(0)) revert L2EthSet();
         l2ETH = _l2Eth;
-        l2EthSet = true;
         emit SetL2Eth(_l2Eth);
     }
 
@@ -271,9 +268,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      */
     function setL2USD(address _l2USD) external onlyOwner {
         if (address(_l2USD) == address(0)) revert ZeroAddress();
-        if (l2USDSet) revert L2USDSet();
+        if (l2USD != address(0)) revert L2USDSet();
         l2USD = _l2USD;
-        l2USDSet = true;
         emit SetL2USD(_l2USD);
     }
 
