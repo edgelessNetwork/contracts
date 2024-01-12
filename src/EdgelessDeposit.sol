@@ -14,8 +14,6 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-import { console2 } from "forge-std/src/console2.sol";
-
 /**
  * @title EdgelessDeposit
  * @notice EdgelessDeposit is a contract that allows users to deposit ETH, USDC, USDT, or DAI and
@@ -47,21 +45,11 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
     error ZeroAddress();
+    error L2EthSet();
+    error L2USDSet();
 
-    function initialize(
-        address _owner,
-        address _staker,
-        IL1StandardBridge _l1standardBridge,
-        address _l2Eth,
-        address _l2USD
-    )
-        external
-        initializer
-    {
-        if (
-            address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)
-                || _l2Eth == address(0) || _l2USD == address(0)
-        ) {
+    function initialize(address _owner, address _staker, IL1StandardBridge _l1standardBridge) external initializer {
+        if (address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)) {
             revert ZeroAddress();
         }
 
@@ -269,6 +257,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
         if (address(_l2Eth) == address(0)) revert ZeroAddress();
+        if (l2ETH != address(0)) revert L2EthSet();
         l2ETH = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
@@ -279,6 +268,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, StakingManager, 
      */
     function setL2USD(address _l2USD) external onlyOwner {
         if (address(_l2USD) == address(0)) revert ZeroAddress();
+        if (l2USD != address(0)) revert L2USDSet();
         l2USD = _l2USD;
         emit SetL2USD(_l2USD);
     }

@@ -128,12 +128,30 @@ $ forge coverage
 ```
 
 ### Deploy
-
-```sh
-$ npx hardhat deploy --network goerli
-```
+There are four steps to the deployment process
 
 For this script to work, you need to have a valid `.env` file. Copy the `.env.example` file to get started
+
+
+1. Deploy contracts to the base chain, ie Ethereum or Goerli
+```sh
+$ npx hardhat deploy --network sepolia
+```
+
+2. Add the `l1Eth` and `l1USD` addresses to namedAccounts in your `hardhat.config.ts`
+
+3. Deploy the OptimismMintableTokens on the layer two, ie Edgeless
+```sh
+$ npx hardhat deploy --network edgelessSepoliaTestnet
+```
+
+4. Add the `l2Eth` and `l2USD` contracts that you just deployed to `hardhat.config.ts`
+
+5. Comment out the `func.skip` and run `002_setL2TokenAddresses.ts`
+```sh
+$ npx hardhat deploy --network sepolia
+```
+
 
 ### Format
 
