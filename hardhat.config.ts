@@ -38,6 +38,11 @@ const config: HardhatUserConfig = {
       url: "https://edgeless-op.rpc.caldera.xyz/http",
       chainId: 2067124,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+      verify: {
+        etherscan: {
+          apiUrl: "https://edgeless-op.explorer.caldera.xyz/"
+        }
+      }
     }
   },
   namedAccounts: {
@@ -68,19 +73,23 @@ const config: HardhatUserConfig = {
     },
     l1Eth: {
       goerli: "",
-      sepolia: "0x73Cb27e3c1a15860b4a6BD1BB4a133c9B3dE9598",
-      edgelessSepoliaTestnet: "0x73Cb27e3c1a15860b4a6BD1BB4a133c9B3dE9598"
+      sepolia: "0xCaD6a7bFdb81d69c0B3f9584d583e4aB59d0be7D",
+      edgelessSepoliaTestnet: "0xCaD6a7bFdb81d69c0B3f9584d583e4aB59d0be7D"
     },
     l1USD: {
       goerli: "",
-      sepolia: "0x68F67eA08ce0E82E572Cee45123Aa7bB91576B7B",
-      edgelessSepoliaTestnet: "0x68F67eA08ce0E82E572Cee45123Aa7bB91576B7B"
+      sepolia: "0x9DDC1EFe941cACC23F447882e9337a726Af4223a",
+      edgelessSepoliaTestnet: "0x9DDC1EFe941cACC23F447882e9337a726Af4223a"
     },
     l2Eth: {
-
+      goerli: "",
+      sepolia: "0x7B4967b3d08a5fc7693d981dfc5bDC574399FAef",
+      edgelessSepoliaTestnet: "0x7B4967b3d08a5fc7693d981dfc5bDC574399FAef"
     },
     l2USD: {
-
+      goerli: "",
+      sepolia: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2",
+      edgelessSepoliaTestnet: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2"
     }
   },
   paths: {

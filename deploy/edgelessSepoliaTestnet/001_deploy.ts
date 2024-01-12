@@ -20,8 +20,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         skipIfAlreadyDeployed: true,
     });
 
-    await hre.run("etherscan-verify", {
-        apiKey: process.env.ETHERSCAN_API_KEY,
-    })
+    // await hre.run("etherscan-verify", {
+    //     apiKey: process.env.ETHERSCAN_API_KEY,
+    // })
 };
 export default func;
