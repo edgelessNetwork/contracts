@@ -41,8 +41,8 @@ abstract contract DeploymentUtils is PRBTest {
             EdgelessDeposit edgelessDeposit,
             WrappedToken wrappedEth,
             WrappedToken wrappedUSD,
-            IStakingStrategy daiStakingStrategy,
-            IStakingStrategy ethStakingStrategy
+            IStakingStrategy ethStakingStrategy,
+            IStakingStrategy daiStakingStrategy
         )
     {
         vm.startPrank(owner);

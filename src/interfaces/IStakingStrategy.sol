@@ -6,6 +6,8 @@ interface IStakingStrategy {
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount);
     function ownerDeposit(uint256 amount) external payable;
     function ownerWithdraw(uint256 amount) external returns (uint256 withdrawnAmount);
+    function setStakingManager(address _stakingManager) external;
+    function setAutoStake(bool _autoStake) external;
 
     function underlyingAsset() external view returns (address);
     function underlyingAssetAmountNoUpdate() external view returns (uint256);

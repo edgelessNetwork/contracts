@@ -7,6 +7,7 @@ import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import { console2 } from "forge-std/src/console2.sol";
 
 contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error InsufficientFunds();
@@ -27,6 +28,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     function deposit(uint256 amount) external payable {
+        console2.log("deposit", amount, autoStake);
         if (!autoStake) {
             return;
         }
@@ -108,6 +110,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     function setAutoStake(bool _autoStake) external onlyOwner {
+        console2.log("setAutoStake", _autoStake);
         autoStake = _autoStake;
     }
 }

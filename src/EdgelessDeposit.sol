@@ -36,8 +36,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     event DepositUSDT(address indexed to, address indexed from, uint256 usdtAmount, uint256 mintAmount);
     event MintWrappedETH(address indexed to, uint256 amount);
     event MintWrappedUSD(address indexed to, uint256 amount);
-    event RecievedLidoWithdrawal(uint256 amount);
     event SetAutoBridge(bool autoBridge);
+    event ReceivedStakingManagerWithdrawal(uint256 amount);
     event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
     event SetL2Eth(address l2Eth);
     event SetL2USD(address l2USD);
@@ -73,8 +73,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
     receive() external payable {
-        if (msg.sender == address(LIDO_WITHDRAWAL_ERC721)) {
-            emit RecievedLidoWithdrawal(msg.value);
+        if (msg.sender == address(stakingManager)) {
+            emit ReceivedStakingManagerWithdrawal(msg.value);
         } else {
             depositEth(msg.sender);
         }

@@ -67,8 +67,9 @@ contract StakingManager is OwnableUpgradeable {
 
     function _withdrawETH(uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
-        if (address(strategy) != address(0)) strategy.withdraw(amount);
-        (bool success, bytes memory data) = depositor.call{ value: amount }("");
+        uint256 withdrawnAmount;
+        if (address(strategy) != address(0)) withdrawnAmount = strategy.withdraw(amount);
+        (bool success, bytes memory data) = depositor.call{ value: withdrawnAmount }("");
         if (!success) {
             revert TransferFailed(data);
         }
