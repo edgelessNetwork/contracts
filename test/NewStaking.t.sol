@@ -131,17 +131,17 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         edgelessDeposit.depositEth{ value: amount }(depositor);
         assertEq(wrappedEth.balanceOf(depositor), amount);
         assertEq(address(depositor).balance, 0 ether);
-
-        // edgelessDeposit.withdrawEth(depositor, amount);
-        // assertEq(wrappedEth.balanceOf(depositor), 0 ether);
-        // assertEq(address(depositor).balance, amount);
     }
 
     function test_DAIDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e18, 1e25);
         deal(address(DAI), depositor, amount);
-        vm.startPrank(depositor);
+        depositAndWithdrawUSD(depositor, address(DAI), amount);
+    }
 
+    // TODO: Add more checks for all variables: sDAI balance, DAI balance, etc.
+    function depositAndWithdrawUSD(address depositor, address asset, uint256 amount) internal {
+        vm.startPrank(depositor);
         // Deposit DAI
         DAI.approve(address(edgelessDeposit), amount);
         edgelessDeposit.depositDAI(depositor, amount);
