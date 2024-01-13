@@ -136,11 +136,51 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     function test_DAIDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e18, 1e25);
         deal(address(DAI), depositor, amount);
-        depositAndWithdrawUSD(depositor, address(DAI), amount);
+        depositAndWithdrawDAI(depositor, address(DAI), amount);
     }
 
+    function test_USDCDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e6, 1e9);
+        deal(address(USDC), depositor, amount);
+        depositAndWithdrawUSDC(depositor, address(USDC), amount);
+    }
+
+    function test_USDTDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e6, 1e9);
+        deal(address(USDT), depositor, amount);
+        depositAndWithdrawUSDT(depositor, address(USDT), amount);
+    }
+
+    function test_EthDepositAndWithdraw(uint256 amount) external { }
+
+    function test_USDCPermitDepositAndWithdraw(uint256 amount) external { }
+    function test_DAIPermitDepositAndWithdraw(uint256 amount) external { }
+
+    function test_DAIDepositAndWithdrawWithOverflow(uint256 amount) external { }
+
+    function test_EthMint(uint256 amount) external { }
+    function test_DAIMint(uint256 amount) external { }
+
+    function test_EthMintWithDeposit(uint256 amount) external { }
+    function test_DAIMintWithDeposit(uint256 amount) external { }
+    function test_LidoRequestWithdrawal(uint64 amount) external { }
+    function test_LidoClaimWithdrawal(uint64 amount) external { }
+    function test_setStakerWithPermission() external { }
+    function test_setStakerWithoutPermission() external { }
+    function test_setL1StandardBridgeWithPermission() external { }
+    function test_setL1StandardBridgeWithoutPermission() external { }
+    function test_setAutoBridgeWithPermission() external { }
+    function test_setAutoBridgeWithoutPermission() external { }
+    function test_setActiveStrategyWithPermission() external { }
+    function test_setActiveStrategyWithoutPermission() external { }
+    function test_setAutoStakeWithPermission() external { }
+    function test_setAutoStakeWithoutPermission() external { }
+    function test_setL2EthAsOwner() external { }
+    function test_setL2EthAsNonOwner() external { }
+    function test_upgradability() { }
+
     // TODO: Add more checks for all variables: sDAI balance, DAI balance, etc.
-    function depositAndWithdrawUSD(address depositor, address asset, uint256 amount) internal {
+    function depositAndWithdrawDAI(address depositor, address asset, uint256 amount) internal {
         vm.startPrank(depositor);
         // Deposit DAI
         DAI.approve(address(edgelessDeposit), amount);
