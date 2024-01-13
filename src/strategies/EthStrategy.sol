@@ -13,6 +13,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error TransferFailed(bytes data);
 
     address public stakingManager;
+    bool public autoStake;
 
     event EthStaked(uint256 amount);
     event EthWithdrawn(uint256 amount);
@@ -21,10 +22,14 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
+        autoStake = true;
         __Ownable_init(_owner);
     }
 
     function deposit(uint256 amount) external payable {
+        if (!autoStake) {
+            return;
+        }
         if (amount > address(this).balance) {
             revert InsufficientFunds();
         }
@@ -47,6 +52,22 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         return withdrawnAmount;
     }
 
+    function ownerDeposit(uint256 amount) external payable onlyOwner {
+        if (amount > address(this).balance) {
+            revert InsufficientFunds();
+        }
+        LIDO.submit{ value: amount }(address(0));
+        emit EthStaked(amount);
+    }
+
+    function ownerWithdraw(uint256 amount) external onlyOwner {
+        (bool success, bytes memory data) = stakingManager.call{ value: amount }("");
+        if (!success) {
+            revert TransferFailed(data);
+        }
+        emit EthWithdrawn(amount);
+    }
+
     function underlyingAsset() external pure returns (address) {
         return address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     }
@@ -60,7 +81,6 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     // ------------- Withdrawal helper functions -------------
-
     function requestLidoWithdrawal(uint256[] calldata amount)
         external
         onlyOwner
@@ -80,5 +100,13 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         uint256[] memory _hints = LIDO_WITHDRAWAL_ERC721.findCheckpointHints(requestIds, 1, lastCheckpointIndex);
         LIDO_WITHDRAWAL_ERC721.claimWithdrawals(requestIds, _hints);
         emit ClaimedLidoWithdrawals(requestIds);
+    }
+
+    function setStakingManager(address _stakingManager) external onlyOwner {
+        stakingManager = _stakingManager;
+    }
+
+    function setAutoStake(bool _autoStake) external onlyOwner {
+        autoStake = _autoStake;
     }
 }

@@ -18,6 +18,7 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
     event DaiWithdrawn(uint256 amount);
 
     address public stakingManager;
+    bool public autoStake;
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -25,6 +26,9 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     function deposit(uint256 amount) external payable {
+        if (!autoStake) {
+            return;
+        }
         DAI.transferFrom(msg.sender, address(this), amount);
         DAI.approve(address(DSR_MANAGER), amount);
         DSR_MANAGER.join(address(this), amount);
@@ -36,6 +40,20 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
         DSR_MANAGER.exit(address(this), amount);
         uint256 balanceAfter = DAI.balanceOf(address(this));
         DAI.transfer(stakingManager, DAI.balanceOf(address(this)));
+        emit DaiWithdrawn(withdrawnAmount);
+        return balanceAfter - balanceBefore;
+    }
+
+    function ownerDeposit(uint256 amount) external payable onlyOwner {
+        DAI.approve(address(DSR_MANAGER), amount);
+        DSR_MANAGER.join(address(this), amount);
+        emit DaiStaked(amount);
+    }
+
+    function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
+        uint256 balanceBefore = DAI.balanceOf(address(this));
+        DSR_MANAGER.exit(address(this), amount);
+        uint256 balanceAfter = DAI.balanceOf(address(this));
         emit DaiWithdrawn(withdrawnAmount);
         return balanceAfter - balanceBefore;
     }
@@ -52,5 +70,13 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function underlyingAssetAmount() external returns (uint256) {
         return DAI.balanceOf(address(this)) + DSR_MANAGER.daiBalance(address(this));
+    }
+
+    function setStakingManager(address _stakingManager) external onlyOwner {
+        stakingManager = _stakingManager;
+    }
+
+    function setAutoStake(bool _autoStake) external onlyOwner {
+        autoStake = _autoStake;
     }
 }
