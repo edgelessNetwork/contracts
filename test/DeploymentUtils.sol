@@ -26,6 +26,11 @@ import { DAI } from "../src/Constants.sol";
 import { Permit, SigUtils } from "./SigUtils.sol";
 
 abstract contract DeploymentUtils is PRBTest {
+    /**
+     * @dev Deploy the staking manager, Edgeless Deposit, Eth Lido Strategy, and Dai Staking Strategy
+     * This also sets the two staking strategies as active in the staking manager
+     * autoStake is set to true, and autoBridge is set to false
+     */
     function deployContracts(
         address owner,
         address staker
@@ -70,5 +75,11 @@ abstract contract DeploymentUtils is PRBTest {
         wrappedUSD = edgelessDeposit.wrappedUSD();
         edgelessDeposit.setAutoBridge(false);
         vm.stopPrank();
+
+        vm.label(address(wrappedEth), "wrappedEth");
+        vm.label(address(wrappedUSD), "wrappedUSD");
+        vm.label(address(edgelessDeposit), "edgelessDeposit");
+        vm.label(owner, "owner");
+        vm.label(staker, "depositor");
     }
 }

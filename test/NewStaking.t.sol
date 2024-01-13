@@ -42,13 +42,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     IStakingStrategy internal ethStakingStrategy;
     IStakingStrategy internal daiStakingStrategy;
 
-    IUSDC public constant USDC = IUSDC(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    IUSDT public constant USDT = IUSDT(0xdAC17F958D2ee523a2206206994597C13D831ec7);
-    IDAI public constant DAI = IDAI(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    ILido public constant LIDO = ILido(0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84);
-    IWithdrawalQueueERC721 public constant LIDO_WITHDRAWAL_ERC721 =
-        IWithdrawalQueueERC721(0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1);
-
     address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
@@ -70,13 +63,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
         (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
             deployContracts(owner, owner);
-
-        vm.label(address(wrappedEth), "wrappedEth");
-        vm.label(address(wrappedUSD), "wrappedUSD");
-        vm.label(address(edgelessDeposit), "edgelessDeposit");
-        vm.label(owner, "owner");
-        vm.label(depositor, "depositor");
-        vm.stopPrank();
     }
 
     function mintStETH(address to, uint256 amount) internal {
