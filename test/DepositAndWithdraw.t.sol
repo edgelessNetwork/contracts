@@ -102,12 +102,32 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     }
 
     function test_USDCPermitDepositAndWithdraw(uint256 amount) external { }
-    function test_DAIPermitDepositAndWithdraw(uint256 amount) external { }
 
-    function test_DAIDepositAndWithdrawWithOverflow(uint256 amount) external { }
-    function test_USDCDepositAndWithdrawWithOverflow(uint256 amount) external { }
-    function test_USDTDepositAndWithdrawWithOverflow(uint256 amount) external { }
-    function test_ETHDepositAndWithdrawWithOverflow(uint256 amount) external { }
+    function test_DAIPermitDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e25);
+        deal(address(DAI), depositor, amount);
+        vm.startPrank(depositor);
+        // Deposit DAI
+        Permit memory permit = Permit({
+            owner: depositor,
+            spender: address(edgelessDeposit),
+            value: amount,
+            nonce: DAI.nonces(depositor),
+            deadline: type(uint256).max,
+            allowed: true
+        });
+        bytes32 digest = permit.getTypedDaiDataHashWithPermitTypeHash(DAI.DOMAIN_SEPARATOR(), DAI.PERMIT_TYPEHASH());
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
+        edgelessDeposit.depositDAIWithPermit(permit.owner, permit.value, permit.nonce, permit.deadline, v, r, s);
+
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, amount - 2);
+        assertAlmostEq(DAI.balanceOf(depositor), amount, 2, "Depositor should have `amount` of DAI afterwithdrawing");
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI afterwithdrawing");
+    }
 
     // TODO: Add more checks for all variables: sDAI balance, DAI balance, etc.
     function depositAndWithdrawDAI(address depositor, address asset, uint256 amount) internal {
