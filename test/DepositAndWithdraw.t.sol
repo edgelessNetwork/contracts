@@ -74,9 +74,9 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     }
 
     function test_USDTDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e6, 1e9);
+        amount = bound(amount, 1e6, 1e13);
         deal(address(USDT), depositor, amount);
-        // depositAndWithdrawUSDT(depositor, address(USDT), amount);
+        depositAndWithdrawUSDT(depositor, amount);
     }
 
     function test_EthDepositAndWithdraw(uint256 amount) external { }
@@ -125,9 +125,38 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
     }
 
+    function depositAndWithdrawUSDT(address depositor, uint256 amount) internal {
+        vm.startPrank(depositor);
+        // Deposit DAI
+        USDT.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositUSDT(depositor, amount, amount);
+
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, wrappedUSD.balanceOf(depositor) - 2);
+        assertTrue(
+            isWithinPercentage(amount * 10 ** 12, DAI.balanceOf(depositor), 1),
+            "Depositor should have `amount` of DAI after withdrawing - account for USDT <> DAI decimals"
+        );
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
+    }
+
     function mintStETH(address to, uint256 amount) internal {
         vm.startPrank(STETH_WHALE);
         LIDO.transfer(to, amount);
         vm.stopPrank();
+    }
+
+    function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
+        require(percentage > 0 && percentage <= 100, "Percentage must be between 1 and 100");
+
+        // Calculate the margin of error
+        uint256 margin = (value1 * percentage) / 100;
+
+        // Check if value2 is within the acceptable range
+        return value2 >= value1 - margin && value2 <= value1 + margin;
     }
 }
