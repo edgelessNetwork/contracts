@@ -6,6 +6,6 @@ interface IStakingStrategy {
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount);
 
     function underlyingAsset() external view returns (address);
-    function underlyingAssetAmount() external view returns (uint256);
-    function underlyingAssetAmountNoUpdate() external returns (uint256);
+    function underlyingAssetAmountNoUpdate() external view returns (uint256);
+    function underlyingAssetAmount() external returns (uint256);
 }

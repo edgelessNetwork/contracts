@@ -10,10 +10,17 @@ import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error InsufficientFunds();
+    error TransferFailed(bytes data);
 
     address public stakingManager;
 
+    event EthStaked(uint256 amount);
+    event EthWithdrawn(uint256 amount);
+    event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
+    event ClaimedLidoWithdrawals(uint256[] requestIds);
+
     function initialize(address _owner, address _stakingManager) external initializer {
+        stakingManager = _stakingManager;
         __Ownable_init(_owner);
     }
 
@@ -22,7 +29,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
             revert InsufficientFunds();
         }
         LIDO.submit{ value: amount }(address(0));
-        // emit EthStaked(amount);
+        emit EthStaked(amount);
     }
 
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
@@ -32,10 +39,27 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         } else {
             withdrawnAmount = amount;
         }
-        payable(stakingManager).transfer(withdrawnAmount);
-        // emit EthWithdrawn(withdrawnAmount);
+        (bool success, bytes memory data) = stakingManager.call{ value: withdrawnAmount }("");
+        if (!success) {
+            revert TransferFailed(data);
+        }
+        emit EthWithdrawn(withdrawnAmount);
         return withdrawnAmount;
     }
+
+    function underlyingAsset() external pure returns (address) {
+        return address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    }
+
+    function underlyingAssetAmountNoUpdate() public view returns (uint256) {
+        return address(this).balance + LIDO.balanceOf(address(this));
+    }
+
+    function underlyingAssetAmount() external view returns (uint256) {
+        return underlyingAssetAmountNoUpdate();
+    }
+
+    // ------------- Withdrawal helper functions -------------
 
     function requestLidoWithdrawal(uint256[] calldata amount)
         external
@@ -48,17 +72,13 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
         requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amount, address(this));
-        // emit RequestedLidoWithdrawals(requestIds, amount);
+        emit RequestedLidoWithdrawals(requestIds, amount);
     }
 
     function claimLidoWithdrawals(uint256[] calldata requestIds) external onlyOwner {
         uint256 lastCheckpointIndex = LIDO_WITHDRAWAL_ERC721.getLastCheckpointIndex();
         uint256[] memory _hints = LIDO_WITHDRAWAL_ERC721.findCheckpointHints(requestIds, 1, lastCheckpointIndex);
         LIDO_WITHDRAWAL_ERC721.claimWithdrawals(requestIds, _hints);
-        // emit ClaimedLidoWithdrawals(requestIds);
+        emit ClaimedLidoWithdrawals(requestIds);
     }
-
-    function underlyingAsset() external view returns (address) { }
-    function underlyingAssetAmount() external view returns (uint256) { }
-    function underlyingAssetAmountNoUpdate() external returns (uint256) { }
 }

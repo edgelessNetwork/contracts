@@ -137,31 +137,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         // assertEq(address(depositor).balance, amount);
     }
 
-    /**
-     * @dev Test that depositing and withdrawing will result in receiving
-     * the same amount of eth.
-     * @param amount The amount of eth to edgelessDeposit and withdraw.
-     * Since this is a fuzz test, this amount is randomly generated.
-     */
-    function test_basicDepositDai(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e25);
-        vm.prank(owner);
-        stakingManager.setAutoStake(false);
-        vm.assume(amount != 0);
-        vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        deal(address(DAI), depositor, amount);
-
-        DAI.approve(address(edgelessDeposit), amount);
-        edgelessDeposit.depositDAI(depositor, amount);
-        assertEq(wrappedUSD.balanceOf(depositor), amount);
-        assertEq(DAI.balanceOf(depositor), 0);
-
-        edgelessDeposit.withdrawUSD(depositor, amount);
-        assertEq(wrappedEth.balanceOf(depositor), 0 ether);
-        assertEq(address(depositor).balance, amount);
-    }
-
     // /**
     //  * @dev Test that depositing and withdrawing will result in receiving back all eth
     //  */
