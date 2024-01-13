@@ -14,6 +14,8 @@ import { console2 } from "forge-std/src/console2.sol";
  */
 
 contract StakingManager is OwnableUpgradeable {
+    error OnlyStaker(address sender);
+
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
     address public staker;
@@ -24,7 +26,9 @@ contract StakingManager is OwnableUpgradeable {
     error TransferFailed(bytes data);
 
     modifier onlyStaker() {
-        require(msg.sender == staker, "Sender is not staker");
+        if (msg.sender != staker) {
+            revert OnlyStaker(msg.sender);
+        }
         _;
     }
 
@@ -63,7 +67,7 @@ contract StakingManager is OwnableUpgradeable {
 
     function _withdrawETH(uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
-        strategy.withdraw(amount);
+        if (address(strategy) != address(0)) strategy.withdraw(amount);
         (bool success, bytes memory data) = depositor.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);
@@ -72,7 +76,10 @@ contract StakingManager is OwnableUpgradeable {
 
     function _withdrawERC20(address asset, uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(asset);
-        uint256 withdrawnAmount = strategy.withdraw(amount);
+        uint256 withdrawnAmount;
+        if (address(strategy) != address(0)) {
+            withdrawnAmount = strategy.withdraw(amount);
+        }
         IERC20(asset).transfer(depositor, withdrawnAmount);
     }
 
@@ -114,6 +121,17 @@ contract StakingManager is OwnableUpgradeable {
             IStakingStrategy strategy = strategies[asset][i];
             total += strategy.underlyingAssetAmountNoUpdate();
         }
+    }
+
+    function removeStrategy(address asset, uint256 index) external onlyOwner {
+        IStakingStrategy strategy = strategies[asset][index];
+        uint256 lastIndex = strategies[asset].length - 1;
+        strategies[asset][index] = strategies[asset][lastIndex];
+        strategies[asset].pop();
+        if (activeStrategyIndex[asset] == index) {
+            activeStrategyIndex[asset] = lastIndex;
+        }
+        strategy.withdraw(strategy.underlyingAssetAmount());
     }
 
     receive() external payable { }
