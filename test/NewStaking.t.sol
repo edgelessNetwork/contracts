@@ -83,6 +83,8 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         ethStakingStrategy =
             IStakingStrategy(payable(address(new ERC1967Proxy(ethStakingStrategyImpl, ethStakingStrategyData))));
 
+        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), ethStakingStrategy);
+        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
         wrappedEth = edgelessDeposit.wrappedEth();
         wrappedUSD = edgelessDeposit.wrappedUSD();
         edgelessDeposit.setAutoBridge(false);
