@@ -2,7 +2,7 @@
 pragma solidity >=0.8.23;
 
 interface IStakingStrategy {
-    function deposit(uint256 amount) external;
+    function deposit(uint256 amount) external payable;
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount);
 
     function underlyingAsset() external view returns (address);
