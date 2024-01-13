@@ -79,7 +79,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
-
+        stakingManager.setDepositor(address(edgelessDeposit));
         address ethStakingStrategyImpl = address(new EthStrategy());
         bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
         ethStakingStrategy =
@@ -143,7 +143,8 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
      * @param amount The amount of eth to edgelessDeposit and withdraw.
      * Since this is a fuzz test, this amount is randomly generated.
      */
-    function test_basicDepositDai(uint64 amount) external {
+    function test_basicDepositDai(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e25);
         vm.prank(owner);
         stakingManager.setAutoStake(false);
         vm.assume(amount != 0);
@@ -156,9 +157,9 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         assertEq(wrappedUSD.balanceOf(depositor), amount);
         assertEq(DAI.balanceOf(depositor), 0);
 
-        // edgelessDeposit.withdrawEth(depositor, amount);
-        // assertEq(wrappedEth.balanceOf(depositor), 0 ether);
-        // assertEq(address(depositor).balance, amount);
+        edgelessDeposit.withdrawUSD(depositor, amount);
+        assertEq(wrappedEth.balanceOf(depositor), 0 ether);
+        assertEq(address(depositor).balance, amount);
     }
 
     // /**
@@ -247,25 +248,23 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     // withdrawing");
     // }
 
-    // function test_DAIDepositAndWithdraw(uint256 amount) external {
-    //     amount = bound(amount, 1e18, 1e25);
-    //     deal(address(DAI), depositor, amount);
-    //     vm.startPrank(depositor);
+    function test_DAIDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e25);
+        deal(address(DAI), depositor, amount);
+        vm.startPrank(depositor);
 
-    //     // Deposit DAI
-    //     DAI.approve(address(edgelessDeposit), amount);
-    //     edgelessDeposit.depositDAI(depositor, amount);
+        // Deposit DAI
+        DAI.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDAI(depositor, amount);
 
-    //     // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
-    //     edgelessDeposit.withdrawUSD(depositor, amount - 2);
-    //     assertAlmostEq(DAI.balanceOf(depositor), amount, 2, "Depositor should have `amount` of DAI after
-    // withdrawing");
-    //     assertAlmostEq(
-    //         wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
-    //     );
-    //     assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after
-    // withdrawing");
-    // }
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, amount - 2);
+        assertAlmostEq(DAI.balanceOf(depositor), amount, 2, "Depositor should have `amount` of DAI afterwithdrawing");
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI afterwithdrawing");
+    }
 
     // function test_StEthPermitDeposit(uint64 amount) external {
     //     vm.assume(amount > 1 gwei);

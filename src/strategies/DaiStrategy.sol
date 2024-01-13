@@ -8,6 +8,8 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
+import { console2 } from "forge-std/src/console2.sol";
+
 contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
     error InsufficientFunds();
 
@@ -27,9 +29,12 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
         uint256 balanceBefore = DAI.balanceOf(address(this));
-        DSR_MANAGER.exit(stakingManager, amount);
+        DSR_MANAGER.exit(address(this), amount);
+        uint256 balanceAfter = DAI.balanceOf(address(this));
+        console2.log("stakingManager", stakingManager);
+        DAI.transfer(stakingManager, DAI.balanceOf(address(this)));
         // emit DaiWithdrawn(withdrawnAmount);
-        return DAI.balanceOf(address(this)) - balanceBefore;
+        return balanceAfter - balanceBefore;
     }
 
     function underlyingAsset() external view returns (address) { }

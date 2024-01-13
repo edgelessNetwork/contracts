@@ -6,6 +6,7 @@ import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { console2 } from "forge-std/src/console2.sol";
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
  * Upon withdrawal, all assets go to the depositor.
@@ -72,11 +73,16 @@ contract StakingManager is OwnableUpgradeable {
     function _withdrawERC20(address asset, uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(asset);
         uint256 withdrawnAmount = strategy.withdraw(amount);
+        console2.log("withdrawnAmount", withdrawnAmount);
         IERC20(asset).transfer(depositor, withdrawnAmount);
     }
 
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
+    }
+
+    function setDepositor(address _depositor) external onlyOwner {
+        depositor = _depositor;
     }
 
     /// ----------------- Helper Functions -----------------
