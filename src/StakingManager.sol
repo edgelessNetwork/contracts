@@ -72,8 +72,9 @@ contract StakingManager is OwnableUpgradeable {
 
     function _withdrawERC20(address asset, uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(asset);
+        console2.log("balanceBefore", IERC20(asset).balanceOf(address(this)));
         uint256 withdrawnAmount = strategy.withdraw(amount);
-        console2.log("withdrawnAmount", withdrawnAmount);
+        console2.log("withdrawnAmount", withdrawnAmount, "actual balance", IERC20(asset).balanceOf(address(this)));
         IERC20(asset).transfer(depositor, withdrawnAmount);
     }
 

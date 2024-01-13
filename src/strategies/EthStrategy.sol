@@ -13,7 +13,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error TransferFailed(bytes data);
 
     address public stakingManager;
-    bool public autoStake = true;
+    bool public autoStake;
 
     event EthStaked(uint256 amount);
     event EthWithdrawn(uint256 amount);
@@ -22,6 +22,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
+        autoStake = true;
         __Ownable_init(_owner);
     }
 
