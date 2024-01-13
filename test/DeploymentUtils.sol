@@ -79,7 +79,5 @@ abstract contract DeploymentUtils is PRBTest {
         vm.label(address(wrappedEth), "wrappedEth");
         vm.label(address(wrappedUSD), "wrappedUSD");
         vm.label(address(edgelessDeposit), "edgelessDeposit");
-        vm.label(owner, "owner");
-        vm.label(staker, "depositor");
     }
 }

@@ -6,7 +6,6 @@ import { PRBTest } from "@prb/test/src/PRBTest.sol";
 import { console2 } from "forge-std/src/console2.sol";
 import { StdCheats } from "forge-std/src/StdCheats.sol";
 import { StdUtils } from "forge-std/src/StdUtils.sol";
-import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 import { EdgelessDeposit } from "../src/EdgelessDeposit.sol";
 import { StakingManager } from "../src/StakingManager.sol";
@@ -24,10 +23,7 @@ import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 import { DeploymentUtils } from "./DeploymentUtils.sol";
-
-interface IERC20 {
-    function balanceOf(address account) external view returns (uint256);
-}
+import { LIDO, DAI, USDC, USDT } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
@@ -65,31 +61,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             deployContracts(owner, owner);
     }
 
-    function mintStETH(address to, uint256 amount) internal {
-        vm.startPrank(STETH_WHALE);
-        LIDO.transfer(to, amount);
-        vm.stopPrank();
-    }
-
-    /**
-     * @dev Test that depositing and withdrawing will result in receiving
-     * the same amount of eth.
-     * @param amount The amount of eth to edgelessDeposit and withdraw.
-     * Since this is a fuzz test, this amount is randomly generated.
-     */
-    function test_basicDeposit(uint64 amount) external {
-        vm.prank(owner);
-        stakingManager.setAutoStake(false);
-        vm.assume(amount != 0);
-        vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
-
-        edgelessDeposit.depositEth{ value: amount }(depositor);
-        assertEq(wrappedEth.balanceOf(depositor), amount);
-        assertEq(address(depositor).balance, 0 ether);
-    }
-
     function test_DAIDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e18, 1e25);
         deal(address(DAI), depositor, amount);
@@ -97,9 +68,9 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     }
 
     function test_USDCDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e6, 1e9);
+        amount = bound(amount, 1e6, 1e13);
         deal(address(USDC), depositor, amount);
-        // depositAndWithdrawUSDC(depositor, address(USDC), amount);
+        depositAndWithdrawUSDC(depositor, amount);
     }
 
     function test_USDTDepositAndWithdraw(uint256 amount) external {
@@ -109,32 +80,13 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     }
 
     function test_EthDepositAndWithdraw(uint256 amount) external { }
-
     function test_USDCPermitDepositAndWithdraw(uint256 amount) external { }
     function test_DAIPermitDepositAndWithdraw(uint256 amount) external { }
 
     function test_DAIDepositAndWithdrawWithOverflow(uint256 amount) external { }
-
-    function test_EthMint(uint256 amount) external { }
-    function test_DAIMint(uint256 amount) external { }
-
-    function test_EthMintWithDeposit(uint256 amount) external { }
-    function test_DAIMintWithDeposit(uint256 amount) external { }
-    function test_LidoRequestWithdrawal(uint64 amount) external { }
-    function test_LidoClaimWithdrawal(uint64 amount) external { }
-    function test_setStakerWithPermission() external { }
-    function test_setStakerWithoutPermission() external { }
-    function test_setL1StandardBridgeWithPermission() external { }
-    function test_setL1StandardBridgeWithoutPermission() external { }
-    function test_setAutoBridgeWithPermission() external { }
-    function test_setAutoBridgeWithoutPermission() external { }
-    function test_setActiveStrategyWithPermission() external { }
-    function test_setActiveStrategyWithoutPermission() external { }
-    function test_setAutoStakeWithPermission() external { }
-    function test_setAutoStakeWithoutPermission() external { }
-    function test_setL2EthAsOwner() external { }
-    function test_setL2EthAsNonOwner() external { }
-    function test_upgradability() external { }
+    function test_USDCDepositAndWithdrawWithOverflow(uint256 amount) external { }
+    function test_USDTDepositAndWithdrawWithOverflow(uint256 amount) external { }
+    function test_ETHDepositAndWithdrawWithOverflow(uint256 amount) external { }
 
     // TODO: Add more checks for all variables: sDAI balance, DAI balance, etc.
     function depositAndWithdrawDAI(address depositor, address asset, uint256 amount) internal {
@@ -150,5 +102,32 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
         );
         assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI afterwithdrawing");
+    }
+
+    function depositAndWithdrawUSDC(address depositor, uint256 amount) internal {
+        vm.startPrank(depositor);
+        // Deposit DAI
+        USDC.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositUSDC(depositor, amount);
+
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, wrappedUSD.balanceOf(depositor) - 2);
+        assertAlmostEq(
+            DAI.balanceOf(depositor),
+            amount * 10 ** 12,
+            2,
+            "Depositor should have `amount` of DAI after withdrawing - account for USDC <> DAI decimals"
+        );
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
+    }
+
+    function mintStETH(address to, uint256 amount) internal {
+        vm.startPrank(STETH_WHALE);
+        LIDO.transfer(to, amount);
+        vm.stopPrank();
     }
 }
