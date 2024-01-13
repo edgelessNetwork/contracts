@@ -13,6 +13,7 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
@@ -86,7 +87,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     function depositEth(address to) public payable {
         uint256 amount = _depositEth(msg.value);
         _mintWrappedEth(to, amount);
-        stakingManager.stake(stakingManager.ETH_ADDRESS(), amount);
+        stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
         _bridgeToL2(wrappedEth, l2ETH, to, amount);
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
@@ -100,6 +101,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
         uint256 mintAmount = _depositStEth(stEthAmount);
         // Don't stake stEth, just mint wrapped tokens
         _mintWrappedEth(to, mintAmount);
+        IERC20(address(LIDO)).approve(address(stakingManager), stEthAmount);
         stakingManager.stake(address(LIDO), stEthAmount);
         _bridgeToL2(wrappedEth, l2ETH, to, mintAmount);
         emit DepositStEth(to, msg.sender, stEthAmount, mintAmount);
@@ -114,6 +116,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     function depositUSDC(address to, uint256 usdcAmount) public {
         uint256 mintAmount = _depositUSDC(usdcAmount);
         _mintWrappedUSD(to, mintAmount);
+        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
         stakingManager.stake(address(DAI), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
         emit DepositUSDC(to, msg.sender, usdcAmount, mintAmount);
@@ -129,6 +132,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     function depositUSDT(address to, uint256 usdtAmount, uint256 minDAIAmount) public {
         uint256 mintAmount = _depositUSDT(usdtAmount, minDAIAmount);
         _mintWrappedUSD(to, mintAmount);
+        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
         stakingManager.stake(address(DAI), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
         emit DepositUSDT(to, msg.sender, usdtAmount, mintAmount);
@@ -142,6 +146,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     function depositDAI(address to, uint256 daiAmount) public {
         uint256 mintAmount = _depositDAI(daiAmount);
         _mintWrappedUSD(to, mintAmount);
+        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
         stakingManager.stake(address(DAI), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
         emit DepositDAI(to, msg.sender, daiAmount, mintAmount);
@@ -240,7 +245,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     function withdrawUSD(address to, uint256 amount) external {
         wrappedUSD.burn(msg.sender, amount);
         stakingManager.withdraw(address(DAI), amount);
-        DSR_MANAGER.exit(to, amount);
+        IERC20(address(DAI)).transfer(to, amount);
         emit WithdrawUSD(msg.sender, to, amount, amount);
     }
 

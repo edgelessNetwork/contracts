@@ -28,9 +28,9 @@ contract StakingManager is Ownable2Step {
 
     constructor(address _owner, address _staker) Ownable(_owner) { }
 
-    function stake(address asset, uint256 amount) external onlyStaker {
+    function stake(address asset, uint256 amount) external payable onlyStaker {
         if (asset == ETH_ADDRESS) {
-            _stakeETH(amount);
+            _stakeETH(msg.value);
         } else {
             _stakeERC20(asset, amount);
         }
@@ -43,6 +43,7 @@ contract StakingManager is Ownable2Step {
 
     function _stakeERC20(address asset, uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(asset);
+        IERC20(asset).approve(address(strategy), amount);
         strategy.deposit(amount);
     }
 
