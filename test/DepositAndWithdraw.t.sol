@@ -101,7 +101,38 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped eth after withdrawing");
     }
 
-    function test_USDCPermitDepositAndWithdraw(uint256 amount) external { }
+    function test_USDCPermitDepositAndWithdraw(uint256 amount) external {
+        amount = bound(amount, 1e6, 1e13);
+        deal(address(USDC), depositor, amount);
+        vm.startPrank(depositor);
+        // Deposit USDC
+
+        Permit memory permit = Permit({
+            owner: depositor,
+            spender: address(edgelessDeposit),
+            value: amount,
+            nonce: USDC.nonces(depositor),
+            deadline: type(uint256).max,
+            allowed: true
+        });
+        bytes32 digest = permit.getTypedDataHash(USDC.DOMAIN_SEPARATOR());
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
+        edgelessDeposit.depositUSDCWithPermit(permit.owner, permit.value, permit.deadline, v, r, s);
+
+        // Withdraw DAI by burning wrapped stablecoin - sDAI rounds down, so you lose 2 wei worth of dai(not 2 dai)
+        edgelessDeposit.withdrawUSD(depositor, wrappedUSD.balanceOf(depositor) - 2);
+        assertAlmostEq(
+            DAI.balanceOf(depositor),
+            amount * 10 ** 12,
+            2,
+            "Depositor should have `amount` of DAI after withdrawing - account for USDC <> DAI decimals"
+        );
+        assertAlmostEq(
+            wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
+        );
+        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(DAI.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 DAI after withdrawing");
+    }
 
     function test_DAIPermitDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e18, 1e25);
