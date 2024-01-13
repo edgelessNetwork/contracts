@@ -55,7 +55,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         });
 
         (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
-            deployContracts(owner, owner);
+            deployContracts(owner, staker);
     }
 
     // ----------- Edgeless Deposit ------------
@@ -80,6 +80,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.expectRevert();
         edgelessDeposit.setL2Eth(randomL2Eth);
     }
+
     function test_setL2USD(address randomL2Usd, address randomUser) external {
         vm.assume(randomL2Usd != address(0));
         vm.prank(owner);
@@ -89,7 +90,8 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.prank(randomUser);
         vm.expectRevert();
         edgelessDeposit.setL2USD(randomL2Usd);
-     }
+    }
+
     function test_setAutoBridge(bool autoBridge, address randomUser) external {
         vm.prank(owner);
         edgelessDeposit.setAutoBridge(autoBridge);
@@ -101,7 +103,21 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     // ----------- Staking Manager ------------
-    function test_stake() external { }
+    function test_stake(uint256 amount, address randomUser) external {
+        amount = bound(amount, 1e18, 1e23);
+        address ethAddress = stakingManager.ETH_ADDRESS();
+        vm.deal(address(edgelessDeposit), amount);
+        vm.prank(owner);
+        stakingManager.setAutoStake(false);
+        vm.prank(address(edgelessDeposit));
+        stakingManager.stake{ value: amount }(ethAddress, amount);
+
+        vm.deal(randomUser, amount);
+        vm.expectRevert();
+        vm.prank(randomUser);
+        stakingManager.stake{ value: amount }(ethAddress, amount);
+    }
+
     function test_withdraw() external { }
     function test_setStaker() external { }
     function test_setDepositor() external { }
