@@ -130,8 +130,25 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.withdraw(ethAddress, 0);
     }
 
-    function test_setStaker() external { }
-    function test_setDepositor() external { }
+    function test_setStaker(address randomStaker, address randomUser) external {
+        vm.prank(owner);
+        stakingManager.setStaker(randomStaker);
+        assertEq(stakingManager.staker(), randomStaker);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        stakingManager.setStaker(randomStaker);
+    }
+
+    function test_setDepositor(address randomDepositor, address randomUser) external {
+        vm.prank(owner);
+        stakingManager.setDepositor(randomDepositor);
+        assertEq(stakingManager.depositor(), randomDepositor);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        stakingManager.setDepositor(randomDepositor);
+    }
     function test_setAutoStake() external { }
     function test_addStrategy() external { }
     function test_setActiveStrategy() external { }
