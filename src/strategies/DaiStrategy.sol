@@ -41,7 +41,6 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
         DSR_MANAGER.exit(address(this), amount);
         uint256 balanceAfter = DAI.balanceOf(address(this));
         withdrawnAmount = balanceAfter - balanceBefore;
-        console2.log("balanceBefore", balanceBefore, "balanceAfter", balanceAfter);
         DAI.transfer(stakingManager, withdrawnAmount);
         emit DaiWithdrawn(withdrawnAmount);
     }
