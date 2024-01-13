@@ -18,7 +18,7 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
     event DaiWithdrawn(uint256 amount);
 
     address public stakingManager;
-    bool public autoStake;
+    bool public autoStake = true;
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -37,9 +37,11 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
         uint256 balanceBefore = DAI.balanceOf(address(this));
+        console2.log("amount", amount);
         DSR_MANAGER.exit(address(this), amount);
+        console2.log("balanceBefore", balanceBefore);
         uint256 balanceAfter = DAI.balanceOf(address(this));
-        DAI.transfer(stakingManager, DAI.balanceOf(address(this)));
+        DAI.transfer(stakingManager, amount);
         emit DaiWithdrawn(withdrawnAmount);
         return balanceAfter - balanceBefore;
     }

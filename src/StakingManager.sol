@@ -103,5 +103,19 @@ contract StakingManager is OwnableUpgradeable {
         return strategies[asset][activeStrategyIndex[asset]];
     }
 
+    function getAssetTotal(address asset) external returns (uint256 total) {
+        for (uint256 i = 0; i < strategies[asset].length; i++) {
+            IStakingStrategy strategy = strategies[asset][i];
+            total += strategy.underlyingAssetAmount();
+        }
+    }
+
+    function getAssetTotalNoUpdate(address asset) external view returns (uint256 total) {
+        for (uint256 i = 0; i < strategies[asset].length; i++) {
+            IStakingStrategy strategy = strategies[asset][i];
+            total += strategy.underlyingAssetAmountNoUpdate();
+        }
+    }
+
     receive() external payable { }
 }

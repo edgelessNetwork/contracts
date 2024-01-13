@@ -13,7 +13,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error TransferFailed(bytes data);
 
     address public stakingManager;
-    bool public autoStake;
+    bool public autoStake = true;
 
     event EthStaked(uint256 amount);
     event EthWithdrawn(uint256 amount);
@@ -22,7 +22,6 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
-        autoStake = true;
         __Ownable_init(_owner);
     }
 
@@ -60,12 +59,13 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         emit EthStaked(amount);
     }
 
-    function ownerWithdraw(uint256 amount) external onlyOwner {
+    function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
         (bool success, bytes memory data) = stakingManager.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);
         }
         emit EthWithdrawn(amount);
+        return amount;
     }
 
     function underlyingAsset() external pure returns (address) {

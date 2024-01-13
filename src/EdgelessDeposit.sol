@@ -298,12 +298,12 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
      * @param amount Amount of wrapped tokens to mint
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        // uint256 maxMint = totalETHBalance() - wrappedEth.totalSupply();
-        // if (maxMint > amount) {
-        //     revert MaxMintExceeded();
-        // }
-        // wrappedEth.mint(to, amount);
-        // emit MintWrappedETH(to, amount);
+        uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
+        if (maxMint > amount) {
+            revert MaxMintExceeded();
+        }
+        wrappedEth.mint(to, amount);
+        emit MintWrappedETH(to, amount);
     }
 
     /**
@@ -313,12 +313,12 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
      * @param amount Amount of wrapped tokens to mint
      */
     function mintUSDBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        // uint256 maxMint = totalUSDBalanceNoUpdate() - wrappedUSD.totalSupply();
-        // if (maxMint > amount) {
-        //     revert MaxMintExceeded();
-        // }
-        // wrappedUSD.mint(to, amount);
-        // emit MintWrappedUSD(to, amount);
+        uint256 maxMint = stakingManager.getAssetTotal(address(DAI)) - wrappedUSD.totalSupply();
+        if (maxMint > amount) {
+            revert MaxMintExceeded();
+        }
+        wrappedUSD.mint(to, amount);
+        emit MintWrappedUSD(to, amount);
     }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
