@@ -80,8 +80,25 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.expectRevert();
         edgelessDeposit.setL2Eth(randomL2Eth);
     }
-    function test_setL2USD() external { }
-    function test_setAutoBridge() external { }
+    function test_setL2USD(address randomL2Usd, address randomUser) external {
+        vm.assume(randomL2Usd != address(0));
+        vm.prank(owner);
+        edgelessDeposit.setL2USD(randomL2Usd);
+        assertEq(address(edgelessDeposit.l2USD()), randomL2Usd);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        edgelessDeposit.setL2USD(randomL2Usd);
+     }
+    function test_setAutoBridge(bool autoBridge, address randomUser) external {
+        vm.prank(owner);
+        edgelessDeposit.setAutoBridge(autoBridge);
+        assertEq(edgelessDeposit.autoBridge(), autoBridge);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        edgelessDeposit.setAutoBridge(autoBridge);
+    }
 
     // ----------- Staking Manager ------------
     function test_stake() external { }
