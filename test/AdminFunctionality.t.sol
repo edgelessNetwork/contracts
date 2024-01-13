@@ -149,8 +149,27 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.expectRevert();
         stakingManager.setDepositor(randomDepositor);
     }
-    function test_setAutoStake() external { }
-    function test_addStrategy() external { }
+
+    function test_setAutoStake(bool autoStake, address randomUser) external {
+        vm.prank(owner);
+        stakingManager.setAutoStake(autoStake);
+        assertEq(stakingManager.autoStake(), autoStake);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        stakingManager.setAutoStake(autoStake);
+    }
+
+    function test_addStrategy(address asset, IStakingStrategy strategy, address randomUser) external {
+        vm.prank(owner);
+        stakingManager.addStrategy(asset, strategy);
+        assertEq(address(stakingManager.strategies(asset, 0)), address(strategy));
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        stakingManager.addStrategy(asset, strategy);
+    }
+
     function test_setActiveStrategy() external { }
     function test_removeStrategy() external { }
 
