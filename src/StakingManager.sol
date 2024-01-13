@@ -96,4 +96,6 @@ contract StakingManager is OwnableUpgradeable {
     function getActiveStrategy(address asset) public view returns (IStakingStrategy) {
         return strategies[asset][activeStrategyIndex[asset]];
     }
+
+    receive() external payable { }
 }

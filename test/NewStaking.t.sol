@@ -12,6 +12,7 @@ import { EdgelessDeposit } from "../src/EdgelessDeposit.sol";
 import { StakingManager } from "../src/StakingManager.sol";
 import { WrappedToken } from "../src/WrappedToken.sol";
 import { EthStrategy } from "../src/strategies/EthStrategy.sol";
+import { DaiStrategy } from "../src/strategies/DaiStrategy.sol";
 
 import { IDAI } from "../src/interfaces/IDAI.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
@@ -38,6 +39,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal ethStakingStrategy;
+    IStakingStrategy internal daiStakingStrategy;
 
     IUSDC public constant USDC = IUSDC(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     IUSDT public constant USDT = IUSDT(0xdAC17F958D2ee523a2206206994597C13D831ec7);
@@ -79,12 +81,19 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         stakingManager.setStaker(address(edgelessDeposit));
 
         address ethStakingStrategyImpl = address(new EthStrategy());
-        bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner));
+        bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
         ethStakingStrategy =
             IStakingStrategy(payable(address(new ERC1967Proxy(ethStakingStrategyImpl, ethStakingStrategyData))));
-
         stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), ethStakingStrategy);
         stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
+
+        address daiStakingStrategyImpl = address(new DaiStrategy());
+        bytes memory daiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));
+        daiStakingStrategy =
+            IStakingStrategy(payable(address(new ERC1967Proxy(daiStakingStrategyImpl, daiStakingStrategyData))));
+        stakingManager.addStrategy(address(DAI), daiStakingStrategy);
+        stakingManager.setActiveStrategy(address(DAI), 0);
+
         wrappedEth = edgelessDeposit.wrappedEth();
         wrappedUSD = edgelessDeposit.wrappedUSD();
         edgelessDeposit.setAutoBridge(false);
@@ -112,6 +121,8 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
      * Since this is a fuzz test, this amount is randomly generated.
      */
     function test_basicDeposit(uint64 amount) external {
+        vm.prank(owner);
+        stakingManager.setAutoStake(false);
         vm.assume(amount != 0);
         vm.startPrank(depositor);
         vm.deal(depositor, amount);
@@ -120,6 +131,30 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils {
         edgelessDeposit.depositEth{ value: amount }(depositor);
         assertEq(wrappedEth.balanceOf(depositor), amount);
         assertEq(address(depositor).balance, 0 ether);
+
+        // edgelessDeposit.withdrawEth(depositor, amount);
+        // assertEq(wrappedEth.balanceOf(depositor), 0 ether);
+        // assertEq(address(depositor).balance, amount);
+    }
+
+    /**
+     * @dev Test that depositing and withdrawing will result in receiving
+     * the same amount of eth.
+     * @param amount The amount of eth to edgelessDeposit and withdraw.
+     * Since this is a fuzz test, this amount is randomly generated.
+     */
+    function test_basicDepositDai(uint64 amount) external {
+        vm.prank(owner);
+        stakingManager.setAutoStake(false);
+        vm.assume(amount != 0);
+        vm.startPrank(depositor);
+        vm.deal(depositor, amount);
+        deal(address(DAI), depositor, amount);
+
+        DAI.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDAI(depositor, amount);
+        assertEq(wrappedUSD.balanceOf(depositor), amount);
+        assertEq(DAI.balanceOf(depositor), 0);
 
         // edgelessDeposit.withdrawEth(depositor, amount);
         // assertEq(wrappedEth.balanceOf(depositor), 0 ether);

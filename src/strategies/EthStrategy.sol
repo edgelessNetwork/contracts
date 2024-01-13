@@ -11,7 +11,9 @@ import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     error InsufficientFunds();
 
-    function initialize(address _owner) external initializer {
+    address public stakingManager;
+
+    function initialize(address _owner, address _stakingManager) external initializer {
         __Ownable_init(_owner);
     }
 
@@ -30,7 +32,7 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         } else {
             withdrawnAmount = amount;
         }
-        payable(msg.sender).transfer(withdrawnAmount);
+        payable(stakingManager).transfer(withdrawnAmount);
         // emit EthWithdrawn(withdrawnAmount);
         return withdrawnAmount;
     }
