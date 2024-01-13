@@ -48,12 +48,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
-        vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
-            blockNumber: FORK_BLOCK_NUMBER
-        });
-
         (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
             deployContracts(owner, staker);
     }
@@ -104,6 +98,14 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     // ----------- Staking Manager ------------
     function test_stake(uint256 amount, address randomUser) external {
+        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
+        vm.createSelectFork({
+            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            blockNumber: FORK_BLOCK_NUMBER
+        });
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+            deployContracts(owner, staker);
+
         amount = bound(amount, 1e18, 1e23);
         address ethAddress = stakingManager.ETH_ADDRESS();
         vm.deal(address(edgelessDeposit), amount);
@@ -170,7 +172,16 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.addStrategy(asset, strategy);
     }
 
-    function test_setActiveStrategy() external { }
+    function test_setActiveStrategy(address asset, uint256 index, address randomUser) external {
+        vm.prank(owner);
+        stakingManager.setActiveStrategy(asset, index);
+        assertEq(stakingManager.activeStrategyIndex(asset), index);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        stakingManager.setActiveStrategy(asset, index);
+    }
+
     function test_removeStrategy() external { }
 
     // ----------- Eth Strategy ------------
