@@ -38,7 +38,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     IStakingStrategy internal EthStakingStrategy;
     IStakingStrategy internal DaiStakingStrategy;
 
-    address public constant STEth_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
+    address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
@@ -59,7 +59,20 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             deployContracts(owner, owner);
     }
 
-    function test_mintNewWrappedEth() external { }
+    function mintStETH(address to, uint256 amount) internal {
+        vm.startPrank(STETH_WHALE);
+        LIDO.transfer(to, amount);
+        vm.stopPrank();
+    }
+
+    function test_mintNewWrappedEthFromSteth(uint64 amount) external {
+        vm.assume(amount != 0);
+        mintStETH(address(EthStakingStrategy), amount);
+
+        vm.startPrank(owner);
+        edgelessDeposit.mintEthBasedOnStakedAmount(owner, amount);
+        assertEq(wrappedEth.balanceOf(owner), amount);
+    }
 
     function test_mintNewWrappedUSD(uint64 amount) external {
         amount = uint64(bound(amount, 1e18, type(uint64).max));
