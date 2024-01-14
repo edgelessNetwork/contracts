@@ -60,8 +60,8 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     }
 
     /**
-     * @dev Assuming our contract has a bug, we would withdraw all assets to a safe address.
-     * This test simulates that scenario
+     * @dev TODO: Assuming our contract has a bug, we would withdraw all assets from the staking manager, edgeless
+     * deposit, strategies, to a safe address.
      */
     function test_withdrawAllAssetsToAddress() external { }
 }

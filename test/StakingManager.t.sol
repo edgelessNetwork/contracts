@@ -81,15 +81,19 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
     }
 
+    /**
+     * @dev TODO: Withdraw all assets from current strategy, swap to new strategy, and deposit assets into new strategy
+     * Also, add a market with an asset that we didn't previously have.
+     */
     function test_ownerCanWithdrawAllAssetsAndSwapStrategies() external { }
 
     /**
-     * @dev Withdraw all Eth from current strategy, swap to new strategy, and deposit Eth into new strategy
+     * @dev TODO: Withdraw all Eth from current strategy, swap to new strategy, and deposit Eth into new strategy
      */
     function test_swapEthStrategy() external { }
 
     /**
-     * @dev Withdraw all Dai from current strategy, swap to new strategy, and deposit Dai into new strategy
+     * @dev TODO: Withdraw all Dai from current strategy, swap to new strategy, and deposit Dai into new strategy
      */
     function test_swapDaiStrategy() external { }
 
