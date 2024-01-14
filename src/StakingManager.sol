@@ -22,6 +22,15 @@ contract StakingManager is Ownable2StepUpgradeable {
 
     error TransferFailed(bytes data);
 
+    event Stake(address indexed asset, uint256 amount);
+    event Withdraw(address indexed asset, uint256 amount);
+    event SetStaker(address staker);
+    event SetDepositor(address depositor);
+    event SetAutoStake(bool autoStake);
+    event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
+    event SetActiveStrategy(address indexed asset, uint256 index);
+    event RemoveStrategy(address indexed asset, IStakingStrategy indexed strategy, uint256 withdrawnAmount);
+
     modifier onlyStaker() {
         if (msg.sender != staker) {
             revert OnlyStaker(msg.sender);
@@ -40,6 +49,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         } else {
             _stakeERC20(asset, amount);
         }
+        emit Stake(asset, amount);
     }
 
     function _stakeEth(uint256 amount) internal {
@@ -60,6 +70,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         } else {
             _withdrawERC20(asset, amount);
         }
+        emit Withdraw(asset, amount);
     }
 
     function _withdrawEth(uint256 amount) internal {
@@ -83,24 +94,29 @@ contract StakingManager is Ownable2StepUpgradeable {
 
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
+        emit SetStaker(_staker);
     }
 
     function setDepositor(address _depositor) external onlyOwner {
         depositor = _depositor;
+        emit SetDepositor(_depositor);
     }
 
     /// ----------------- Helper Functions -----------------
 
     function setAutoStake(bool _autoStake) external onlyOwner {
         autoStake = _autoStake;
+        emit SetAutoStake(_autoStake);
     }
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {
         strategies[asset].push(strategy);
+        emit AddStrategy(asset, strategy);
     }
 
     function setActiveStrategy(address asset, uint256 index) external onlyOwner {
         activeStrategyIndex[asset] = index;
+        emit SetActiveStrategy(asset, index);
     }
 
     function getActiveStrategy(address asset) public view returns (IStakingStrategy) {
@@ -129,7 +145,8 @@ contract StakingManager is Ownable2StepUpgradeable {
         if (activeStrategyIndex[asset] == index) {
             activeStrategyIndex[asset] = lastIndex;
         }
-        strategy.withdraw(strategy.underlyingAssetAmount());
+        uint256 withdrawnAmount = strategy.withdraw(strategy.underlyingAssetAmount());
+        emit RemoveStrategy(asset, strategy, withdrawnAmount);
     }
 
     receive() external payable { }

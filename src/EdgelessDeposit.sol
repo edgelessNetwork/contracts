@@ -41,6 +41,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
     event SetL2USD(address l2USD);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
     event WithdrawUSD(address indexed from, address indexed to, uint256 usdAmountWithdrew, uint256 burnAmount);
+    event BridgeToL2(address indexed from, address indexed to, address indexed l2Address, uint256 amount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
@@ -326,6 +327,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
         if (autoBridge) {
             wrappedToken.approve(address(l1standardBridge), amount);
             l1standardBridge.depositERC20To(address(wrappedToken), l2WrappedToken, to, amount, 0, "");
+            emit BridgeToL2(address(wrappedToken), l2WrappedToken, to, amount);
         }
     }
 
