@@ -16,8 +16,8 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     address public stakingManager;
     bool public autoStake;
 
-    event EthStaked(uint256 amount);
-    event EthWithdrawn(uint256 amount);
+    event EthStaked(uint256 amounts);
+    event EthWithdrawn(uint256 amounts);
     event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
     event ClaimedLidoWithdrawals(uint256[] requestIds);
 
@@ -27,24 +27,24 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         __Ownable_init(_owner);
     }
 
-    function deposit(uint256 amount) external payable {
-        console2.log("deposit", amount, autoStake);
+    function deposit(uint256 amounts) external payable {
+        console2.log("deposit", amounts, autoStake);
         if (!autoStake) {
             return;
         }
-        if (amount > address(this).balance) {
+        if (amounts > address(this).balance) {
             revert InsufficientFunds();
         }
-        LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount);
+        LIDO.submit{ value: amounts }(address(0));
+        emit EthStaked(amounts);
     }
 
-    function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
+    function withdraw(uint256 amounts) external returns (uint256 withdrawnAmount) {
         uint256 balance = address(this).balance;
-        if (amount > balance) {
+        if (amounts > balance) {
             withdrawnAmount = balance;
         } else {
-            withdrawnAmount = amount;
+            withdrawnAmount = amounts;
         }
         (bool success, bytes memory data) = stakingManager.call{ value: withdrawnAmount }("");
         if (!success) {
@@ -54,21 +54,21 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
         return withdrawnAmount;
     }
 
-    function ownerDeposit(uint256 amount) external payable onlyOwner {
-        if (amount > address(this).balance) {
+    function ownerDeposit(uint256 amounts) external payable onlyOwner {
+        if (amounts > address(this).balance) {
             revert InsufficientFunds();
         }
-        LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount);
+        LIDO.submit{ value: amounts }(address(0));
+        emit EthStaked(amounts);
     }
 
-    function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
-        (bool success, bytes memory data) = stakingManager.call{ value: amount }("");
+    function ownerWithdraw(uint256 amounts) external onlyOwner returns (uint256 withdrawnAmount) {
+        (bool success, bytes memory data) = stakingManager.call{ value: amounts }("");
         if (!success) {
             revert TransferFailed(data);
         }
-        emit EthWithdrawn(amount);
-        return amount;
+        emit EthWithdrawn(amounts);
+        return amounts;
     }
 
     function underlyingAsset() external pure returns (address) {
@@ -84,18 +84,18 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     // ------------- Withdrawal helper functions -------------
-    function requestLidoWithdrawal(uint256[] calldata amount)
+    function requestLidoWithdrawal(uint256[] calldata amounts)
         external
         onlyOwner
         returns (uint256[] memory requestIds)
     {
         uint256 total = 0;
-        for (uint256 i = 0; i < amount.length; i++) {
-            total += amount[i];
+        for (uint256 i = 0; i < amounts.length; i++) {
+            total += amounts[i];
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
-        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amount, address(this));
-        emit RequestedLidoWithdrawals(requestIds, amount);
+        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amounts, address(this));
+        emit RequestedLidoWithdrawals(requestIds, amounts);
     }
 
     function claimLidoWithdrawals(uint256[] calldata requestIds) external onlyOwner {
