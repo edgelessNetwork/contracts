@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { Dai, LIDO, USDC, Usdt, _RAY, CURVE_3POOL, PSM } from "./Constants.sol";
+import { Dai, LIDO, Usdc, Usdt, _RAY, CURVE_3POOL, PSM } from "./Constants.sol";
 import { WrappedToken } from "./WrappedToken.sol";
 
 import { MakerMath } from "./lib/MakerMath.sol";
 
 /**
  * @title DepositManager
- * @notice DepositManager is a library of functions that take in an amount of ETH, USDC, Usdt, or
+ * @notice DepositManager is a library of functions that take in an amount of ETH, Usdc, Usdt, or
  * Dai and calculates how much of the corresponding wrapped token to mint.
  */
 contract DepositManager {
@@ -36,24 +36,24 @@ contract DepositManager {
     }
 
     /**
-     * @notice Swaps USDC for Dai
-     * @dev USDC is converted to Dai using Maker PSM
-     * @param usdcAmount Amount of USDC deposited for swapping
+     * @notice Swaps Usdc for Dai
+     * @dev Usdc is converted to Dai using Maker PSM
+     * @param UsdcAmount Amount of Usdc deposited for swapping
      * @return mintAmount Amount of wrapped tokens to mint
      */
-    function _depositUSDC(uint256 usdcAmount) internal returns (uint256 mintAmount) {
-        if (usdcAmount == 0) {
+    function _depositUsdc(uint256 UsdcAmount) internal returns (uint256 mintAmount) {
+        if (UsdcAmount == 0) {
             revert ZeroDeposit();
         }
-        uint256 wadAmount = MakerMath.usdToWad(usdcAmount);
+        uint256 wadAmount = MakerMath.usdToWad(UsdcAmount);
         uint256 conversionFee = PSM.tin() * wadAmount / _WAD;
         mintAmount = wadAmount - conversionFee;
 
-        USDC.transferFrom(msg.sender, address(this), usdcAmount);
+        Usdc.transferFrom(msg.sender, address(this), UsdcAmount);
 
-        /* Convert USDC to Dai through MakerDAO Peg Stability Mechanism. */
-        USDC.approve(PSM.gemJoin(), usdcAmount);
-        PSM.sellGem(address(this), usdcAmount);
+        /* Convert Usdc to Dai through MakerDAO Peg Stability Mechanism. */
+        Usdc.approve(PSM.gemJoin(), UsdcAmount);
+        PSM.sellGem(address(this), UsdcAmount);
     }
 
     /**

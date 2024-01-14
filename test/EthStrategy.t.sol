@@ -17,13 +17,13 @@ import { IDai } from "../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../src/interfaces/ILido.sol";
 import { IUsdt } from "../src/interfaces/IUsdt.sol";
-import { IUSDC } from "../src/interfaces/IUSDC.sol";
+import { IUsdc } from "../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 import { DeploymentUtils } from "./DeploymentUtils.sol";
-import { LIDO, Dai, USDC, Usdt } from "../src/Constants.sol";
+import { LIDO, Dai, Usdc, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests

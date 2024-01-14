@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { Dai, LIDO, USDC, Usdt, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
+import { Dai, LIDO, Usdc, Usdt, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 
 import { DepositManager } from "./DepositManager.sol";
 import { StakingManager } from "./StakingManager.sol";
@@ -17,7 +17,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
- * @notice EdgelessDeposit is a contract that allows users to deposit ETH, USDC, Usdt, or Dai and
+ * @notice EdgelessDeposit is a contract that allows users to deposit ETH, Usdc, Usdt, or Dai and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable {
@@ -32,7 +32,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     event DepositDai(address indexed to, address indexed from, uint256 DaiAmount, uint256 mintAmount);
     event DepositEth(address indexed to, address indexed from, uint256 ethAmount, uint256 mintAmount);
     event DepositStEth(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
-    event DepositUSDC(address indexed to, address indexed from, uint256 usdcAmount, uint256 mintAmount);
+    event DepositUsdc(address indexed to, address indexed from, uint256 UsdcAmount, uint256 mintAmount);
     event DepositUsdt(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
     event MintWrappedETH(address indexed to, uint256 amount);
     event MintWrappedUSD(address indexed to, uint256 amount);
@@ -108,18 +108,18 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Deposit USDC, mint wrapped tokens, and bridge to the Edgeless L2
-     * @dev USDC is converted to Dai using Maker DssPsm
+     * @notice Deposit Usdc, mint wrapped tokens, and bridge to the Edgeless L2
+     * @dev Usdc is converted to Dai using Maker DssPsm
      * @param to Address to mint wrapped tokens to
-     * @param usdcAmount Amount to deposit in USDC (usd)
+     * @param UsdcAmount Amount to deposit in Usdc (usd)
      */
-    function depositUSDC(address to, uint256 usdcAmount) public {
-        uint256 mintAmount = _depositUSDC(usdcAmount);
+    function depositUsdc(address to, uint256 UsdcAmount) public {
+        uint256 mintAmount = _depositUsdc(UsdcAmount);
         _mintWrappedUSD(to, mintAmount);
         IERC20(address(Dai)).approve(address(stakingManager), mintAmount);
         stakingManager.stake(address(Dai), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
-        emit DepositUSDC(to, msg.sender, usdcAmount, mintAmount);
+        emit DepositUsdc(to, msg.sender, UsdcAmount, mintAmount);
     }
 
     /**
@@ -153,17 +153,17 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Deposit USDC to the USD pool with a permit signature
-     * @dev USDC is converted to Dai using Maker DssPsm
-     * @param usdcAmount Amount to deposit in USDC (usd)
+     * @notice Deposit Usdc to the USD pool with a permit signature
+     * @dev Usdc is converted to Dai using Maker DssPsm
+     * @param UsdcAmount Amount to deposit in Usdc (usd)
      * @param deadline Permit signature deadline timestamp
      * @param v Permit signature v parameter
      * @param r Permit signature r parameter
      * @param s Permit signature s parameter
      */
-    function depositUSDCWithPermit(
+    function depositUsdcWithPermit(
         address to,
-        uint256 usdcAmount,
+        uint256 UsdcAmount,
         uint256 deadline,
         uint8 v,
         bytes32 r,
@@ -171,14 +171,14 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     )
         external
     {
-        USDC.permit(msg.sender, address(this), usdcAmount, deadline, v, r, s);
-        depositUSDC(to, usdcAmount);
+        Usdc.permit(msg.sender, address(this), UsdcAmount, deadline, v, r, s);
+        depositUsdc(to, UsdcAmount);
     }
 
     /**
      * @notice Deposit STETH with a permit signature
-     * @dev USDC is converted to Dai using Maker DssPsm
-     * @param stEthAmount Amount to deposit in USDC (usd)
+     * @dev Usdc is converted to Dai using Maker DssPsm
+     * @param stEthAmount Amount to deposit in Usdc (usd)
      * @param deadline Permit signature deadline timestamp
      * @param v Permit signature v parameter
      * @param r Permit signature r parameter

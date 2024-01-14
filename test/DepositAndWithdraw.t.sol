@@ -17,13 +17,13 @@ import { IDai } from "../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../src/interfaces/ILido.sol";
 import { IUsdt } from "../src/interfaces/IUsdt.sol";
-import { IUSDC } from "../src/interfaces/IUSDC.sol";
+import { IUsdc } from "../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 import { DeploymentUtils } from "./DeploymentUtils.sol";
-import { LIDO, Dai, USDC, Usdt } from "../src/Constants.sol";
+import { LIDO, Dai, Usdc, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
@@ -67,10 +67,10 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         depositAndWithdrawDai(depositor, address(Dai), amount);
     }
 
-    function test_USDCDepositAndWithdraw(uint256 amount) external {
+    function test_UsdcDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e6, 1e13);
-        deal(address(USDC), depositor, amount);
-        depositAndWithdrawUSDC(depositor, amount);
+        deal(address(Usdc), depositor, amount);
+        depositAndWithdrawUsdc(depositor, amount);
     }
 
     function test_UsdtDepositAndWithdraw(uint256 amount) external {
@@ -101,23 +101,23 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped eth after withdrawing");
     }
 
-    function test_USDCPermitDepositAndWithdraw(uint256 amount) external {
+    function test_UsdcPermitDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e6, 1e13);
-        deal(address(USDC), depositor, amount);
+        deal(address(Usdc), depositor, amount);
         vm.startPrank(depositor);
-        // Deposit USDC
+        // Deposit Usdc
 
         Permit memory permit = Permit({
             owner: depositor,
             spender: address(edgelessDeposit),
             value: amount,
-            nonce: USDC.nonces(depositor),
+            nonce: Usdc.nonces(depositor),
             deadline: type(uint256).max,
             allowed: true
         });
-        bytes32 digest = permit.getTypedDataHash(USDC.DOMAIN_SEPARATOR());
+        bytes32 digest = permit.getTypedDataHash(Usdc.DOMAIN_SEPARATOR());
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(depositorKey, digest);
-        edgelessDeposit.depositUSDCWithPermit(permit.owner, permit.value, permit.deadline, v, r, s);
+        edgelessDeposit.depositUsdcWithPermit(permit.owner, permit.value, permit.deadline, v, r, s);
 
         // Withdraw Dai by burning wrapped stablecoin - sDai rounds down, so you lose 2 wei worth of Dai(not 2 Dai)
         edgelessDeposit.withdrawUSD(depositor, wrappedUSD.balanceOf(depositor) - 2);
@@ -125,12 +125,12 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             Dai.balanceOf(depositor),
             amount * 10 ** 12,
             2,
-            "Depositor should have `amount` of Dai after withdrawing - account for USDC <> Dai decimals"
+            "Depositor should have `amount` of Dai after withdrawing - account for Usdc <> Dai decimals"
         );
         assertAlmostEq(
             wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
         );
-        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(Usdc.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Usdc after withdrawing");
         assertAlmostEq(Dai.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Dai after withdrawing");
     }
 
@@ -176,11 +176,11 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertAlmostEq(Dai.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Dai afterwithdrawing");
     }
 
-    function depositAndWithdrawUSDC(address depositor, uint256 amount) internal {
+    function depositAndWithdrawUsdc(address depositor, uint256 amount) internal {
         vm.startPrank(depositor);
         // Deposit Dai
-        USDC.approve(address(edgelessDeposit), amount);
-        edgelessDeposit.depositUSDC(depositor, amount);
+        Usdc.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositUsdc(depositor, amount);
 
         // Withdraw Dai by burning wrapped stablecoin - sDai rounds down, so you lose 2 wei worth of Dai(not 2 Dai)
         edgelessDeposit.withdrawUSD(depositor, wrappedUSD.balanceOf(depositor) - 2);
@@ -188,12 +188,12 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             Dai.balanceOf(depositor),
             amount * 10 ** 12,
             2,
-            "Depositor should have `amount` of Dai after withdrawing - account for USDC <> Dai decimals"
+            "Depositor should have `amount` of Dai after withdrawing - account for Usdc <> Dai decimals"
         );
         assertAlmostEq(
             wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
         );
-        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(Usdc.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Usdc after withdrawing");
         assertAlmostEq(Dai.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Dai after withdrawing");
     }
 
@@ -212,7 +212,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertAlmostEq(
             wrappedUSD.balanceOf(depositor), 0, 2, "Depositor should have 0 wrapped stablecoin after withdrawing"
         );
-        assertAlmostEq(USDC.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 usdc after withdrawing");
+        assertAlmostEq(Usdc.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Usdc after withdrawing");
         assertAlmostEq(Dai.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Dai after withdrawing");
     }
 
