@@ -28,7 +28,6 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     function deposit(uint256 amounts) external payable {
-        console2.log("deposit", amounts, autoStake);
         if (!autoStake) {
             return;
         }
@@ -110,7 +109,6 @@ contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
     }
 
     function setAutoStake(bool _autoStake) external onlyOwner {
-        console2.log("setAutoStake", _autoStake);
         autoStake = _autoStake;
     }
 }

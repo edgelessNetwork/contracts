@@ -26,7 +26,6 @@ contract StakingManager is OwnableUpgradeable {
     error TransferFailed(bytes data);
 
     modifier onlyStaker() {
-        console2.log(msg.sender, staker);
         if (msg.sender != staker) {
             revert OnlyStaker(msg.sender);
         }
