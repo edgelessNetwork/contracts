@@ -85,7 +85,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
     function depositEth(address to) public payable {
         uint256 amount = _depositEth(msg.value);
         _mintWrappedEth(to, amount);
-        stakingManager.stake{ value: amount }(stakingManager.Eth_ADDRESS(), amount);
+        stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
         _bridgeToL2(wrappedEth, l2Eth, to, amount);
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
@@ -227,7 +227,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
      */
     function withdrawEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
-        stakingManager.withdraw(stakingManager.Eth_ADDRESS(), amount);
+        stakingManager.withdraw(stakingManager.ETH_ADDRESS(), amount);
         (bool success, bytes memory data) = to.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);
@@ -296,7 +296,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
      * @param amount Amount of wrapped tokens to mint
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        uint256 maxMint = stakingManager.getAssetTotal(stakingManager.Eth_ADDRESS()) - wrappedEth.totalSupply();
+        uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
         if (maxMint > amount) {
             revert MaxMintExceeded();
         }

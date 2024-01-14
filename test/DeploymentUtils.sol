@@ -62,8 +62,8 @@ abstract contract DeploymentUtils is PRBTest {
         bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
         EthStakingStrategy =
             IStakingStrategy(payable(address(new ERC1967Proxy(EthStakingStrategyImpl, EthStakingStrategyData))));
-        stakingManager.addStrategy(stakingManager.Eth_ADDRESS(), EthStakingStrategy);
-        stakingManager.setActiveStrategy(stakingManager.Eth_ADDRESS(), 0);
+        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), EthStakingStrategy);
+        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
 
         address DaiStakingStrategyImpl = address(new DaiStrategy());
         bytes memory DaiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));

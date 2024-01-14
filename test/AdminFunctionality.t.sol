@@ -101,7 +101,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         forkMainnetAndDeploy();
 
         amount = bound(amount, 1e18, 1e23);
-        address EthAddress = stakingManager.Eth_ADDRESS();
+        address EthAddress = stakingManager.ETH_ADDRESS();
         vm.deal(address(edgelessDeposit), amount);
         vm.prank(owner);
         stakingManager.setAutoStake(false);
@@ -116,7 +116,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     function test_withdraw(address randomUser) external {
-        address EthAddress = stakingManager.Eth_ADDRESS();
+        address EthAddress = stakingManager.ETH_ADDRESS();
 
         vm.prank(address(edgelessDeposit));
         stakingManager.withdraw(EthAddress, 0);
