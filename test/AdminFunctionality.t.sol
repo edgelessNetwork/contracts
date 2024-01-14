@@ -212,7 +212,15 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         ethStakingStrategy.ownerDeposit{ value: amount }(amount);
     }
 
-    function test_ownerWithdrawEth() external { }
+    function test_ownerWithdrawEth(address randomAddress) external {
+        vm.prank(owner);
+        ethStakingStrategy.ownerWithdraw(0);
+
+        vm.prank(randomAddress);
+        vm.expectRevert();
+        ethStakingStrategy.ownerWithdraw(0);
+    }
+
     function test_requestLidoWithdrawal() external { }
     function test_claimLidoWithdrawals() external { }
 
