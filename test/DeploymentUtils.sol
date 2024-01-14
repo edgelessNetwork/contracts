@@ -57,6 +57,7 @@ abstract contract DeploymentUtils is PRBTest {
 
         stakingManager.setStaker(address(edgelessDeposit));
         stakingManager.setDepositor(address(edgelessDeposit));
+        
         address ethStakingStrategyImpl = address(new EthStrategy());
         bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
         ethStakingStrategy =
