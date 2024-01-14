@@ -11,16 +11,12 @@ import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/acc
  * TODO: The depositor needs to be set after deployment
  */
 contract StakingManager is Ownable2StepUpgradeable {
-    error OnlyStaker(address sender);
-
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
     address public staker;
     address public depositor;
     bool public autoStake;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-
-    error TransferFailed(bytes data);
 
     event Stake(address indexed asset, uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
@@ -30,6 +26,9 @@ contract StakingManager is Ownable2StepUpgradeable {
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
     event RemoveStrategy(address indexed asset, IStakingStrategy indexed strategy, uint256 withdrawnAmount);
+
+    error OnlyStaker(address sender);
+    error TransferFailed(bytes data);
 
     modifier onlyStaker() {
         if (msg.sender != staker) {
