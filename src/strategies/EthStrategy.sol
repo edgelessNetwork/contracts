@@ -7,9 +7,6 @@ import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
 contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
-    error InsufficientFunds();
-    error TransferFailed(bytes data);
-
     address public stakingManager;
     bool public autoStake;
 
@@ -19,6 +16,9 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     event ClaimedLidoWithdrawals(uint256[] requestIds);
     event SetStakingManager(address stakingManager);
     event SetAutoStake(bool autoStake);
+
+    error InsufficientFunds();
+    error TransferFailed(bytes data);
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -81,7 +81,6 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         return underlyingAssetAmountNoUpdate();
     }
 
-    // ------------- Withdrawal helper functions -------------
     function requestLidoWithdrawal(uint256[] calldata amounts)
         external
         onlyOwner
