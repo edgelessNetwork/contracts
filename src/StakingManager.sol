@@ -3,6 +3,7 @@ pragma solidity >=0.8.23;
 
 import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
 /**
@@ -11,6 +12,8 @@ import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/acc
  * TODO: The depositor needs to be set after deployment
  */
 contract StakingManager is Ownable2StepUpgradeable {
+    using SafeERC20 for IERC20;
+
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
     address public staker;
@@ -59,7 +62,7 @@ contract StakingManager is Ownable2StepUpgradeable {
 
     function _stakeERC20(address asset, uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(asset);
-        IERC20(asset).transferFrom(msg.sender, address(this), amount);
+        IERC20(asset).safeTransferFrom(msg.sender, address(this), amount);
         IERC20(asset).approve(address(strategy), amount);
         strategy.deposit(amount);
     }
@@ -89,7 +92,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         if (address(strategy) != address(0)) {
             withdrawnAmount = strategy.withdraw(amount);
         }
-        IERC20(asset).transfer(depositor, withdrawnAmount);
+        IERC20(asset).safeTransfer(depositor, withdrawnAmount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
