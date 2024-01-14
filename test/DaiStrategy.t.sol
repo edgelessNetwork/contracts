@@ -27,7 +27,7 @@ import { LIDO, Dai, Usdc, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
-contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
+contract DaiStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     using SigUtils for Permit;
 
     EdgelessDeposit internal edgelessDeposit;
@@ -57,5 +57,26 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
         (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, owner);
+    }
+
+    function test_OwnerCanWithdrawAllAssetsToStakingManager(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e26);
+        depositAssetsToStrategy(amount);
+        vm.prank(owner);
+        DaiStakingStrategy.ownerWithdraw(amount - 2);
+
+        assertEq(address(DaiStakingStrategy).balance, 0, "DaiStakingStrategy should have 0 Dai");
+        assertAlmostEq(
+            Dai.balanceOf(address(stakingManager)), amount - 2, 1, "StakingManager should have `amount` of Dai"
+        );
+    }
+
+    function depositAssetsToStrategy(uint256 amount) internal {
+        deal(address(Dai), depositor, amount);
+        vm.startPrank(depositor);
+        // Deposit Dai
+        Dai.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDai(depositor, amount);
+        vm.stopPrank();
     }
 }

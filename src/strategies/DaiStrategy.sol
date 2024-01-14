@@ -25,8 +25,13 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         __Ownable_init(_owner);
     }
 
+    modifier onlyStakingManager() {
+        require(msg.sender == stakingManager, "DaiStrategy: Only staking manager");
+        _;
+    }
+
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
-    function deposit(uint256 amount) external payable {
+    function deposit(uint256 amount) external payable onlyStakingManager {
         if (!autoStake) {
             return;
         }
@@ -36,9 +41,9 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         emit DaiStaked(amount);
     }
 
-    function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
+    function withdraw(uint256 amount) external onlyStakingManager returns (uint256 withdrawnAmount) {
         uint256 balanceBefore = Dai.balanceOf(address(this));
-        DSR_MANAGER.exit(address(this), amount);
+        if (balanceBefore < amount) DSR_MANAGER.exit(address(this), amount);
         uint256 balanceAfter = Dai.balanceOf(address(this));
         withdrawnAmount = balanceAfter - balanceBefore;
         Dai.transfer(stakingManager, withdrawnAmount);
@@ -54,10 +59,11 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
         uint256 balanceBefore = Dai.balanceOf(address(this));
-        DSR_MANAGER.exit(address(this), amount);
+        if (balanceBefore < amount) DSR_MANAGER.exit(address(this), amount);
         uint256 balanceAfter = Dai.balanceOf(address(this));
-        emit DaiWithdrawn(balanceAfter - balanceBefore);
-        return balanceAfter - balanceBefore;
+        withdrawnAmount = balanceAfter - balanceBefore;
+        Dai.transfer(stakingManager, withdrawnAmount);
+        emit DaiWithdrawn(withdrawnAmount);
     }
 
     function setStakingManager(address _stakingManager) external onlyOwner {
