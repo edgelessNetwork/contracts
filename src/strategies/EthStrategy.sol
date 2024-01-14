@@ -54,21 +54,21 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
-    function ownerDeposit(uint256 amounts) external payable onlyOwner {
-        if (amounts > address(this).balance) {
+    function ownerDeposit(uint256 amount) external payable onlyOwner {
+        if (amount > address(this).balance) {
             revert InsufficientFunds();
         }
-        LIDO.submit{ value: amounts }(address(0));
-        emit EthStaked(amounts);
+        LIDO.submit{ value: amount }(address(0));
+        emit EthStaked(amount);
     }
 
-    function ownerWithdraw(uint256 amounts) external onlyOwner returns (uint256 withdrawnAmount) {
-        (bool success, bytes memory data) = stakingManager.call{ value: amounts }("");
+    function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
+        (bool success, bytes memory data) = stakingManager.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);
         }
-        emit EthWithdrawn(amounts);
-        return amounts;
+        emit EthWithdrawn(amount);
+        return amount;
     }
 
     function requestLidoWithdrawal(uint256[] calldata amounts)

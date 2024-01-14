@@ -59,7 +59,35 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             deployContracts(owner, owner);
     }
 
-    function test_OwnerCanWithdrawAllAssetsToStakingManager() external { }
+    function test_OwnerCanWithdrawAllAssetsToStakingManager(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e26);
+        depositAssetsToStrategy(amount);
+        vm.prank(owner);
+        uint256 ethStakingStrategyBalance = address(EthStakingStrategy).balance;
+        console2.log(amount, ethStakingStrategyBalance);
+        EthStakingStrategy.ownerWithdraw(ethStakingStrategyBalance);
+
+        assertEq(address(EthStakingStrategy).balance, 0, "EthStrategy should have 0 Eth");
+        assertEq(address(stakingManager).balance, amount, "StakingManager should have `amount` of Eth");
+    }
+
+    function depositAssetsToStrategy(uint256 amount) internal {
+        vm.prank(owner);
+        EthStakingStrategy.setAutoStake(false);
+        vm.startPrank(depositor);
+        vm.deal(depositor, amount);
+
+        // Deposit Eth
+        edgelessDeposit.depositEth{ value: amount }(depositor);
+        assertEq(
+            address(depositor).balance,
+            0,
+            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
+        );
+        assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
+        assertEq(address(EthStakingStrategy).balance, amount, "EthStrategy should have 0 Eth");
+        vm.stopPrank();
+    }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
         require(percentage > 0 && percentage <= 100, "Percentage must be between 1 and 100");
