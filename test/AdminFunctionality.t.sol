@@ -182,7 +182,32 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setActiveStrategy(asset, index);
     }
 
-    function test_removeStrategy() external { }
+    function test_removeStrategy(address asset, IStakingStrategy stakingStrategy, address randomUser) external {
+        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
+        vm.createSelectFork({
+            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            blockNumber: FORK_BLOCK_NUMBER
+        });
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+            deployContracts(owner, staker);
+
+        vm.startPrank(owner);
+        stakingManager.addStrategy(asset, ethStakingStrategy);
+        stakingManager.addStrategy(asset, stakingStrategy);
+        assertEq(address(stakingManager.strategies(asset, 0)), address(ethStakingStrategy));
+        assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
+
+        stakingManager.removeStrategy(asset, 0);
+        assertEq(address(stakingManager.strategies(asset, 0)), address(stakingStrategy));
+
+        stakingManager.addStrategy(asset, stakingStrategy);
+        assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
+
+        vm.stopPrank();
+        vm.startPrank(randomUser);
+        vm.expectRevert();
+        stakingManager.removeStrategy(asset, 0);
+    }
 
     // ----------- Eth Strategy ------------
     function test_ownerDepositEth() external { }
