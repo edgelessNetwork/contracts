@@ -81,7 +81,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped eth after withdrawing");
     }
 
-    function test_OwnerCanWithdrawAllAssetsToStakingManager() external { }
+    function test_ownerCanWithdrawAllAssetsAndSwapStrategies() external { }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
         require(percentage > 0 && percentage <= 100, "Percentage must be between 1 and 100");
