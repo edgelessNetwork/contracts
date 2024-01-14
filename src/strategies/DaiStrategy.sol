@@ -9,15 +9,15 @@ import { IPot } from "../interfaces/IPot.sol";
 import { MakerMath } from "../lib/MakerMath.sol";
 
 contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
-    error InsufficientFunds();
+    address public stakingManager;
+    bool public autoStake;
 
     event DaiStaked(uint256 amount);
     event DaiWithdrawn(uint256 amount);
     event SetStakingManager(address stakingManager);
     event SetAutoStake(bool autoStake);
 
-    address public stakingManager;
-    bool public autoStake;
+    error InsufficientFunds();
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
