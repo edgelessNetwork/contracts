@@ -22,8 +22,8 @@ import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
 import { LIDO, Dai, Usdc, Usdt } from "../../src/Constants.sol";
 
-import { Permit, SigUtils } from "../SigUtils.sol";
-import { DeploymentUtils } from "../DeploymentUtils.sol";
+import { Permit, SigUtils } from "../Utils/SigUtils.sol";
+import { DeploymentUtils } from "../Utils/DeploymentUtils.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests

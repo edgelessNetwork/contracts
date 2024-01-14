@@ -21,8 +21,8 @@ import { IUsdc } from "../../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
 
-import { Permit, SigUtils } from "../SigUtils.sol";
-import { DeploymentUtils } from "../DeploymentUtils.sol";
+import { Permit, SigUtils } from "../Utils/SigUtils.sol";
+import { DeploymentUtils } from "../Utils/DeploymentUtils.sol";
 import { LIDO, Dai, Usdc, Usdt } from "../../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
