@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-/// @notice output format struct for `_getWithdrawalStatus()` method
+/// @notice output format struct for `_getWithdrawalStatus()` mEthod
 struct WithdrawalRequestStatus {
-    /// @notice stETH token amount that was locked on withdrawal queue for this request
-    uint256 amountOfStETH;
-    /// @notice amount of stETH shares locked on withdrawal queue for this request
+    /// @notice stEth token amount that was locked on withdrawal queue for this request
+    uint256 amountOfStEth;
+    /// @notice amount of stEth shares locked on withdrawal queue for this request
     uint256 amountOfShares;
     /// @notice address that can claim or transfer this request
     address owner;

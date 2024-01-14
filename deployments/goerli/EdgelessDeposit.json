@@ -1,5 +1,5 @@
 {
-  "address": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
+  "address": "0x3F8C5951015665aD618964C83f641FE5682072D1",
   "abi": [
     {
       "anonymous": false,
@@ -93,11 +93,6 @@
     },
     {
       "inputs": [],
-      "name": "InsufficientFunds",
-      "type": "error"
-    },
-    {
-      "inputs": [],
       "name": "InvalidInitialization",
       "type": "error"
     },
@@ -144,11 +139,6 @@
       "type": "error"
     },
     {
-      "inputs": [],
-      "name": "SenderIsNotStaker",
-      "type": "error"
-    },
-    {
       "inputs": [
         {
           "internalType": "bytes",
@@ -189,32 +179,6 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "requestIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "ClaimedLidoWithdrawals",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "DaiStaked",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
           "indexed": true,
           "internalType": "address",
           "name": "to",
@@ -229,7 +193,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "daiAmount",
+          "name": "DaiAmount",
           "type": "uint256"
         },
         {
@@ -239,7 +203,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DepositDAI",
+      "name": "DepositDai",
       "type": "event"
     },
     {
@@ -260,7 +224,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "ethAmount",
+          "name": "EthAmount",
           "type": "uint256"
         },
         {
@@ -291,7 +255,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "usdtAmount",
+          "name": "UsdtAmount",
           "type": "uint256"
         },
         {
@@ -322,7 +286,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "usdcAmount",
+          "name": "UsdcAmount",
           "type": "uint256"
         },
         {
@@ -332,7 +296,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DepositUSDC",
+      "name": "DepositUsdc",
       "type": "event"
     },
     {
@@ -353,7 +317,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "usdtAmount",
+          "name": "UsdtAmount",
           "type": "uint256"
         },
         {
@@ -363,20 +327,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DepositUSDT",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "EthStaked",
+      "name": "DepositUsdt",
       "type": "event"
     },
     {
@@ -408,7 +359,7 @@
           "type": "uint256"
         }
       ],
-      "name": "MintWrappedETH",
+      "name": "MintWrappedEth",
       "type": "event"
     },
     {
@@ -446,6 +397,25 @@
           "type": "address"
         }
       ],
+      "name": "OwnershipTransferStarted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
       "name": "OwnershipTransferred",
       "type": "event"
     },
@@ -459,26 +429,7 @@
           "type": "uint256"
         }
       ],
-      "name": "RecievedLidoWithdrawal",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "requestIds",
-          "type": "uint256[]"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "amounts",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "RequestedLidoWithdrawals",
+      "name": "ReceivedStakingManagerWithdrawal",
       "type": "event"
     },
     {
@@ -492,19 +443,6 @@
         }
       ],
       "name": "SetAutoBridge",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "autoDeposit",
-          "type": "bool"
-        }
-      ],
-      "name": "SetAutoStake",
       "type": "event"
     },
     {
@@ -550,19 +488,6 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "address",
-          "name": "staker",
-          "type": "address"
-        }
-      ],
-      "name": "SetStaker",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
           "indexed": true,
           "internalType": "address",
           "name": "from",
@@ -577,7 +502,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "ethAmountWithdrew",
+          "name": "EthAmountWithdrew",
           "type": "uint256"
         },
         {
@@ -649,7 +574,7 @@
     },
     {
       "inputs": [],
-      "name": "_CURVE_DAI_INDEX",
+      "name": "_CURVE_Dai_INDEX",
       "outputs": [
         {
           "internalType": "int128",
@@ -662,7 +587,7 @@
     },
     {
       "inputs": [],
-      "name": "_CURVE_USDT_INDEX",
+      "name": "_CURVE_Usdt_INDEX",
       "outputs": [
         {
           "internalType": "int128",
@@ -714,6 +639,13 @@
     },
     {
       "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "autoBridge",
       "outputs": [
         {
@@ -726,32 +658,6 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "autoStake",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "requestIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "claimLidoWithdrawals",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "address",
@@ -760,11 +666,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "daiAmount",
+          "name": "DaiAmount",
           "type": "uint256"
         }
       ],
-      "name": "depositDAI",
+      "name": "depositDai",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -778,7 +684,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "daiAmount",
+          "name": "DaiAmount",
           "type": "uint256"
         },
         {
@@ -807,7 +713,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "depositDAIWithPermit",
+      "name": "depositDaiWithPermit",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -890,11 +796,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "usdcAmount",
+          "name": "UsdcAmount",
           "type": "uint256"
         }
       ],
-      "name": "depositUSDC",
+      "name": "depositUsdc",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -908,7 +814,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "usdcAmount",
+          "name": "UsdcAmount",
           "type": "uint256"
         },
         {
@@ -932,7 +838,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "depositUSDCWithPermit",
+      "name": "depositUsdcWithPermit",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -946,16 +852,16 @@
         },
         {
           "internalType": "uint256",
-          "name": "usdtAmount",
+          "name": "UsdtAmount",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "minDAIAmount",
+          "name": "minDaiAmount",
           "type": "uint256"
         }
       ],
-      "name": "depositUSDT",
+      "name": "depositUsdt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -975,6 +881,11 @@
         {
           "internalType": "contract IL1StandardBridge",
           "name": "_l1standardBridge",
+          "type": "address"
+        },
+        {
+          "internalType": "contract StakingManager",
+          "name": "_stakingManager",
           "type": "address"
         }
       ],
@@ -998,7 +909,7 @@
     },
     {
       "inputs": [],
-      "name": "l2ETH",
+      "name": "l2Eth",
       "outputs": [
         {
           "internalType": "address",
@@ -1073,6 +984,19 @@
     },
     {
       "inputs": [],
+      "name": "pendingOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "proxiableUUID",
       "outputs": [
         {
@@ -1094,44 +1018,12 @@
     {
       "inputs": [
         {
-          "internalType": "uint256[]",
-          "name": "amount",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "requestLidoWithdrawal",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "requestIds",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "bool",
           "name": "_autoBridge",
           "type": "bool"
         }
       ],
       "name": "setAutoBridge",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bool",
-          "name": "_autoStake",
-          "type": "bool"
-        }
-      ],
-      "name": "setAutoStake",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1176,91 +1068,13 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_staker",
-          "type": "address"
-        }
-      ],
-      "name": "setStaker",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "stakeDAI",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "stakeETH",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
-      "name": "staker",
+      "name": "stakingManager",
       "outputs": [
         {
-          "internalType": "address",
+          "internalType": "contract StakingManager",
           "name": "",
           "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalETHBalance",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalUSDBalance",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalUSDBalanceNoUpdate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -1328,24 +1142,6 @@
           "type": "uint256"
         }
       ],
-      "name": "withdrawStEth",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
       "name": "withdrawUSD",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -1394,77 +1190,65 @@
       "type": "constructor"
     }
   ],
-  "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
+  "transactionHash": "0x833bb6fb03d5d929ae6f30a400923bb2c4543c40cbb8feb9c0bac534fd6c951c",
   "receipt": {
     "to": null,
     "from": "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-    "contractAddress": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
-    "transactionIndex": 35,
-    "gasUsed": "1535106",
-    "logsBloom": "0x00000002000000000000000000000000400000000000000000800000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000040000002000001000000000000000000000000000000000000020000000000000000000800000000000000000000000000000000482000080000000000000800000000000000000000000080000000000002000000000000000000000400000000000000000000000000000000000000000000000000000020000000000000000000100000000000000004000000000000000020000000000000000000000020008000800000000000000000000000000000000000",
-    "blockHash": "0xca3728aa650ef177effac8e13c2801fa97b36aba097a26dfe6bac7d99dcd1bee",
-    "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
+    "contractAddress": "0x3F8C5951015665aD618964C83f641FE5682072D1",
+    "transactionIndex": 95,
+    "gasUsed": "1538511",
+    "logsBloom": "0x00000000000000000000000000000000400000000000000000800000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000040001002000001000000000000000000000000000000000000020000000000000000100800000000000000000000008000000000400000080000000000000800000000000000000200000080000020000000000000000000000000000000000010000000000000000000000000000000000000000000000020000000000000000000000000000000000004000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x41e7e0e65610f665ad4c6f8203a4b3fadc689be0e5fb3ebc97646396693a426d",
+    "transactionHash": "0x833bb6fb03d5d929ae6f30a400923bb2c4543c40cbb8feb9c0bac534fd6c951c",
     "logs": [
       {
-        "transactionIndex": 35,
-        "blockNumber": 10363166,
-        "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
-        "address": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
+        "transactionIndex": 95,
+        "blockNumber": 10371646,
+        "transactionHash": "0x833bb6fb03d5d929ae6f30a400923bb2c4543c40cbb8feb9c0bac534fd6c951c",
+        "address": "0x3F8C5951015665aD618964C83f641FE5682072D1",
         "topics": [
           "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
-          "0x000000000000000000000000cfc9b23fbd91dbd9b05024a1112795b5861072c7"
+          "0x0000000000000000000000007dfd453647b45bc8ee2cad17b2466e033e9f8525"
         ],
         "data": "0x",
-        "logIndex": 92,
-        "blockHash": "0xca3728aa650ef177effac8e13c2801fa97b36aba097a26dfe6bac7d99dcd1bee"
+        "logIndex": 129,
+        "blockHash": "0x41e7e0e65610f665ad4c6f8203a4b3fadc689be0e5fb3ebc97646396693a426d"
       },
       {
-        "transactionIndex": 35,
-        "blockNumber": 10363166,
-        "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
-        "address": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
-        "topics": [
-          "0x6901da73a3480b0bbd7deb64f259ff29a76ce811c7a3e5cf495f0e1eb4fb4dfb"
-        ],
-        "data": "0x00000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e44",
-        "logIndex": 93,
-        "blockHash": "0xca3728aa650ef177effac8e13c2801fa97b36aba097a26dfe6bac7d99dcd1bee"
-      },
-      {
-        "transactionIndex": 35,
-        "blockNumber": 10363166,
-        "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
-        "address": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
+        "transactionIndex": 95,
+        "blockNumber": 10371646,
+        "transactionHash": "0x833bb6fb03d5d929ae6f30a400923bb2c4543c40cbb8feb9c0bac534fd6c951c",
+        "address": "0x3F8C5951015665aD618964C83f641FE5682072D1",
         "topics": [
           "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
           "0x0000000000000000000000000000000000000000000000000000000000000000",
           "0x00000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e44"
         ],
         "data": "0x",
-        "logIndex": 94,
-        "blockHash": "0xca3728aa650ef177effac8e13c2801fa97b36aba097a26dfe6bac7d99dcd1bee"
+        "logIndex": 130,
+        "blockHash": "0x41e7e0e65610f665ad4c6f8203a4b3fadc689be0e5fb3ebc97646396693a426d"
       },
       {
-        "transactionIndex": 35,
-        "blockNumber": 10363166,
-        "transactionHash": "0x1d0a3fc8f40b8c425fad85343d66f814b8d30c6b75b4b0f7bd0b5a037dd8bc29",
-        "address": "0xE5197Ddc6A704C7d0cC4A003403d148EDD4e5895",
+        "transactionIndex": 95,
+        "blockNumber": 10371646,
+        "transactionHash": "0x833bb6fb03d5d929ae6f30a400923bb2c4543c40cbb8feb9c0bac534fd6c951c",
+        "address": "0x3F8C5951015665aD618964C83f641FE5682072D1",
         "topics": [
           "0xc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d2"
         ],
         "data": "0x0000000000000000000000000000000000000000000000000000000000000001",
-        "logIndex": 95,
-        "blockHash": "0xca3728aa650ef177effac8e13c2801fa97b36aba097a26dfe6bac7d99dcd1bee"
+        "logIndex": 131,
+        "blockHash": "0x41e7e0e65610f665ad4c6f8203a4b3fadc689be0e5fb3ebc97646396693a426d"
       }
     ],
-    "blockNumber": 10363166,
-    "cumulativeGasUsed": "12293116",
+    "blockNumber": 10371646,
+    "cumulativeGasUsed": "17878950",
     "status": 1,
     "byzantium": true
   },
   "args": [
-    "0xcFC9B23fBD91dBd9B05024a1112795B5861072c7",
-    "0xc0c53b8b00000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e4400000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e4400000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e44"
+    "0x7DFd453647b45bc8Ee2cAd17b2466E033E9f8525",
+    "0xf8c8765e00000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e4400000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e4400000000000000000000000008c6fba53bf2ae19dbdc330e258b510c1c148e4400000000000000000000000012f2707ca9c951b6f354950f98e7b09dc665857a"
   ],
   "numDeployments": 1,
   "solcInputHash": "0e89febeebc7444140de8e67c9067d2c",
@@ -1476,10 +1260,11 @@
     "args": [
       "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
+      "0x12F2707Ca9C951B6f354950F98E7B09dC665857a"
     ]
   },
-  "implementation": "0xcFC9B23fBD91dBd9B05024a1112795B5861072c7",
+  "implementation": "0x7DFd453647b45bc8Ee2cAd17b2466E033E9f8525",
   "devdoc": {
     "details": "This contract implements an upgradeable proxy. It is upgradeable because calls are delegated to an implementation address that can be changed. This address is stored in storage in the location specified by https://eips.ethereum.org/EIPS/eip-1967[EIP1967], so that it doesn't conflict with the storage layout of the implementation behind the proxy.",
     "kind": "dev",
