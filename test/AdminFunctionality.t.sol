@@ -264,8 +264,25 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     // ----------- Dai Strategy ------------
-    function test_ownerDepositDai() external { }
-    function test_ownerWithdrawDai() external { }
+    function test_ownerDepositDai(address randomAddress) external {
+        forkMainnetAndDeploy();
+        vm.prank(owner);
+        daiStakingStrategy.ownerDeposit(0);
+
+        vm.expectRevert();
+        vm.prank(randomAddress);
+        daiStakingStrategy.ownerDeposit(0);
+    }
+
+    function test_ownerWithdrawDai(address randomAddress) external {
+        forkMainnetAndDeploy();
+        vm.prank(owner);
+        daiStakingStrategy.ownerWithdraw(0);
+
+        vm.prank(randomAddress);
+        vm.expectRevert();
+        daiStakingStrategy.ownerWithdraw(0);
+    }
 
     function test_setStakingManagerDai(address stakingManager, address randomUser) external {
         vm.prank(owner);
