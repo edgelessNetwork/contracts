@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { DAI, LIDO, USDC, USDT, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
+import { Dai, LIDO, USDC, Usdt, DSR_MANAGER, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 
 import { DepositManager } from "./DepositManager.sol";
 import { StakingManager } from "./StakingManager.sol";
@@ -17,7 +17,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
- * @notice EdgelessDeposit is a contract that allows users to deposit ETH, USDC, USDT, or DAI and
+ * @notice EdgelessDeposit is a contract that allows users to deposit ETH, USDC, Usdt, or Dai and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable {
@@ -29,11 +29,11 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     IL1StandardBridge public l1standardBridge;
     StakingManager public stakingManager;
 
-    event DepositDAI(address indexed to, address indexed from, uint256 daiAmount, uint256 mintAmount);
+    event DepositDai(address indexed to, address indexed from, uint256 DaiAmount, uint256 mintAmount);
     event DepositEth(address indexed to, address indexed from, uint256 ethAmount, uint256 mintAmount);
-    event DepositStEth(address indexed to, address indexed from, uint256 usdtAmount, uint256 mintAmount);
+    event DepositStEth(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
     event DepositUSDC(address indexed to, address indexed from, uint256 usdcAmount, uint256 mintAmount);
-    event DepositUSDT(address indexed to, address indexed from, uint256 usdtAmount, uint256 mintAmount);
+    event DepositUsdt(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
     event MintWrappedETH(address indexed to, uint256 amount);
     event MintWrappedUSD(address indexed to, uint256 amount);
     event SetAutoBridge(bool autoBridge);
@@ -95,7 +95,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     /**
      * @notice Deposit stEth, mint wrapped tokens, and bridge to the Edgeless L2
      * @param to Address to mint wrapped tokens to
-     * @param stEthAmount Amount to deposit in DAI (wad)
+     * @param stEthAmount Amount to deposit in Dai (wad)
      */
     function depositStEth(address to, uint256 stEthAmount) public {
         uint256 mintAmount = _depositStEth(stEthAmount);
@@ -109,52 +109,52 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
 
     /**
      * @notice Deposit USDC, mint wrapped tokens, and bridge to the Edgeless L2
-     * @dev USDC is converted to DAI using Maker DssPsm
+     * @dev USDC is converted to Dai using Maker DssPsm
      * @param to Address to mint wrapped tokens to
      * @param usdcAmount Amount to deposit in USDC (usd)
      */
     function depositUSDC(address to, uint256 usdcAmount) public {
         uint256 mintAmount = _depositUSDC(usdcAmount);
         _mintWrappedUSD(to, mintAmount);
-        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
-        stakingManager.stake(address(DAI), mintAmount);
+        IERC20(address(Dai)).approve(address(stakingManager), mintAmount);
+        stakingManager.stake(address(Dai), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
         emit DepositUSDC(to, msg.sender, usdcAmount, mintAmount);
     }
 
     /**
-     * @notice Deposit USDT, mint wrapped tokens, and bridge to the Edgeless L2
-     * @dev USDT is converted to DAI using Maker DssPsm
+     * @notice Deposit Usdt, mint wrapped tokens, and bridge to the Edgeless L2
+     * @dev Usdt is converted to Dai using Maker DssPsm
      * @param to Address to mint wrapped tokens to
-     * @param usdtAmount Amount to deposit in USDT (usd)
-     * @param minDAIAmount Minimum amount of DAI to receive from the PSM (slippage protection)
+     * @param UsdtAmount Amount to deposit in Usdt (usd)
+     * @param minDaiAmount Minimum amount of Dai to receive from the PSM (slippage protection)
      */
-    function depositUSDT(address to, uint256 usdtAmount, uint256 minDAIAmount) public {
-        uint256 mintAmount = _depositUSDT(usdtAmount, minDAIAmount);
+    function depositUsdt(address to, uint256 UsdtAmount, uint256 minDaiAmount) public {
+        uint256 mintAmount = _depositUsdt(UsdtAmount, minDaiAmount);
         _mintWrappedUSD(to, mintAmount);
-        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
-        stakingManager.stake(address(DAI), mintAmount);
+        IERC20(address(Dai)).approve(address(stakingManager), mintAmount);
+        stakingManager.stake(address(Dai), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
-        emit DepositUSDT(to, msg.sender, usdtAmount, mintAmount);
+        emit DepositUsdt(to, msg.sender, UsdtAmount, mintAmount);
     }
 
     /**
-     * @notice Deposit DAI, mint wrapped tokens, and bridge to the Edgeless L2
+     * @notice Deposit Dai, mint wrapped tokens, and bridge to the Edgeless L2
      * @param to Address to mint wrapped tokens to
-     * @param daiAmount Amount to deposit in DAI (wad)
+     * @param DaiAmount Amount to deposit in Dai (wad)
      */
-    function depositDAI(address to, uint256 daiAmount) public {
-        uint256 mintAmount = _depositDAI(daiAmount);
+    function depositDai(address to, uint256 DaiAmount) public {
+        uint256 mintAmount = _depositDai(DaiAmount);
         _mintWrappedUSD(to, mintAmount);
-        IERC20(address(DAI)).approve(address(stakingManager), mintAmount);
-        stakingManager.stake(address(DAI), mintAmount);
+        IERC20(address(Dai)).approve(address(stakingManager), mintAmount);
+        stakingManager.stake(address(Dai), mintAmount);
         _bridgeToL2(wrappedUSD, l2USD, to, mintAmount);
-        emit DepositDAI(to, msg.sender, daiAmount, mintAmount);
+        emit DepositDai(to, msg.sender, DaiAmount, mintAmount);
     }
 
     /**
      * @notice Deposit USDC to the USD pool with a permit signature
-     * @dev USDC is converted to DAI using Maker DssPsm
+     * @dev USDC is converted to Dai using Maker DssPsm
      * @param usdcAmount Amount to deposit in USDC (usd)
      * @param deadline Permit signature deadline timestamp
      * @param v Permit signature v parameter
@@ -177,7 +177,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
 
     /**
      * @notice Deposit STETH with a permit signature
-     * @dev USDC is converted to DAI using Maker DssPsm
+     * @dev USDC is converted to Dai using Maker DssPsm
      * @param stEthAmount Amount to deposit in USDC (usd)
      * @param deadline Permit signature deadline timestamp
      * @param v Permit signature v parameter
@@ -199,17 +199,17 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Deposit DAI to the USD pool with a permit signature
-     * @param daiAmount Amount to deposit in DAI (wad)
+     * @notice Deposit Dai to the USD pool with a permit signature
+     * @param DaiAmount Amount to deposit in Dai (wad)
      * @param nonce Permit signature nonce
      * @param expiry Permit signature expiry timestamp
      * @param v Permit signature v parameter
      * @param r Permit signature r parameter
      * @param s Permit signature s parameter
      */
-    function depositDAIWithPermit(
+    function depositDaiWithPermit(
         address to,
-        uint256 daiAmount,
+        uint256 DaiAmount,
         uint256 nonce,
         uint256 expiry,
         uint8 v,
@@ -218,8 +218,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     )
         external
     {
-        DAI.permit(msg.sender, address(this), nonce, expiry, true, v, r, s);
-        depositDAI(to, daiAmount);
+        Dai.permit(msg.sender, address(this), nonce, expiry, true, v, r, s);
+        depositDai(to, DaiAmount);
     }
 
     /**
@@ -238,14 +238,14 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Withdraw dai from the stablecoin pool
-     * @param to Address to withdraw dai to
+     * @notice Withdraw Dai from the stablecoin pool
+     * @param to Address to withdraw Dai to
      * @param amount Amount to withdraw
      */
     function withdrawUSD(address to, uint256 amount) external {
         wrappedUSD.burn(msg.sender, amount);
-        stakingManager.withdraw(address(DAI), amount);
-        IERC20(address(DAI)).transfer(to, amount);
+        stakingManager.withdraw(address(Dai), amount);
+        IERC20(address(Dai)).transfer(to, amount);
         emit WithdrawUSD(msg.sender, to, amount, amount);
     }
 
@@ -313,7 +313,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
      * @param amount Amount of wrapped tokens to mint
      */
     function mintUSDBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        uint256 maxMint = stakingManager.getAssetTotal(address(DAI)) - wrappedUSD.totalSupply();
+        uint256 maxMint = stakingManager.getAssetTotal(address(Dai)) - wrappedUSD.totalSupply();
         if (maxMint > amount) {
             revert MaxMintExceeded();
         }

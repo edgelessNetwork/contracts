@@ -13,17 +13,17 @@ import { WrappedToken } from "../src/WrappedToken.sol";
 import { EthStrategy } from "../src/strategies/EthStrategy.sol";
 import { DaiStrategy } from "../src/strategies/DaiStrategy.sol";
 
-import { IDAI } from "../src/interfaces/IDAI.sol";
+import { IDai } from "../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../src/interfaces/ILido.sol";
-import { IUSDT } from "../src/interfaces/IUSDT.sol";
+import { IUsdt } from "../src/interfaces/IUsdt.sol";
 import { IUSDC } from "../src/interfaces/IUSDC.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 import { DeploymentUtils } from "./DeploymentUtils.sol";
-import { LIDO, DAI, USDC, USDT } from "../src/Constants.sol";
+import { LIDO, Dai, USDC, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
@@ -36,7 +36,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal ethStakingStrategy;
-    IStakingStrategy internal daiStakingStrategy;
+    IStakingStrategy internal DaiStakingStrategy;
 
     address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
@@ -55,7 +55,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, owner);
     }
 }

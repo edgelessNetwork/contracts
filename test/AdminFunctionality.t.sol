@@ -13,17 +13,17 @@ import { WrappedToken } from "../src/WrappedToken.sol";
 import { EthStrategy } from "../src/strategies/EthStrategy.sol";
 import { DaiStrategy } from "../src/strategies/DaiStrategy.sol";
 
-import { IDAI } from "../src/interfaces/IDAI.sol";
+import { IDai } from "../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../src/interfaces/ILido.sol";
-import { IUSDT } from "../src/interfaces/IUSDT.sol";
+import { IUsdt } from "../src/interfaces/IUsdt.sol";
 import { IUSDC } from "../src/interfaces/IUSDC.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 import { DeploymentUtils } from "./DeploymentUtils.sol";
-import { LIDO, DAI, USDC, USDT } from "../src/Constants.sol";
+import { LIDO, Dai, USDC, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
@@ -36,7 +36,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal ethStakingStrategy;
-    IStakingStrategy internal daiStakingStrategy;
+    IStakingStrategy internal DaiStakingStrategy;
 
     address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
@@ -48,7 +48,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, staker);
     }
 
@@ -267,41 +267,41 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     function test_ownerDepositDai(address randomAddress) external {
         forkMainnetAndDeploy();
         vm.prank(owner);
-        daiStakingStrategy.ownerDeposit(0);
+        DaiStakingStrategy.ownerDeposit(0);
 
         vm.expectRevert();
         vm.prank(randomAddress);
-        daiStakingStrategy.ownerDeposit(0);
+        DaiStakingStrategy.ownerDeposit(0);
     }
 
     function test_ownerWithdrawDai(address randomAddress) external {
         forkMainnetAndDeploy();
         vm.prank(owner);
-        daiStakingStrategy.ownerWithdraw(0);
+        DaiStakingStrategy.ownerWithdraw(0);
 
         vm.prank(randomAddress);
         vm.expectRevert();
-        daiStakingStrategy.ownerWithdraw(0);
+        DaiStakingStrategy.ownerWithdraw(0);
     }
 
     function test_setStakingManagerDai(address stakingManager, address randomUser) external {
         vm.prank(owner);
-        daiStakingStrategy.setStakingManager(stakingManager);
-        assertEq(daiStakingStrategy.stakingManager(), stakingManager);
+        DaiStakingStrategy.setStakingManager(stakingManager);
+        assertEq(DaiStakingStrategy.stakingManager(), stakingManager);
 
         vm.prank(randomUser);
         vm.expectRevert();
-        daiStakingStrategy.setStakingManager(address(stakingManager));
+        DaiStakingStrategy.setStakingManager(address(stakingManager));
     }
 
     function test_setAutoStakeDai(bool autoStake, address randomUser) external {
         vm.prank(owner);
-        daiStakingStrategy.setAutoStake(autoStake);
-        assertEq(daiStakingStrategy.autoStake(), autoStake);
+        DaiStakingStrategy.setAutoStake(autoStake);
+        assertEq(DaiStakingStrategy.autoStake(), autoStake);
 
         vm.prank(randomUser);
         vm.expectRevert();
-        daiStakingStrategy.setAutoStake(autoStake);
+        DaiStakingStrategy.setAutoStake(autoStake);
     }
 
     function forkMainnetAndDeploy() internal {
@@ -310,7 +310,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
             urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, staker);
     }
 }

@@ -25,7 +25,7 @@ forge test
     - The first set of use cases is within social gaming. Think games that Zynga would make, such as poker, blackjack, slot machines, and Gacha games
     - For the first time ever, developers could offer EV neutral or even EV positive games. Developers would no longer need to take a house rake or fee but could monetize off of the yield (ETH or stables).
 - Why Now
-    - Casinos and other similar businesses cannot offer this due to lack of access to tbills(hard to get when based out of curacao) and liquidity risks. The true unlock here is that liquid staked eth/staked DAI is truly liquid and has liquidity to convert and withdraw
+    - Casinos and other similar businesses cannot offer this due to lack of access to tbills(hard to get when based out of curacao) and liquidity risks. The true unlock here is that liquid staked eth/staked Dai is truly liquid and has liquidity to convert and withdraw
     - There are some interesting ways to gamify the chain, for example accumulating jackpots or lotteries that become increasingly positive EV to participate or even redistributing a portion of earnings to developers who are creating apps on the platform based on the amount of capital used in their dApp / the length in which it is used (since this directly correlates to earnings for the L2).
     - Lastly, from a market sizing perspective, we can think about capturing 4-5% of deposits which while significantly smaller than the average hold for a casino (~10% of volume), is an extremely attractive business at scale. Lido currently has about $20bn of liquid staked ETH for context, with annualized yields equally about $800m.
     - Account abstraction is mature enough for gasless experiences
@@ -54,12 +54,12 @@ forge test
 
 ### Swapping Contracts
 
-- **Curve3Pool Contract**: Designed for the swapping of assets within a stablecoin pool, this contract facilitates efficient asset exchange, crucial for marketplace liquidity. Used for swapping USDT ⇒ Dai
+- **Curve3Pool Contract**: Designed for the swapping of assets within a stablecoin pool, this contract facilitates efficient asset exchange, crucial for marketplace liquidity. Used for swapping Usdt ⇒ Dai
 - **Maker Peg Stability Module**: This contract ensures the stability of the Dai token's value relative to the US Dollar, a vital aspect for maintaining trust and consistency in the marketplace. Used for swapping USDC⇒Dai
 
 ### Asset Contracts
 
-- **USDC, USDT, and DAI**: These contracts manage the respective stablecoins, ensuring their smooth operation and integration into the marketplace.
+- **USDC, Usdt, and Dai**: These contracts manage the respective stablecoins, ensuring their smooth operation and integration into the marketplace.
 - **Steth (Staked Eth)**: This contract handles the staked version of Ether, a critical component of the staking strategy within the ecosystem.
 
 ### Deposit Flows
@@ -68,7 +68,7 @@ forge test
 - **StEth:** Involves minting Wrapped Ether and bridging it to Edgeless Layer 2.
 - **Dai**: Involves minting Wrapped USD, optional auto-staking of Dai in the DSR_Manager, and bridging the Wrapped USD to Edgeless Layer 2.
 - **USDC**: The flow for USDC includes using the Maker Peg Stability Module to swap USDC for Dai, followed by the Dai flow.
-- **USDT**: For USDT, the process involves using the Curve Pool to swap USDT for Dai, followed by the standard Dai flow.
+- **Usdt**: For Usdt, the process involves using the Curve Pool to swap Usdt for Dai, followed by the standard Dai flow.
 
 ### Withdrawal Flows
 

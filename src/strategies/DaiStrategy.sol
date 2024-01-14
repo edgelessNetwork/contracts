@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { DAI, DSR_MANAGER, _RAY } from "../Constants.sol";
+import { Dai, DSR_MANAGER, _RAY } from "../Constants.sol";
 
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -30,47 +30,47 @@ contract DaiStrategy is IStakingStrategy, OwnableUpgradeable {
         if (!autoStake) {
             return;
         }
-        DAI.transferFrom(msg.sender, address(this), amount);
-        DAI.approve(address(DSR_MANAGER), amount);
+        Dai.transferFrom(msg.sender, address(this), amount);
+        Dai.approve(address(DSR_MANAGER), amount);
         DSR_MANAGER.join(address(this), amount);
         emit DaiStaked(amount);
     }
 
     function withdraw(uint256 amount) external returns (uint256 withdrawnAmount) {
-        uint256 balanceBefore = DAI.balanceOf(address(this));
+        uint256 balanceBefore = Dai.balanceOf(address(this));
         DSR_MANAGER.exit(address(this), amount);
-        uint256 balanceAfter = DAI.balanceOf(address(this));
+        uint256 balanceAfter = Dai.balanceOf(address(this));
         withdrawnAmount = balanceAfter - balanceBefore;
-        DAI.transfer(stakingManager, withdrawnAmount);
+        Dai.transfer(stakingManager, withdrawnAmount);
         emit DaiWithdrawn(withdrawnAmount);
     }
 
     function ownerDeposit(uint256 amount) external payable onlyOwner {
-        DAI.approve(address(DSR_MANAGER), amount);
+        Dai.approve(address(DSR_MANAGER), amount);
         DSR_MANAGER.join(address(this), amount);
         emit DaiStaked(amount);
     }
 
     function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
-        uint256 balanceBefore = DAI.balanceOf(address(this));
+        uint256 balanceBefore = Dai.balanceOf(address(this));
         DSR_MANAGER.exit(address(this), amount);
-        uint256 balanceAfter = DAI.balanceOf(address(this));
+        uint256 balanceAfter = Dai.balanceOf(address(this));
         emit DaiWithdrawn(balanceAfter - balanceBefore);
         return balanceAfter - balanceBefore;
     }
 
     function underlyingAsset() external pure returns (address) {
-        return address(DAI);
+        return address(Dai);
     }
 
     function underlyingAssetAmountNoUpdate() external view returns (uint256) {
         IPot pot = DSR_MANAGER.pot();
         uint256 chi = MakerMath.rmul(MakerMath.rpow(pot.dsr(), block.timestamp - pot.rho(), _RAY), pot.chi());
-        return DAI.balanceOf(address(this)) + MakerMath.rmul(DSR_MANAGER.pieOf(address(this)), chi);
+        return Dai.balanceOf(address(this)) + MakerMath.rmul(DSR_MANAGER.pieOf(address(this)), chi);
     }
 
     function underlyingAssetAmount() external returns (uint256) {
-        return DAI.balanceOf(address(this)) + DSR_MANAGER.daiBalance(address(this));
+        return Dai.balanceOf(address(this)) + DSR_MANAGER.DaiBalance(address(this));
     }
 
     function setStakingManager(address _stakingManager) external onlyOwner {

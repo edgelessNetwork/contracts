@@ -14,14 +14,14 @@ import { WrappedToken } from "../src/WrappedToken.sol";
 import { EthStrategy } from "../src/strategies/EthStrategy.sol";
 import { DaiStrategy } from "../src/strategies/DaiStrategy.sol";
 
-import { IDAI } from "../src/interfaces/IDAI.sol";
+import { IDai } from "../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../src/interfaces/ILido.sol";
-import { IUSDT } from "../src/interfaces/IUSDT.sol";
+import { IUsdt } from "../src/interfaces/IUsdt.sol";
 import { IUSDC } from "../src/interfaces/IUSDC.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
-import { DAI } from "../src/Constants.sol";
+import { Dai } from "../src/Constants.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 
@@ -42,7 +42,7 @@ abstract contract DeploymentUtils is PRBTest {
             WrappedToken wrappedEth,
             WrappedToken wrappedUSD,
             IStakingStrategy ethStakingStrategy,
-            IStakingStrategy daiStakingStrategy
+            IStakingStrategy DaiStakingStrategy
         )
     {
         vm.startPrank(owner);
@@ -57,7 +57,7 @@ abstract contract DeploymentUtils is PRBTest {
 
         stakingManager.setStaker(address(edgelessDeposit));
         stakingManager.setDepositor(address(edgelessDeposit));
-        
+
         address ethStakingStrategyImpl = address(new EthStrategy());
         bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
         ethStakingStrategy =
@@ -65,12 +65,12 @@ abstract contract DeploymentUtils is PRBTest {
         stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), ethStakingStrategy);
         stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
 
-        address daiStakingStrategyImpl = address(new DaiStrategy());
-        bytes memory daiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));
-        daiStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(daiStakingStrategyImpl, daiStakingStrategyData))));
-        stakingManager.addStrategy(address(DAI), daiStakingStrategy);
-        stakingManager.setActiveStrategy(address(DAI), 0);
+        address DaiStakingStrategyImpl = address(new DaiStrategy());
+        bytes memory DaiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));
+        DaiStakingStrategy =
+            IStakingStrategy(payable(address(new ERC1967Proxy(DaiStakingStrategyImpl, DaiStakingStrategyData))));
+        stakingManager.addStrategy(address(Dai), DaiStakingStrategy);
+        stakingManager.setActiveStrategy(address(Dai), 0);
 
         wrappedEth = edgelessDeposit.wrappedEth();
         wrappedUSD = edgelessDeposit.wrappedUSD();

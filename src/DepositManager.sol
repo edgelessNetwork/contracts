@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { DAI, LIDO, USDC, USDT, _RAY, CURVE_3POOL, PSM } from "./Constants.sol";
+import { Dai, LIDO, USDC, Usdt, _RAY, CURVE_3POOL, PSM } from "./Constants.sol";
 import { WrappedToken } from "./WrappedToken.sol";
 
 import { MakerMath } from "./lib/MakerMath.sol";
 
 /**
  * @title DepositManager
- * @notice DepositManager is a library of functions that take in an amount of ETH, USDC, USDT, or
- * DAI and calculates how much of the corresponding wrapped token to mint.
+ * @notice DepositManager is a library of functions that take in an amount of ETH, USDC, Usdt, or
+ * Dai and calculates how much of the corresponding wrapped token to mint.
  */
 contract DepositManager {
     uint256 public constant _BASIS_POINTS = 10_000;
     address public constant _INITIAL_TOKEN_HOLDER = 0x000000000000000000000000000000000000dEaD;
 
-    int128 public constant _CURVE_DAI_INDEX = 0;
-    int128 public constant _CURVE_USDT_INDEX = 2;
+    int128 public constant _CURVE_Dai_INDEX = 0;
+    int128 public constant _CURVE_Usdt_INDEX = 2;
     uint256 public constant _INITIAL_DEPOSIT_AMOUNT = 1000;
     uint256 public constant _WAD = 10 ** 18;
 
@@ -36,8 +36,8 @@ contract DepositManager {
     }
 
     /**
-     * @notice Swaps USDC for DAI
-     * @dev USDC is converted to DAI using Maker PSM
+     * @notice Swaps USDC for Dai
+     * @dev USDC is converted to Dai using Maker PSM
      * @param usdcAmount Amount of USDC deposited for swapping
      * @return mintAmount Amount of wrapped tokens to mint
      */
@@ -51,48 +51,48 @@ contract DepositManager {
 
         USDC.transferFrom(msg.sender, address(this), usdcAmount);
 
-        /* Convert USDC to DAI through MakerDAO Peg Stability Mechanism. */
+        /* Convert USDC to Dai through MakerDAO Peg Stability Mechanism. */
         USDC.approve(PSM.gemJoin(), usdcAmount);
         PSM.sellGem(address(this), usdcAmount);
     }
 
     /**
-     * @notice Swaps USDT for DAI
-     * @dev USDT is converted to DAI using Curve 3Pool
-     * @param usdtAmount Amount of USDT deposited for swapping
-     * @param minDAIAmount Minimum DAI amount to accept when exchanging through Curve (wad)
+     * @notice Swaps Usdt for Dai
+     * @dev Usdt is converted to Dai using Curve 3Pool
+     * @param UsdtAmount Amount of Usdt deposited for swapping
+     * @param minDaiAmount Minimum Dai amount to accept when exchanging through Curve (wad)
      * @return mintAmount Amount of wrapped tokens to mint
      */
-    function _depositUSDT(uint256 usdtAmount, uint256 minDAIAmount) internal returns (uint256 mintAmount) {
-        if (usdtAmount == 0) {
+    function _depositUsdt(uint256 UsdtAmount, uint256 minDaiAmount) internal returns (uint256 mintAmount) {
+        if (UsdtAmount == 0) {
             revert ZeroDeposit();
         }
 
-        uint256 usdtBalance = USDT.balanceOf(address(this));
-        USDT.transferFrom(msg.sender, address(this), usdtAmount);
-        uint256 receivedUSDT = USDT.balanceOf(address(this)) - usdtBalance;
+        uint256 UsdtBalance = Usdt.balanceOf(address(this));
+        Usdt.transferFrom(msg.sender, address(this), UsdtAmount);
+        uint256 receivedUsdt = Usdt.balanceOf(address(this)) - UsdtBalance;
 
-        /* Exchange USDT to DAI through the Curve 3Pool. */
-        uint256 daiBalance = DAI.balanceOf(address(this));
-        USDT.approve(address(CURVE_3POOL), receivedUSDT);
-        CURVE_3POOL.exchange(_CURVE_USDT_INDEX, _CURVE_DAI_INDEX, receivedUSDT, minDAIAmount);
+        /* Exchange Usdt to Dai through the Curve 3Pool. */
+        uint256 DaiBalance = Dai.balanceOf(address(this));
+        Usdt.approve(address(CURVE_3POOL), receivedUsdt);
+        CURVE_3POOL.exchange(_CURVE_Usdt_INDEX, _CURVE_Dai_INDEX, receivedUsdt, minDaiAmount);
 
-        /* The amount of DAI received in the exchange is uncertain due to slippage, so we must record the deposit after
+        /* The amount of Dai received in the exchange is uncertain due to slippage, so we must record the deposit after
         the exchange. */
-        mintAmount = DAI.balanceOf(address(this)) - daiBalance;
+        mintAmount = Dai.balanceOf(address(this)) - DaiBalance;
     }
 
     /**
-     * @notice Transfer DAI from the depositor to this contract
-     * @param daiAmount Amount to deposit in DAI (wad)
+     * @notice Transfer Dai from the depositor to this contract
+     * @param DaiAmount Amount to deposit in Dai (wad)
      * @return mintAmount Amount of wrapped tokens to mint
      */
-    function _depositDAI(uint256 daiAmount) internal returns (uint256 mintAmount) {
-        if (daiAmount == 0) {
+    function _depositDai(uint256 DaiAmount) internal returns (uint256 mintAmount) {
+        if (DaiAmount == 0) {
             revert ZeroDeposit();
         }
-        DAI.transferFrom(msg.sender, address(this), daiAmount);
-        return daiAmount;
+        Dai.transferFrom(msg.sender, address(this), DaiAmount);
+        return DaiAmount;
     }
 
     /**
