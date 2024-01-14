@@ -82,6 +82,6 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     function underlyingAssetAmount() external returns (uint256) {
-        return Dai.balanceOf(address(this)) + DSR_MANAGER.DaiBalance(address(this));
+        return Dai.balanceOf(address(this)) + DSR_MANAGER.daiBalance(address(this));
     }
 }

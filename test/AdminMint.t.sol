@@ -61,5 +61,18 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     function test_mintNewWrappedEth() external { }
 
-    function test_mintNewWrappedUSD() external { }
+    function test_mintNewWrappedUSD(uint64 amount) external {
+        amount = uint64(bound(amount, 1e18, type(uint64).max));
+        deal(address(Dai), depositor, amount);
+
+        vm.startPrank(depositor);
+        Dai.approve(address(edgelessDeposit), amount);
+        edgelessDeposit.depositDai(depositor, amount);
+        vm.stopPrank();
+        deal(address(Dai), address(DaiStakingStrategy), amount);
+        vm.startPrank(owner);
+        edgelessDeposit.mintUSDBasedOnStakedAmount(owner, amount);
+        assertEq(wrappedUSD.balanceOf(owner), amount);
+        assertEq(wrappedUSD.balanceOf(depositor), amount);
+    }
 }
