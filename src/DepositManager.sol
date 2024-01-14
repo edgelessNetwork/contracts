@@ -8,7 +8,7 @@ import { MakerMath } from "./lib/MakerMath.sol";
 
 /**
  * @title DepositManager
- * @notice DepositManager is a library of functions that take in an amount of ETH, Usdc, Usdt, or
+ * @notice DepositManager is a library of functions that take in an amount of Eth, Usdc, Usdt, or
  * Dai and calculates how much of the corresponding wrapped token to mint.
  */
 contract DepositManager {
@@ -24,7 +24,7 @@ contract DepositManager {
     error InsufficientBalance();
 
     /**
-     * @notice Deposit Eth to the ETH pool
+     * @notice Deposit Eth to the Eth pool
      * @dev Amount is msg.value
      * @return mintAmount Amount of wrapped tokens to mint
      */

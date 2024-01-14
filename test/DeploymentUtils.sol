@@ -41,7 +41,7 @@ abstract contract DeploymentUtils is PRBTest {
             EdgelessDeposit edgelessDeposit,
             WrappedToken wrappedEth,
             WrappedToken wrappedUSD,
-            IStakingStrategy ethStakingStrategy,
+            IStakingStrategy EthStakingStrategy,
             IStakingStrategy DaiStakingStrategy
         )
     {
@@ -58,12 +58,12 @@ abstract contract DeploymentUtils is PRBTest {
         stakingManager.setStaker(address(edgelessDeposit));
         stakingManager.setDepositor(address(edgelessDeposit));
 
-        address ethStakingStrategyImpl = address(new EthStrategy());
-        bytes memory ethStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
-        ethStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(ethStakingStrategyImpl, ethStakingStrategyData))));
-        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), ethStakingStrategy);
-        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
+        address EthStakingStrategyImpl = address(new EthStrategy());
+        bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
+        EthStakingStrategy =
+            IStakingStrategy(payable(address(new ERC1967Proxy(EthStakingStrategyImpl, EthStakingStrategyData))));
+        stakingManager.addStrategy(stakingManager.Eth_ADDRESS(), EthStakingStrategy);
+        stakingManager.setActiveStrategy(stakingManager.Eth_ADDRESS(), 0);
 
         address DaiStakingStrategyImpl = address(new DaiStrategy());
         bytes memory DaiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));

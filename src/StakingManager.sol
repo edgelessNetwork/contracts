@@ -21,7 +21,7 @@ contract StakingManager is OwnableUpgradeable {
     address public staker;
     address public depositor;
     bool public autoStake;
-    address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    address public constant Eth_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
 
     error TransferFailed(bytes data);
 
@@ -38,15 +38,15 @@ contract StakingManager is OwnableUpgradeable {
     }
 
     function stake(address asset, uint256 amount) external payable onlyStaker {
-        if (asset == ETH_ADDRESS) {
-            _stakeETH(msg.value);
+        if (asset == Eth_ADDRESS) {
+            _stakeEth(msg.value);
         } else {
             _stakeERC20(asset, amount);
         }
     }
 
-    function _stakeETH(uint256 amount) internal {
-        IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
+    function _stakeEth(uint256 amount) internal {
+        IStakingStrategy strategy = getActiveStrategy(Eth_ADDRESS);
         strategy.deposit{ value: amount }(amount);
     }
 
@@ -58,15 +58,15 @@ contract StakingManager is OwnableUpgradeable {
     }
 
     function withdraw(address asset, uint256 amount) external onlyStaker {
-        if (asset == ETH_ADDRESS) {
-            _withdrawETH(amount);
+        if (asset == Eth_ADDRESS) {
+            _withdrawEth(amount);
         } else {
             _withdrawERC20(asset, amount);
         }
     }
 
-    function _withdrawETH(uint256 amount) internal {
-        IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
+    function _withdrawEth(uint256 amount) internal {
+        IStakingStrategy strategy = getActiveStrategy(Eth_ADDRESS);
         uint256 withdrawnAmount;
         if (address(strategy) != address(0)) withdrawnAmount = strategy.withdraw(amount);
         (bool success, bytes memory data) = depositor.call{ value: withdrawnAmount }("");

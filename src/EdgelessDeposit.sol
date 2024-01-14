@@ -17,12 +17,12 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
- * @notice EdgelessDeposit is a contract that allows users to deposit ETH, Usdc, Usdt, or Dai and
+ * @notice EdgelessDeposit is a contract that allows users to deposit Eth, Usdc, Usdt, or Dai and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
-    address public l2ETH;
+    address public l2Eth;
     address public l2USD;
     WrappedToken public wrappedEth;
     WrappedToken public wrappedUSD;
@@ -30,18 +30,18 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     StakingManager public stakingManager;
 
     event DepositDai(address indexed to, address indexed from, uint256 DaiAmount, uint256 mintAmount);
-    event DepositEth(address indexed to, address indexed from, uint256 ethAmount, uint256 mintAmount);
+    event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event DepositStEth(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
     event DepositUsdc(address indexed to, address indexed from, uint256 UsdcAmount, uint256 mintAmount);
     event DepositUsdt(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
-    event MintWrappedETH(address indexed to, uint256 amount);
+    event MintWrappedEth(address indexed to, uint256 amount);
     event MintWrappedUSD(address indexed to, uint256 amount);
     event SetAutoBridge(bool autoBridge);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
     event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
     event SetL2Eth(address l2Eth);
     event SetL2USD(address l2USD);
-    event WithdrawEth(address indexed from, address indexed to, uint256 ethAmountWithdrew, uint256 burnAmount);
+    event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
     event WithdrawUSD(address indexed from, address indexed to, uint256 usdAmountWithdrew, uint256 burnAmount);
 
     error MaxMintExceeded();
@@ -63,7 +63,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
             revert ZeroAddress();
         }
 
-        wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped ETH", "ewETH");
+        wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
         wrappedUSD = new WrappedToken(address(this), "Edgeless Wrapped USD", "ewUSD");
         l1standardBridge = _l1standardBridge;
         autoBridge = false;
@@ -81,14 +81,14 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Deposit ETH, mint wrapped tokens, and bridge to the Edgeless L2
+     * @notice Deposit Eth, mint wrapped tokens, and bridge to the Edgeless L2
      * @param to Address to mint wrapped tokens to
      */
     function depositEth(address to) public payable {
         uint256 amount = _depositEth(msg.value);
         _mintWrappedEth(to, amount);
-        stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
-        _bridgeToL2(wrappedEth, l2ETH, to, amount);
+        stakingManager.stake{ value: amount }(stakingManager.Eth_ADDRESS(), amount);
+        _bridgeToL2(wrappedEth, l2Eth, to, amount);
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
@@ -103,7 +103,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
         _mintWrappedEth(to, mintAmount);
         IERC20(address(LIDO)).approve(address(stakingManager), stEthAmount);
         stakingManager.stake(address(LIDO), stEthAmount);
-        _bridgeToL2(wrappedEth, l2ETH, to, mintAmount);
+        _bridgeToL2(wrappedEth, l2Eth, to, mintAmount);
         emit DepositStEth(to, msg.sender, stEthAmount, mintAmount);
     }
 
@@ -176,7 +176,7 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Deposit STETH with a permit signature
+     * @notice Deposit STEth with a permit signature
      * @dev Usdc is converted to Dai using Maker DssPsm
      * @param stEthAmount Amount to deposit in Usdc (usd)
      * @param deadline Permit signature deadline timestamp
@@ -223,13 +223,13 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Withdraw Eth from the ETH pool
+     * @notice Withdraw Eth from the Eth pool
      * @param to Address to withdraw Eth to
      * @param amount  Amount to withdraw
      */
     function withdrawEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
-        stakingManager.withdraw(stakingManager.ETH_ADDRESS(), amount);
+        stakingManager.withdraw(stakingManager.Eth_ADDRESS(), amount);
         (bool success, bytes memory data) = to.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);
@@ -266,8 +266,8 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
         if (address(_l2Eth) == address(0)) revert ZeroAddress();
-        if (l2ETH != address(0)) revert L2EthSet();
-        l2ETH = _l2Eth;
+        if (l2Eth != address(0)) revert L2EthSet();
+        l2Eth = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
 
@@ -292,18 +292,18 @@ contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable 
     }
 
     /**
-     * @notice Mint wrapped tokens based on the amount of ETH staked
-     * @dev The owner can only mint up to the amount of ETH deposited + ETH staking rewards from Lido
+     * @notice Mint wrapped tokens based on the amount of Eth staked
+     * @dev The owner can only mint up to the amount of Eth deposited + Eth staking rewards from Lido
      * @param to Address to mint wrapped tokens to
      * @param amount Amount of wrapped tokens to mint
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
-        uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
+        uint256 maxMint = stakingManager.getAssetTotal(stakingManager.Eth_ADDRESS()) - wrappedEth.totalSupply();
         if (maxMint > amount) {
             revert MaxMintExceeded();
         }
         wrappedEth.mint(to, amount);
-        emit MintWrappedETH(to, amount);
+        emit MintWrappedEth(to, amount);
     }
 
     /**

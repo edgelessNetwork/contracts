@@ -84,7 +84,7 @@ contract OptimismMintableERC20 is IOptimismMintableERC20, ILegacyMintableERC20, 
 
     /// @notice ERC165 interface check function.
     /// @param _interfaceId Interface ID to check.
-    /// @return Whether or not the interface is supported by this contract.
+    /// @return WhEther or not the interface is supported by this contract.
     function supportsInterface(bytes4 _interfaceId) external pure virtual returns (bool) {
         bytes4 iface1 = type(IERC165).interfaceId;
         // Interface corresponding to the legacy L2StandardERC20.

@@ -35,10 +35,10 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     WrappedToken internal wrappedUSD;
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
-    IStakingStrategy internal ethStakingStrategy;
+    IStakingStrategy internal EthStakingStrategy;
     IStakingStrategy internal DaiStakingStrategy;
 
-    address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
+    address public constant STEth_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
@@ -51,11 +51,11 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     function setUp() public virtual {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            urlOrAlias: string(abi.encodePacked("https://Eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, DaiStakingStrategy) =
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, owner);
     }
 

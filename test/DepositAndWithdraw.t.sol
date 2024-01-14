@@ -35,10 +35,10 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     WrappedToken internal wrappedUSD;
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
-    IStakingStrategy internal ethStakingStrategy;
+    IStakingStrategy internal EthStakingStrategy;
     IStakingStrategy internal DaiStakingStrategy;
 
-    address public constant STETH_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
+    address public constant STEth_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
@@ -53,11 +53,11 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     function setUp() public virtual {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            urlOrAlias: string(abi.encodePacked("https://Eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, DaiStakingStrategy) =
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
             deployContracts(owner, owner);
     }
 
@@ -82,7 +82,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     function test_EthDepositAndWithdraw(uint256 amount) external {
         amount = bound(amount, 1e18, 1e40);
         vm.prank(owner);
-        ethStakingStrategy.setAutoStake(false);
+        EthStakingStrategy.setAutoStake(false);
         vm.startPrank(depositor);
         vm.deal(depositor, amount);
         vm.deal(address(edgelessDeposit), amount);
@@ -92,13 +92,13 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(
             address(depositor).balance,
             0,
-            "Deposit should have 0 eth since all eth was sent to the edgeless edgelessDeposit contract"
+            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
         );
-        assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped eth");
+        assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
 
         edgelessDeposit.withdrawEth(depositor, amount);
-        assertEq(address(depositor).balance, amount, "Depositor should have `amount` of eth after withdrawing");
-        assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped eth after withdrawing");
+        assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
+        assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
     }
 
     function test_UsdcPermitDepositAndWithdraw(uint256 amount) external {
@@ -216,8 +216,8 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertAlmostEq(Dai.balanceOf(address(edgelessDeposit)), 0, 2, "Edgeless should have 0 Dai after withdrawing");
     }
 
-    function mintStETH(address to, uint256 amount) internal {
-        vm.startPrank(STETH_WHALE);
+    function mintStEth(address to, uint256 amount) internal {
+        vm.startPrank(STEth_WHALE);
         LIDO.transfer(to, amount);
         vm.stopPrank();
     }
