@@ -7,13 +7,14 @@ import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { IPot } from "../interfaces/IPot.sol";
 import { MakerMath } from "../lib/MakerMath.sol";
-import { console2 } from "forge-std/src/console2.sol";
 
 contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     error InsufficientFunds();
 
     event DaiStaked(uint256 amount);
     event DaiWithdrawn(uint256 amount);
+    event SetStakingManager(address stakingManager);
+    event SetAutoStake(bool autoStake);
 
     address public stakingManager;
     bool public autoStake;
@@ -73,9 +74,11 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     function setStakingManager(address _stakingManager) external onlyOwner {
         stakingManager = _stakingManager;
+        emit SetStakingManager(_stakingManager);
     }
 
     function setAutoStake(bool _autoStake) external onlyOwner {
         autoStake = _autoStake;
+        emit SetAutoStake(_autoStake);
     }
 }

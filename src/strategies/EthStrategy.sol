@@ -5,7 +5,6 @@ import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
 
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
-import { console2 } from "forge-std/src/console2.sol";
 
 contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     error InsufficientFunds();
@@ -18,6 +17,8 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     event EthWithdrawn(uint256 amounts);
     event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
     event ClaimedLidoWithdrawals(uint256[] requestIds);
+    event SetStakingManager(address stakingManager);
+    event SetAutoStake(bool autoStake);
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -104,9 +105,11 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     function setStakingManager(address _stakingManager) external onlyOwner {
         stakingManager = _stakingManager;
+        emit SetStakingManager(_stakingManager);
     }
 
     function setAutoStake(bool _autoStake) external onlyOwner {
         autoStake = _autoStake;
+        emit SetAutoStake(_autoStake);
     }
 }
