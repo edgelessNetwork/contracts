@@ -214,12 +214,46 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     function test_ownerWithdrawEth() external { }
     function test_requestLidoWithdrawal() external { }
     function test_claimLidoWithdrawals() external { }
-    function test_setStakingManagerEth() external { }
-    function test_setAutoStakeEth() external { }
+
+    function test_setStakingManagerEth(address stakingManager, address randomUser) external {
+        vm.prank(owner);
+        ethStakingStrategy.setStakingManager(stakingManager);
+        assertEq(ethStakingStrategy.stakingManager(), stakingManager);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        ethStakingStrategy.setStakingManager(address(stakingManager));
+    }
+
+    function test_setAutoStakeEth(bool autoStake, address randomUser) external {
+        vm.prank(owner);
+        ethStakingStrategy.setAutoStake(autoStake);
+        assertEq(ethStakingStrategy.autoStake(), autoStake);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        ethStakingStrategy.setAutoStake(autoStake);
+    }
 
     // ----------- Dai Strategy ------------
     function test_ownerDepositDai() external { }
     function test_ownerWithdrawDai() external { }
-    function test_setStakingManagerDai() external { }
-    function test_setAutoStakeDai() external { }
+    function test_setStakingManagerDai(address stakingManager, address randomUser) external {
+        vm.prank(owner);
+        daiStakingStrategy.setStakingManager(stakingManager);
+        assertEq(daiStakingStrategy.stakingManager(), stakingManager);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        daiStakingStrategy.setStakingManager(address(stakingManager));
+    }
+    function test_setAutoStakeDai(bool autoStake, address randomUser) external {
+        vm.prank(owner);
+        daiStakingStrategy.setAutoStake(autoStake);
+        assertEq(daiStakingStrategy.autoStake(), autoStake);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        daiStakingStrategy.setAutoStake(autoStake);
+    }
 }
