@@ -26,6 +26,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         __Ownable_init(_owner);
     }
 
+    /// -------------------------------- 📝 External Functions 📝 --------------------------------
     function deposit(uint256 amounts) external payable {
         if (!autoStake) {
             return;
@@ -52,6 +53,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         return withdrawnAmount;
     }
 
+    /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     function ownerDeposit(uint256 amounts) external payable onlyOwner {
         if (amounts > address(this).balance) {
             revert InsufficientFunds();
@@ -67,18 +69,6 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         }
         emit EthWithdrawn(amounts);
         return amounts;
-    }
-
-    function underlyingAsset() external pure returns (address) {
-        return address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    }
-
-    function underlyingAssetAmountNoUpdate() public view returns (uint256) {
-        return address(this).balance + LIDO.balanceOf(address(this));
-    }
-
-    function underlyingAssetAmount() external view returns (uint256) {
-        return underlyingAssetAmountNoUpdate();
     }
 
     function requestLidoWithdrawal(uint256[] calldata amounts)
@@ -110,5 +100,18 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     function setAutoStake(bool _autoStake) external onlyOwner {
         autoStake = _autoStake;
         emit SetAutoStake(_autoStake);
+    }
+
+    /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
+    function underlyingAsset() external pure returns (address) {
+        return address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    }
+
+    function underlyingAssetAmountNoUpdate() public view returns (uint256) {
+        return address(this).balance + LIDO.balanceOf(address(this));
+    }
+
+    function underlyingAssetAmount() external view returns (uint256) {
+        return underlyingAssetAmountNoUpdate();
     }
 }

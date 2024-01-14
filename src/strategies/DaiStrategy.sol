@@ -25,6 +25,7 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         __Ownable_init(_owner);
     }
 
+    /// -------------------------------- 📝 External Functions 📝 --------------------------------
     function deposit(uint256 amount) external payable {
         if (!autoStake) {
             return;
@@ -44,6 +45,7 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         emit DaiWithdrawn(withdrawnAmount);
     }
 
+    /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     function ownerDeposit(uint256 amount) external payable onlyOwner {
         Dai.approve(address(DSR_MANAGER), amount);
         DSR_MANAGER.join(address(this), amount);
@@ -58,6 +60,17 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         return balanceAfter - balanceBefore;
     }
 
+    function setStakingManager(address _stakingManager) external onlyOwner {
+        stakingManager = _stakingManager;
+        emit SetStakingManager(_stakingManager);
+    }
+
+    function setAutoStake(bool _autoStake) external onlyOwner {
+        autoStake = _autoStake;
+        emit SetAutoStake(_autoStake);
+    }
+
+    /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
     function underlyingAsset() external pure returns (address) {
         return address(Dai);
     }
@@ -70,15 +83,5 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     function underlyingAssetAmount() external returns (uint256) {
         return Dai.balanceOf(address(this)) + DSR_MANAGER.DaiBalance(address(this));
-    }
-
-    function setStakingManager(address _stakingManager) external onlyOwner {
-        stakingManager = _stakingManager;
-        emit SetStakingManager(_stakingManager);
-    }
-
-    function setAutoStake(bool _autoStake) external onlyOwner {
-        autoStake = _autoStake;
-        emit SetAutoStake(_autoStake);
     }
 }
