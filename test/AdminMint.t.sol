@@ -27,7 +27,7 @@ import { LIDO, Dai, Usdc, Usdt } from "../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
-contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
+contract AdminMintTests is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     using SigUtils for Permit;
 
     EdgelessDeposit internal edgelessDeposit;
