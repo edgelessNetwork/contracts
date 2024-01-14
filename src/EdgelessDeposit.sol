@@ -320,9 +320,9 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
         emit MintWrappedUSD(to, amount);
     }
 
-    /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
 
+    /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {
         if (autoBridge) {
             wrappedToken.approve(address(l1standardBridge), amount);

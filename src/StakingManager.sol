@@ -42,6 +42,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         __Ownable_init(_owner);
     }
 
+    /// -------------------------------- 📝 Staker Functions 📝 --------------------------------
     function stake(address asset, uint256 amount) external payable onlyStaker {
         if (asset == ETH_ADDRESS) {
             _stakeEth(msg.value);
@@ -91,6 +92,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         IERC20(asset).transfer(depositor, withdrawnAmount);
     }
 
+    /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
         emit SetStaker(_staker);
@@ -100,8 +102,6 @@ contract StakingManager is Ownable2StepUpgradeable {
         depositor = _depositor;
         emit SetDepositor(_depositor);
     }
-
-    /// ----------------- Helper Functions -----------------
 
     function setAutoStake(bool _autoStake) external onlyOwner {
         autoStake = _autoStake;
@@ -118,6 +118,19 @@ contract StakingManager is Ownable2StepUpgradeable {
         emit SetActiveStrategy(asset, index);
     }
 
+    function removeStrategy(address asset, uint256 index) external onlyOwner {
+        IStakingStrategy strategy = strategies[asset][index];
+        uint256 lastIndex = strategies[asset].length - 1;
+        strategies[asset][index] = strategies[asset][lastIndex];
+        strategies[asset].pop();
+        if (activeStrategyIndex[asset] == index) {
+            activeStrategyIndex[asset] = lastIndex;
+        }
+        uint256 withdrawnAmount = strategy.withdraw(strategy.underlyingAssetAmount());
+        emit RemoveStrategy(asset, strategy, withdrawnAmount);
+    }
+
+    /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
     function getActiveStrategy(address asset) public view returns (IStakingStrategy) {
         return strategies[asset][activeStrategyIndex[asset]];
     }
@@ -134,18 +147,6 @@ contract StakingManager is Ownable2StepUpgradeable {
             IStakingStrategy strategy = strategies[asset][i];
             total += strategy.underlyingAssetAmountNoUpdate();
         }
-    }
-
-    function removeStrategy(address asset, uint256 index) external onlyOwner {
-        IStakingStrategy strategy = strategies[asset][index];
-        uint256 lastIndex = strategies[asset].length - 1;
-        strategies[asset][index] = strategies[asset][lastIndex];
-        strategies[asset].pop();
-        if (activeStrategyIndex[asset] == index) {
-            activeStrategyIndex[asset] = lastIndex;
-        }
-        uint256 withdrawnAmount = strategy.withdraw(strategy.underlyingAssetAmount());
-        emit RemoveStrategy(asset, strategy, withdrawnAmount);
     }
 
     receive() external payable { }
