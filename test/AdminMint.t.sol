@@ -65,7 +65,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         vm.stopPrank();
     }
 
-    function test_mintNewWrappedEthFromSteth(uint64 amount) external {
+    function test_mintWrappedEthFromSteth(uint64 amount) external {
         vm.assume(amount != 0);
         mintStETH(address(EthStakingStrategy), amount);
 
@@ -74,7 +74,16 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(owner), amount);
     }
 
-    function test_mintNewWrappedUSD(uint64 amount) external {
+    function test_mintWrappedEthFromEth(uint64 amount) external {
+        vm.assume(amount != 0);
+        vm.deal(address(edgelessDeposit), amount);
+
+        vm.startPrank(owner);
+        edgelessDeposit.mintEthBasedOnStakedAmount(owner, amount);
+        assertEq(wrappedEth.balanceOf(owner), amount);
+    }
+
+    function test_mintWrappedUSDFromDai(uint64 amount) external {
         amount = uint64(bound(amount, 1e18, type(uint64).max));
         deal(address(Dai), depositor, amount);
 
@@ -87,5 +96,18 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         edgelessDeposit.mintUSDBasedOnStakedAmount(owner, amount);
         assertEq(wrappedUSD.balanceOf(owner), amount);
         assertEq(wrappedUSD.balanceOf(depositor), amount);
+    }
+
+    function test_mintWrappedEthFromEthandSteth(uint64 ethAmount, uint64 lidoAmount) external {
+        vm.assume(ethAmount != 0 && lidoAmount != 0);
+
+        uint96 total = uint96(ethAmount) + uint96(lidoAmount);
+
+        vm.deal(address(edgelessDeposit), ethAmount);
+        mintStETH(address(edgelessDeposit), lidoAmount);
+
+        vm.startPrank(owner);
+        edgelessDeposit.mintEthBasedOnStakedAmount(owner, total);
+        assertEq(wrappedEth.balanceOf(owner), total);
     }
 }
