@@ -18,6 +18,7 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     event SetAutoStake(bool autoStake);
 
     error InsufficientFunds();
+    error OnlyStakingManager(address sender);
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -26,7 +27,7 @@ contract DaiStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     modifier onlyStakingManager() {
-        require(msg.sender == stakingManager, "DaiStrategy: Only staking manager");
+        if (msg.sender != stakingManager) revert OnlyStakingManager(msg.sender);
         _;
     }
 

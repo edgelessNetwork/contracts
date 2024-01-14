@@ -19,6 +19,12 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     error InsufficientFunds();
     error TransferFailed(bytes data);
+    error OnlyStakingManager(address sender);
+
+    modifier onlyStakingManager() {
+        if (msg.sender != stakingManager) revert OnlyStakingManager(msg.sender);
+        _;
+    }
 
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
@@ -27,7 +33,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
-    function deposit(uint256 amounts) external payable {
+    function deposit(uint256 amounts) external payable onlyStakingManager {
         if (!autoStake) {
             return;
         }
@@ -38,7 +44,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         emit EthStaked(amounts);
     }
 
-    function withdraw(uint256 amounts) external returns (uint256 withdrawnAmount) {
+    function withdraw(uint256 amounts) external onlyStakingManager returns (uint256 withdrawnAmount) {
         uint256 balance = address(this).balance;
         if (amounts > balance) {
             withdrawnAmount = balance;
