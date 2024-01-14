@@ -98,13 +98,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     // ----------- Staking Manager ------------
     function test_stake(uint256 amount, address randomUser) external {
-        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
-        vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
-            blockNumber: FORK_BLOCK_NUMBER
-        });
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
-            deployContracts(owner, staker);
+        forkMainnetAndDeploy();
 
         amount = bound(amount, 1e18, 1e23);
         address ethAddress = stakingManager.ETH_ADDRESS();
@@ -183,13 +177,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     function test_removeStrategy(address asset, IStakingStrategy stakingStrategy, address randomUser) external {
-        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
-        vm.createSelectFork({
-            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
-            blockNumber: FORK_BLOCK_NUMBER
-        });
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
-            deployContracts(owner, staker);
+        forkMainnetAndDeploy();
 
         vm.startPrank(owner);
         stakingManager.addStrategy(asset, ethStakingStrategy);
@@ -210,7 +198,20 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     // ----------- Eth Strategy ------------
-    function test_ownerDepositEth() external { }
+    function test_ownerDepositEth(uint256 amount, address randomAddress) external {
+        amount = bound(amount, 1e18, 1e23);
+        forkMainnetAndDeploy();
+        vm.deal(owner, amount);
+        vm.prank(owner);
+        ethStakingStrategy.ownerDeposit{ value: amount }(amount);
+        assertAlmostEq(LIDO.balanceOf(address(ethStakingStrategy)), amount, 2);
+
+        vm.deal(randomAddress, amount);
+        vm.expectRevert();
+        vm.prank(randomAddress);
+        ethStakingStrategy.ownerDeposit{ value: amount }(amount);
+    }
+
     function test_ownerWithdrawEth() external { }
     function test_requestLidoWithdrawal() external { }
     function test_claimLidoWithdrawals() external { }
@@ -238,6 +239,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     // ----------- Dai Strategy ------------
     function test_ownerDepositDai() external { }
     function test_ownerWithdrawDai() external { }
+
     function test_setStakingManagerDai(address stakingManager, address randomUser) external {
         vm.prank(owner);
         daiStakingStrategy.setStakingManager(stakingManager);
@@ -247,6 +249,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.expectRevert();
         daiStakingStrategy.setStakingManager(address(stakingManager));
     }
+
     function test_setAutoStakeDai(bool autoStake, address randomUser) external {
         vm.prank(owner);
         daiStakingStrategy.setAutoStake(autoStake);
@@ -255,5 +258,15 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.prank(randomUser);
         vm.expectRevert();
         daiStakingStrategy.setAutoStake(autoStake);
+    }
+
+    function forkMainnetAndDeploy() internal {
+        string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
+        vm.createSelectFork({
+            urlOrAlias: string(abi.encodePacked("https://eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
+            blockNumber: FORK_BLOCK_NUMBER
+        });
+        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, ethStakingStrategy, daiStakingStrategy) =
+            deployContracts(owner, staker);
     }
 }
