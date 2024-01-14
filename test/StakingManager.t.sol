@@ -83,6 +83,16 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     function test_ownerCanWithdrawAllAssetsAndSwapStrategies() external { }
 
+    /**
+     * @dev Withdraw all eth from current strategy, swap to new strategy, and deposit eth into new strategy
+     */
+    function test_swapEthStrategy() external { }
+
+    /**
+     * @dev Withdraw all dai from current strategy, swap to new strategy, and deposit dai into new strategy
+     */
+    function test_swapDaiStrategy() external { }
+
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
         require(percentage > 0 && percentage <= 100, "Percentage must be between 1 and 100");
 

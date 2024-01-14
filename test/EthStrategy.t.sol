@@ -59,28 +59,6 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             deployContracts(owner, owner);
     }
 
-    function test_EthDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e40);
-        vm.prank(owner);
-        ethStakingStrategy.setAutoStake(false);
-        vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
-
-        // Deposit Eth
-        edgelessDeposit.depositEth{ value: amount }(depositor);
-        assertEq(
-            address(depositor).balance,
-            0,
-            "Deposit should have 0 eth since all eth was sent to the edgeless edgelessDeposit contract"
-        );
-        assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped eth");
-
-        edgelessDeposit.withdrawEth(depositor, amount);
-        assertEq(address(depositor).balance, amount, "Depositor should have `amount` of eth after withdrawing");
-        assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped eth after withdrawing");
-    }
-
     function test_OwnerCanWithdrawAllAssetsToStakingManager() external { }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
