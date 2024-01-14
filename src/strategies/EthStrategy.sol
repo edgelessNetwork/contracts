@@ -4,12 +4,10 @@ pragma solidity >=0.8.23;
 import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
 
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { console2 } from "forge-std/src/console2.sol";
 
-contract EthStrategy is IStakingStrategy, OwnableUpgradeable {
+contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     error InsufficientFunds();
     error TransferFailed(bytes data);
 

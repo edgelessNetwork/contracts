@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { console2 } from "forge-std/src/console2.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
  * Upon withdrawal, all assets go to the depositor.
  * TODO: The depositor needs to be set after deployment
  */
 
-contract StakingManager is OwnableUpgradeable {
+contract StakingManager is Ownable2StepUpgradeable {
     error OnlyStaker(address sender);
 
     mapping(address => IStakingStrategy[]) public strategies;

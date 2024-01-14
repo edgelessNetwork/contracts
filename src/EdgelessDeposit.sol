@@ -9,9 +9,7 @@ import { WrappedToken } from "./WrappedToken.sol";
 
 import { IL1StandardBridge } from "./interfaces/IL1StandardBridge.sol";
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -20,7 +18,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth, Usdc, Usdt, or Dai and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is DepositManager, OwnableUpgradeable, UUPSUpgradeable {
+contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     address public l2USD;
