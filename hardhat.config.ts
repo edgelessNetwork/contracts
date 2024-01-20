@@ -67,8 +67,8 @@ const config: HardhatUserConfig = {
     l1StandardBridge: {
       hardhat: 0,
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04",
-      edgelessSepoliaTestnet: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04"
+      sepolia: "0xfF591f2f96697F4D852C775B74830282d97D2c37",
+      edgelessSepoliaTestnet: "0xfF591f2f96697F4D852C775B74830282d97D2c37"
     },
     l2StandardBridge: {
       hardhat: 0,
