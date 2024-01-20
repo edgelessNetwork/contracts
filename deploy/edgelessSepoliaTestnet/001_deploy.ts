@@ -6,14 +6,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy, get } = deployments
     const { deployer, l2StandardBridge, l1Eth, l1USD } = await getNamedAccounts()
 
-    await deploy('Edgeless Wrapped ETH', {
-        contract: "OptimismMintableERC20",
-        from: deployer,
-        args: [l2StandardBridge, l1Eth, "Edgeless Wrapped ETH", "ewETH"],
-        log: true,
-        skipIfAlreadyDeployed: true,
-    });
-
     await deploy('Edgeless Wrapped USD', {
         contract: "OptimismMintableERC20",
         from: deployer,

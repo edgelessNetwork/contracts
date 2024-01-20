@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const EdgelessDeposit = await getOrNull("EdgelessDeposit");
     if (EdgelessDeposit) {
-        await execute("EdgelessDeposit", { from: deployer, log: true }, "setL2Eth", l2Eth);
+        // await execute("EdgelessDeposit", { from: deployer, log: true }, "setL2Eth", l2Eth);
         await execute("EdgelessDeposit", { from: deployer, log: true }, "setL2USD", l2USD);
     } else {
         log("EdgelessDeposit not found, make sure to deploy it first");
@@ -16,4 +16,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.skip = async () => true;
+// func.skip = async () => true;

@@ -35,12 +35,12 @@ const config: HardhatUserConfig = {
     },
     edgelessSepoliaTestnet: {
       deploy: ["./deploy/edgelessSepoliaTestnet/"],
-      url: "https://edgeless-op.rpc.caldera.xyz/http",
-      chainId: 2067124,
+      url: "https://edgeless-testnet.rpc.caldera.xyz/http",
+      chainId: 202,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
       verify: {
         etherscan: {
-          apiUrl: "https://edgeless-op.explorer.caldera.xyz/"
+          apiUrl: "https://edgeless-testnet.explorer.caldera.xyz/"
         }
       }
     }
@@ -67,8 +67,8 @@ const config: HardhatUserConfig = {
     l1StandardBridge: {
       hardhat: 0,
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04",
-      edgelessSepoliaTestnet: "0x2aff8fd3f9d46C3Cf4993CcD7259021b0F898A04"
+      sepolia: "0xfF591f2f96697F4D852C775B74830282d97D2c37",
+      edgelessSepoliaTestnet: "0xfF591f2f96697F4D852C775B74830282d97D2c37"
     },
     l2StandardBridge: {
       hardhat: 0,
@@ -79,26 +79,26 @@ const config: HardhatUserConfig = {
     l1Eth: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x62b4B558971b6C6054C195602Fc32ae5939bF471",
-      edgelessSepoliaTestnet: "0x62b4B558971b6C6054C195602Fc32ae5939bF471"
+      sepolia: "0x15353D8e704D218280E7A3F5563DF4E4149F040b",
+      edgelessSepoliaTestnet: "0x15353D8e704D218280E7A3F5563DF4E4149F040b"
     },
     l1USD: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA",
-      edgelessSepoliaTestnet: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA"
+      sepolia: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad",
+      edgelessSepoliaTestnet: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad"
     },
     l2Eth: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x2305C316529e4c97510E72B18673168e1C22a927",
-      edgelessSepoliaTestnet: "0x2305C316529e4c97510E72B18673168e1C22a927"
+      sepolia: "0x0000000000000000000000000000000000000000",
+      edgelessSepoliaTestnet: "0x0000000000000000000000000000000000000000"
     },
     l2USD: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2",
-      edgelessSepoliaTestnet: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2"
+      sepolia: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2",
+      edgelessSepoliaTestnet: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2"
     }
   },
   paths: {
@@ -107,15 +107,16 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       goerli: process.env.ETHERSCAN_API_KEY!,
+      sepolia: process.env.ETHERSCAN_API_KEY!,
       edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter "
     },
     customChains: [
       {
         network: "edgelessSepoliaTestnet",
-        chainId: 2067124,
+        chainId: 202,
         urls: {
-          apiURL: "https://edgeless-op.explorer.caldera.xyz/api/",
-          browserURL: "https://edgeless-op.explorer.caldera.xyz/"
+          apiURL: "https://edgeless-testnet.explorer.caldera.xyz/api/",
+          browserURL: "https://edgeless-testnet.explorer.caldera.xyz/"
         }
       }
     ]
