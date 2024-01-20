@@ -91,14 +91,14 @@ const config: HardhatUserConfig = {
     l2Eth: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x2305C316529e4c97510E72B18673168e1C22a927",
-      edgelessSepoliaTestnet: "0x2305C316529e4c97510E72B18673168e1C22a927"
+      sepolia: "0x0000000000000000000000000000000000000000",
+      edgelessSepoliaTestnet: "0x0000000000000000000000000000000000000000"
     },
     l2USD: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2",
-      edgelessSepoliaTestnet: "0x1a38fd27562b98313C2fAeCFb5bD0dFC3F7Ebcb2"
+      sepolia: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2",
+      edgelessSepoliaTestnet: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2"
     }
   },
   paths: {
