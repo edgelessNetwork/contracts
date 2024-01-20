@@ -35,12 +35,12 @@ const config: HardhatUserConfig = {
     },
     edgelessSepoliaTestnet: {
       deploy: ["./deploy/edgelessSepoliaTestnet/"],
-      url: "https://edgeless-op.rpc.caldera.xyz/http",
-      chainId: 2067124,
+      url: "https://edgeless-testnet.rpc.caldera.xyz/http",
+      chainId: 202,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
       verify: {
         etherscan: {
-          apiUrl: "https://edgeless-op.explorer.caldera.xyz/"
+          apiUrl: "https://edgeless-testnet.explorer.caldera.xyz/"
         }
       }
     }
@@ -79,14 +79,14 @@ const config: HardhatUserConfig = {
     l1Eth: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x62b4B558971b6C6054C195602Fc32ae5939bF471",
-      edgelessSepoliaTestnet: "0x62b4B558971b6C6054C195602Fc32ae5939bF471"
+      sepolia: "0x15353D8e704D218280E7A3F5563DF4E4149F040b",
+      edgelessSepoliaTestnet: "0x15353D8e704D218280E7A3F5563DF4E4149F040b"
     },
     l1USD: {
       hardhat: 0,
       goerli: "",
-      sepolia: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA",
-      edgelessSepoliaTestnet: "0x5EFaC893A67E167a64AfA71209ab5A86765A3feA"
+      sepolia: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad",
+      edgelessSepoliaTestnet: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad"
     },
     l2Eth: {
       hardhat: 0,
@@ -113,10 +113,10 @@ const config: HardhatUserConfig = {
     customChains: [
       {
         network: "edgelessSepoliaTestnet",
-        chainId: 2067124,
+        chainId: 202,
         urls: {
-          apiURL: "https://edgeless-op.explorer.caldera.xyz/api/",
-          browserURL: "https://edgeless-op.explorer.caldera.xyz/"
+          apiURL: "https://edgeless-testnet.explorer.caldera.xyz/api/",
+          browserURL: "https://edgeless-testnet.explorer.caldera.xyz/"
         }
       }
     ]
