@@ -1,10 +1,4 @@
 # Edgeless Contracts
-[![Github Actions][gha-badge]][gha] [![Foundry][foundry-badge]][foundry]
-
-[gha]: https://github.com/edgeless-network/edgeless-contracts/actions
-[gha-badge]: https://github.com/edgeless-network/edgeless-contracts/actions/workflows/ci.yml/badge.svg
-[foundry]: https://getfoundry.sh/
-[foundry-badge]: https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg
 
 ## Getting Started
 
