@@ -33,7 +33,14 @@ forge test
 
 ## System Design
 
-![System Design](EdgelessSystem.png)
+### Deposit Flow
+<img width="1117" alt="image" src="https://github.com/edgelessNetwork/contracts/assets/156271310/74d8a869-badc-430b-93a6-dc5a85689d30">
+
+### Withdrawal Flow
+
+<img width="1117" alt="image" src="https://github.com/edgelessNetwork/contracts/assets/156271310/a1c214a9-17b9-4641-b374-20d92271fb58">
+
+
 
 # Contract Design
 
