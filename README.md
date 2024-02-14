@@ -10,20 +10,11 @@ forge test
 
 ### Background
 
-- A feeless yield bearing L2 focused on iGaming and Social Gaming
-- Overview
-    - Traditional marketplaces charge anywhere from 1% to 30% (credit card companies, apple store)
-    - Blast and Manta are focused on creating generalizable L2s where the native token is yield bearing.
-    - While a yield bearing token is a step in the right direction, the yield should be used for more than just higher APYs - the ultimate vision should be to move from charging transaction fees to removing them all together.
-- Use Cases
-    - The first set of use cases is within social gaming. Think games that Zynga would make, such as poker, blackjack, slot machines, and Gacha games
-    - For the first time ever, developers could offer EV neutral or even EV positive games. Developers would no longer need to take a house rake or fee but could monetize off of the yield (ETH or stables).
-- Why Now
-    - Casinos and other similar businesses cannot offer this due to lack of access to tbills(hard to get when based out of curacao) and liquidity risks. The true unlock here is that liquid staked eth/staked Dai is truly liquid and has liquidity to convert and withdraw
-    - There are some interesting ways to gamify the chain, for example accumulating jackpots or lotteries that become increasingly positive EV to participate or even redistributing a portion of earnings to developers who are creating apps on the platform based on the amount of capital used in their dApp / the length in which it is used (since this directly correlates to earnings for the L2).
-    - Lastly, from a market sizing perspective, we can think about capturing 4-5% of deposits which while significantly smaller than the average hold for a casino (~10% of volume), is an extremely attractive business at scale. Lido currently has about $20bn of liquid staked ETH for context, with annualized yields equally about $800m.
-    - Account abstraction is mature enough for gasless experiences
-    - Devs will build here since you can offer your users a gasless experience with nothing out of pocket
+The yield generating contracts on Ethereum for Edgeless Network.
+
+Overview: The high level vision of Edgeless is to lower or remove the transaction fees that dApps currently charge and monetize via bridged TVL. Blast and Manta are focused on creating generalizable L2s where the native token is yield bearing and passed through to the initial user. While this is a step in the right direction the ultimate vision should be to remove transaction fees altogether, which is what we are setting out to do. Like Roblox and Epic, Edgeless is able to pool together the revenue that is generated across the ecosystem and redistribute it to app developers based on the value they bring to the ecosystem.
+
+Use Cases: There are many use cases where charging no transaction fee naturally makes sense, social gaming is one of the most exciting, and is one of the key focuses for Edgeless to begin with (think games that Zynga would make: poker, blackjack, slot machines, and Gacha games). For the first time ever you could offer EV neutral or even EV positive games using the infrastructure that Edgeless offers. Game creators do not need to have a house rake or fee on every spin / turn since they can monetize off of the yield (ETH / stables). Other gaming related use cases include daily fantasy sports, season long survivor brackets and PvP games. Second to gaming, there are several DeFi and consumer applications that we believe would be great apps for our ecosystem including perps exchanges and NFT marketplaces.
 
 ## System Design
 
