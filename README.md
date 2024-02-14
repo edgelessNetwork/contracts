@@ -46,37 +46,18 @@ forge test
 
 - **Edgeless Deposit Contract**: This contract is UUPS Upgradeable by the owner.
 - **Edgeless Wrapped Ether**: An ERC20 representing ETH balance on the L2 with minting exposed to a minter (**Edgeless Deposit Contract)**.
-- **Edgeless Wrapped USD**: An ERC20 representing USD balance on the L2 with minting exposed to a minter (**Edgeless Deposit Contract)**.
 
 ### Staking Contracts
 
 - **Lido Contract**: This contract is focused on managing the staking of Ethereum, a key component of the marketplace's asset management strategy.
-- **Maker DSR_Manager**: A specialized contract for handling the staking of Dai, utilizing the Dai Savings Rate mechanism provided by the MakerDAO ecosystem.
-
-### Swapping Contracts
-
-- **Curve3Pool Contract**: Designed for the swapping of assets within a stablecoin pool, this contract facilitates efficient asset exchange, crucial for marketplace liquidity. Used for swapping Usdt ⇒ Dai
-- **Maker Peg Stability Module**: This contract ensures the stability of the Dai token's value relative to the US Dollar, a vital aspect for maintaining trust and consistency in the marketplace. Used for swapping USDC⇒Dai
-
-### Asset Contracts
-
-- **USDC, Usdt, and Dai**: These contracts manage the respective stablecoins, ensuring their smooth operation and integration into the marketplace.
-- **Steth (Staked Eth)**: This contract handles the staked version of Ether, a critical component of the staking strategy within the ecosystem.
 
 ### Deposit Flows
 
-- **Eth**: Involves minting Wrapped Ether, optional auto-staking through Lido, and bridging the Wrapped Ether to the Edgeless Layer 2.
-- **StEth:** Involves minting Wrapped Ether and bridging it to Edgeless Layer 2.
-- **Dai**: Involves minting Wrapped USD, optional auto-staking of Dai in the DSR_Manager, and bridging the Wrapped USD to Edgeless Layer 2.
-- **USDC**: The flow for USDC includes using the Maker Peg Stability Module to swap USDC for Dai, followed by the Dai flow.
-- **Usdt**: For Usdt, the process involves using the Curve Pool to swap Usdt for Dai, followed by the standard Dai flow.
+- **Eth**: Involves minting Wrapped Ether, optional auto-staking through Lido, and bridging the Wrapped Ether to the Edgeless Layer 2
 
 ### Withdrawal Flows
 
 - **Lido (Eth)**: This flow allows the designated staker to request Lido to withdraw a specific balance of Eth, followed by claiming rewards after the withdrawal is finalized.
-- **Eth**: Involves burning the user's Wrapped Eth and then sending an equivalent amount of Eth to the user.
-- **Dai**: This process requires burning the user's Wrapped USD and then exiting the equivalent amount of Dai from the DSR to the user's address.
-- **Steth**: The flow involves burning the user's Wrapped Ether and transferring Steth to the user's address.
 
 ### Staking Information
 
@@ -93,7 +74,6 @@ forge test
 The following invariants should always be maintained within the contract:
 
 - The balance of Wrapped Eth should always be less than or equal to the total Steth balance combined with the Eth balance.
-- The balance of Wrapped USD should always be less than or equal to the sum of the DSR amount and the Dai balance.
 - If autostaking is not enabled, only the designated staker has the authority to stake Eth and Dai.
 - Toggling the AutoStake feature can only be done by the staker.
 - Setting the staker, L1Bridge, bridgePause, authorizing upgrades, and minting tokens can only be performed by the owner of the contract.
@@ -184,14 +164,14 @@ For this script to work, you need to have a valid `.env` file. Copy the `.env.ex
 $ npx hardhat deploy --network sepolia
 ```
 
-2. Add the `l1Eth` and `l1USD` addresses to namedAccounts in your `hardhat.config.ts`
+2. Add the `l1Eth` addresses to namedAccounts in your `hardhat.config.ts`
 
 3. Deploy the OptimismMintableTokens on the layer two, ie Edgeless
 ```sh
 $ npx hardhat deploy --network edgelessSepoliaTestnet
 ```
 
-4. Add the `l2Eth` and `l2USD` contracts that you just deployed to `hardhat.config.ts`
+4. Add the `l2Eth` contracts that you just deployed to `hardhat.config.ts`
 
 5. Comment out the `func.skip` and run `002_setL2TokenAddresses.ts`
 ```sh

@@ -8,8 +8,7 @@ import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/acc
 
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
- * Upon withdrawal, all assets go to the depositor.
- * TODO: The depositor needs to be set after deployment
+ * Upon withdrawal, all assets go to the depositor. The depositor needs to be set after deployment
  */
 contract StakingManager is Ownable2StepUpgradeable {
     using SafeERC20 for IERC20;

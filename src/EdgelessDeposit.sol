@@ -2,12 +2,9 @@
 pragma solidity >=0.8.23;
 
 import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
-
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
-
 import { IL1StandardBridge } from "./interfaces/IL1StandardBridge.sol";
-
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
