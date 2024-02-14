@@ -12,16 +12,11 @@ import { EdgelessDeposit } from "../../src/EdgelessDeposit.sol";
 import { StakingManager } from "../../src/StakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
-import { DaiStrategy } from "../../src/strategies/DaiStrategy.sol";
 
-import { IDai } from "../../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../../src/interfaces/IL1StandardBridge.sol";
 import { ILido } from "../../src/interfaces/ILido.sol";
-import { IUsdt } from "../../src/interfaces/IUsdt.sol";
-import { IUsdc } from "../../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
-import { Dai } from "../../src/Constants.sol";
 
 import { Permit, SigUtils } from "./SigUtils.sol";
 
@@ -40,9 +35,7 @@ abstract contract DeploymentUtils is PRBTest {
             StakingManager stakingManager,
             EdgelessDeposit edgelessDeposit,
             WrappedToken wrappedEth,
-            WrappedToken wrappedUSD,
-            IStakingStrategy EthStakingStrategy,
-            IStakingStrategy DaiStakingStrategy
+            IStakingStrategy EthStakingStrategy
         )
     {
         vm.startPrank(owner);
@@ -65,20 +58,11 @@ abstract contract DeploymentUtils is PRBTest {
         stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), EthStakingStrategy);
         stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
 
-        address DaiStakingStrategyImpl = address(new DaiStrategy());
-        bytes memory DaiStakingStrategyData = abi.encodeCall(DaiStrategy.initialize, (owner, address(stakingManager)));
-        DaiStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(DaiStakingStrategyImpl, DaiStakingStrategyData))));
-        stakingManager.addStrategy(address(Dai), DaiStakingStrategy);
-        stakingManager.setActiveStrategy(address(Dai), 0);
-
         wrappedEth = edgelessDeposit.wrappedEth();
-        wrappedUSD = edgelessDeposit.wrappedUSD();
         edgelessDeposit.setAutoBridge(false);
         vm.stopPrank();
 
         vm.label(address(wrappedEth), "wrappedEth");
-        vm.label(address(wrappedUSD), "wrappedUSD");
         vm.label(address(edgelessDeposit), "edgelessDeposit");
     }
 }

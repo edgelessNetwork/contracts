@@ -47,11 +47,7 @@ contract StakingManager is Ownable2StepUpgradeable {
 
     /// -------------------------------- 📝 Staker Functions 📝 --------------------------------
     function stake(address asset, uint256 amount) external payable onlyStaker {
-        if (asset == ETH_ADDRESS) {
-            _stakeEth(msg.value);
-        } else {
-            _stakeERC20(asset, amount);
-        }
+        _stakeEth(msg.value);
         emit Stake(asset, amount);
     }
 
@@ -60,20 +56,8 @@ contract StakingManager is Ownable2StepUpgradeable {
         strategy.deposit{ value: amount }(amount);
     }
 
-    function _stakeERC20(address asset, uint256 amount) internal {
-        IStakingStrategy strategy = getActiveStrategy(asset);
-        IERC20(asset).safeTransferFrom(msg.sender, address(this), amount);
-        IERC20(asset).approve(address(strategy), amount);
-        strategy.deposit(amount);
-    }
-
     function withdraw(address asset, uint256 amount) external onlyStaker {
-        if (asset == ETH_ADDRESS) {
-            _withdrawEth(amount);
-        } else {
-            _withdrawERC20(asset, amount);
-        }
-        emit Withdraw(asset, amount);
+        _withdrawEth(amount);
     }
 
     function _withdrawEth(uint256 amount) internal {
@@ -84,15 +68,6 @@ contract StakingManager is Ownable2StepUpgradeable {
         if (!success) {
             revert TransferFailed(data);
         }
-    }
-
-    function _withdrawERC20(address asset, uint256 amount) internal {
-        IStakingStrategy strategy = getActiveStrategy(asset);
-        uint256 withdrawnAmount;
-        if (address(strategy) != address(0)) {
-            withdrawnAmount = strategy.withdraw(amount);
-        }
-        IERC20(asset).safeTransfer(depositor, withdrawnAmount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------

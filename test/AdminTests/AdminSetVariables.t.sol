@@ -11,16 +11,11 @@ import { EdgelessDeposit } from "../../src/EdgelessDeposit.sol";
 import { StakingManager } from "../../src/StakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
-import { DaiStrategy } from "../../src/strategies/DaiStrategy.sol";
 
-import { IDai } from "../../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../../src/interfaces/IL1StandardBridge.sol";
-import { ILido } from "../../src/interfaces/ILido.sol";
-import { IUsdt } from "../../src/interfaces/IUsdt.sol";
-import { IUsdc } from "../../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
-import { LIDO, Dai, Usdc, Usdt } from "../../src/Constants.sol";
+import { LIDO } from "../../src/Constants.sol";
 
 import { Permit, SigUtils } from "../Utils/SigUtils.sol";
 import { DeploymentUtils } from "../Utils/DeploymentUtils.sol";
@@ -32,13 +27,9 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    WrappedToken internal wrappedUSD;
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
-    IStakingStrategy internal DaiStakingStrategy;
-
-    address public constant STEth_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
@@ -48,8 +39,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
-            deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
     }
 
     // ----------- Edgeless Deposit ------------
@@ -73,17 +63,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.prank(randomUser);
         vm.expectRevert();
         edgelessDeposit.setL2Eth(randomL2Eth);
-    }
-
-    function test_setL2USD(address randomL2Usd, address randomUser) external {
-        vm.assume(randomL2Usd != address(0));
-        vm.prank(owner);
-        edgelessDeposit.setL2USD(randomL2Usd);
-        assertEq(address(edgelessDeposit.l2USD()), randomL2Usd);
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        edgelessDeposit.setL2USD(randomL2Usd);
     }
 
     function test_setAutoBridge(bool autoBridge, address randomUser) external {
@@ -263,54 +242,12 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         EthStakingStrategy.setAutoStake(autoStake);
     }
 
-    // ----------- Dai Strategy ------------
-    function test_ownerDepositDai(address randomAddress) external {
-        forkMainnetAndDeploy();
-        vm.prank(owner);
-        DaiStakingStrategy.ownerDeposit(0);
-
-        vm.expectRevert();
-        vm.prank(randomAddress);
-        DaiStakingStrategy.ownerDeposit(0);
-    }
-
-    function test_ownerWithdrawDai(address randomAddress) external {
-        forkMainnetAndDeploy();
-        vm.prank(owner);
-        DaiStakingStrategy.ownerWithdraw(0);
-
-        vm.prank(randomAddress);
-        vm.expectRevert();
-        DaiStakingStrategy.ownerWithdraw(0);
-    }
-
-    function test_setStakingManagerDai(address stakingManager, address randomUser) external {
-        vm.prank(owner);
-        DaiStakingStrategy.setStakingManager(stakingManager);
-        assertEq(DaiStakingStrategy.stakingManager(), stakingManager);
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        DaiStakingStrategy.setStakingManager(address(stakingManager));
-    }
-
-    function test_setAutoStakeDai(bool autoStake, address randomUser) external {
-        vm.prank(owner);
-        DaiStakingStrategy.setAutoStake(autoStake);
-        assertEq(DaiStakingStrategy.autoStake(), autoStake);
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        DaiStakingStrategy.setAutoStake(autoStake);
-    }
-
     function forkMainnetAndDeploy() internal {
         string memory alchemyApiKey = vm.envOr("API_KEY_ALCHEMY", string(""));
         vm.createSelectFork({
             urlOrAlias: string(abi.encodePacked("https://Eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
-            deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
     }
 }
