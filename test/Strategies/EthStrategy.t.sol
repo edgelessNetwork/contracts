@@ -11,19 +11,14 @@ import { EdgelessDeposit } from "../../src/EdgelessDeposit.sol";
 import { StakingManager } from "../../src/StakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
-import { DaiStrategy } from "../../src/strategies/DaiStrategy.sol";
 
-import { IDai } from "../../src/interfaces/IDai.sol";
 import { IL1StandardBridge } from "../../src/interfaces/IL1StandardBridge.sol";
-import { ILido } from "../../src/interfaces/ILido.sol";
-import { IUsdt } from "../../src/interfaces/IUsdt.sol";
-import { IUsdc } from "../../src/interfaces/IUsdc.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "../Utils/SigUtils.sol";
 import { DeploymentUtils } from "../Utils/DeploymentUtils.sol";
-import { LIDO, Dai, Usdc, Usdt } from "../../src/Constants.sol";
+import { LIDO } from "../../src/Constants.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
@@ -32,13 +27,9 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    WrappedToken internal wrappedUSD;
     IL1StandardBridge internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
-    IStakingStrategy internal DaiStakingStrategy;
-
-    address public constant STEth_WHALE = 0x5F6AE08B8AeB7078cf2F96AFb089D7c9f51DA47d; // Blast Deposits
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
@@ -55,8 +46,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, wrappedUSD, EthStakingStrategy, DaiStakingStrategy) =
-            deployContracts(owner, owner);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, owner);
     }
 
     function test_OwnerCanWithdrawAllAssetsToStakingManager(uint256 amount) external {
@@ -64,7 +54,6 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         depositAssetsToStrategy(amount);
         vm.prank(owner);
         uint256 ethStakingStrategyBalance = address(EthStakingStrategy).balance;
-        console2.log(amount, ethStakingStrategyBalance);
         EthStakingStrategy.ownerWithdraw(ethStakingStrategyBalance);
 
         assertEq(address(EthStakingStrategy).balance, 0, "EthStrategy should have 0 Eth");
