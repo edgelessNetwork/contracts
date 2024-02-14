@@ -10,9 +10,9 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     address public stakingManager;
     bool public autoStake;
 
-    event EthStaked(uint256 amounts);
-    event EthWithdrawn(uint256 amounts);
-    event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
+    event EthStaked(uint256 amount);
+    event EthWithdrawn(uint256 amount);
+    event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amount);
     event ClaimedLidoWithdrawals(uint256[] requestIds);
     event SetStakingManager(address stakingManager);
     event SetAutoStake(bool autoStake);
@@ -33,23 +33,23 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
-    function deposit(uint256 amounts) external payable onlyStakingManager {
+    function deposit(uint256 amount) external payable onlyStakingManager {
         if (!autoStake) {
             return;
         }
-        if (amounts > address(this).balance) {
+        if (amount > address(this).balance) {
             revert InsufficientFunds();
         }
-        LIDO.submit{ value: amounts }(address(0));
-        emit EthStaked(amounts);
+        LIDO.submit{ value: amount }(address(0));
+        emit EthStaked(amount);
     }
 
-    function withdraw(uint256 amounts) external onlyStakingManager returns (uint256 withdrawnAmount) {
+    function withdraw(uint256 amount) external onlyStakingManager returns (uint256 withdrawnAmount) {
         uint256 balance = address(this).balance;
-        if (amounts > balance) {
+        if (amount > balance) {
             withdrawnAmount = balance;
         } else {
-            withdrawnAmount = amounts;
+            withdrawnAmount = amount;
         }
         (bool success, bytes memory data) = stakingManager.call{ value: withdrawnAmount }("");
         if (!success) {
@@ -77,18 +77,18 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         return amount;
     }
 
-    function requestLidoWithdrawal(uint256[] calldata amounts)
+    function requestLidoWithdrawal(uint256[] calldata amount)
         external
         onlyOwner
         returns (uint256[] memory requestIds)
     {
         uint256 total = 0;
-        for (uint256 i = 0; i < amounts.length; i++) {
-            total += amounts[i];
+        for (uint256 i = 0; i < amount.length; i++) {
+            total += amount[i];
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
-        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amounts, address(this));
-        emit RequestedLidoWithdrawals(requestIds, amounts);
+        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amount, address(this));
+        emit RequestedLidoWithdrawals(requestIds, amount);
     }
 
     function claimLidoWithdrawals(uint256[] calldata requestIds) external onlyOwner {

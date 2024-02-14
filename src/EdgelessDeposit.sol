@@ -11,15 +11,13 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
- * @notice EdgelessDeposit is a contract that allows users to deposit Eth, Usdc, Usdt, or Dai and
+ * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
-    address public l2USD;
     WrappedToken public wrappedEth;
-    WrappedToken public wrappedUSD;
     IL1StandardBridge public l1standardBridge;
     StakingManager public stakingManager;
 
