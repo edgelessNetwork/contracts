@@ -9,9 +9,7 @@ interface IStakingStrategy {
     function setStakingManager(address _stakingManager) external;
     function setAutoStake(bool _autoStake) external;
 
-    function underlyingAsset() external view returns (address);
-    function underlyingAssetAmountNoUpdate() external view returns (uint256);
-    function underlyingAssetAmount() external returns (uint256);
+    function underlyingAssetAmount() external view returns (uint256);
     function autoStake() external view returns (bool);
     function stakingManager() external view returns (address);
 }

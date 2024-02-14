@@ -3,7 +3,6 @@ pragma solidity >=0.8.23;
 
 import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 
-import { DepositManager } from "./DepositManager.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
 
@@ -18,7 +17,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth, Usdc, Usdt, or Dai and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgradeable {
+contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     address public l2USD;
@@ -27,27 +26,19 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
     IL1StandardBridge public l1standardBridge;
     StakingManager public stakingManager;
 
-    event DepositDai(address indexed to, address indexed from, uint256 DaiAmount, uint256 mintAmount);
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
-    event DepositStEth(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
-    event DepositUsdc(address indexed to, address indexed from, uint256 UsdcAmount, uint256 mintAmount);
-    event DepositUsdt(address indexed to, address indexed from, uint256 UsdtAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
-    event MintWrappedUSD(address indexed to, uint256 amount);
     event SetAutoBridge(bool autoBridge);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
     event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
     event SetL2Eth(address l2Eth);
-    event SetL2USD(address l2USD);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
-    event WithdrawUSD(address indexed from, address indexed to, uint256 usdAmountWithdrew, uint256 burnAmount);
     event BridgeToL2(address indexed from, address indexed to, address indexed l2Address, uint256 amount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
     error ZeroAddress();
     error L2EthSet();
-    error L2USDSet();
 
     function initialize(
         address _owner,
@@ -83,7 +74,7 @@ contract EdgelessDeposit is DepositManager, Ownable2StepUpgradeable, UUPSUpgrade
      * @param to Address to mint wrapped tokens to
      */
     function depositEth(address to) public payable {
-        uint256 amount = _depositEth(msg.value);
+        uint256 amount = msg.value;
         _mintWrappedEth(to, amount);
         stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
         _bridgeToL2(wrappedEth, l2Eth, to, amount);

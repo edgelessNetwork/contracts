@@ -109,15 +109,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
-    function underlyingAsset() external pure returns (address) {
-        return address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    }
-
-    function underlyingAssetAmountNoUpdate() public view returns (uint256) {
-        return address(this).balance + LIDO.balanceOf(address(this));
-    }
-
     function underlyingAssetAmount() external view returns (uint256) {
-        return underlyingAssetAmountNoUpdate();
+        return address(this).balance + LIDO.balanceOf(address(this));
     }
 }

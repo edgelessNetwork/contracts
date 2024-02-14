@@ -222,14 +222,14 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         EthStrategy(address(EthStakingStrategy)).claimLidoWithdrawals(requestIds);
     }
 
-    function test_setStakingManagerEth(address stakingManager, address randomUser) external {
+    function test_setStakingManagerEth(address newStakingManager, address randomUser) external {
         vm.prank(owner);
-        EthStakingStrategy.setStakingManager(stakingManager);
-        assertEq(EthStakingStrategy.stakingManager(), stakingManager);
+        EthStakingStrategy.setStakingManager(newStakingManager);
+        assertEq(EthStakingStrategy.stakingManager(), newStakingManager);
 
         vm.prank(randomUser);
         vm.expectRevert();
-        EthStakingStrategy.setStakingManager(address(stakingManager));
+        EthStakingStrategy.setStakingManager(address(newStakingManager));
     }
 
     function test_setAutoStakeEth(bool autoStake, address randomUser) external {
