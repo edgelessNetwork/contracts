@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { LIDO } from "./Constants.sol";
+import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
-import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
-import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
-import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
+contract EdgelessDeposit is Ownable2StepUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
@@ -33,7 +32,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     error MaxMintExceeded();
     error TransferFailed(bytes data);
     error ZeroAddress();
-    error L2EthSet();
 
     function initialize(
         address _owner,
@@ -47,7 +45,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         if (address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)) {
             revert ZeroAddress();
         }
-
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
         l1standardBridge = _l1standardBridge;
         autoBridge = false;
@@ -83,11 +80,9 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      */
     function withdrawEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
-        stakingManager.withdraw(stakingManager.ETH_ADDRESS(), amount);
+        stakingManager.withdraw(amount);
         (bool success, bytes memory data) = to.call{ value: amount }("");
-        if (!success) {
-            revert TransferFailed(data);
-        }
+        if (!success) revert TransferFailed(data);
         emit WithdrawEth(msg.sender, to, amount, amount);
     }
 
@@ -108,7 +103,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
         if (address(_l2Eth) == address(0)) revert ZeroAddress();
-        if (l2Eth != address(0)) revert L2EthSet();
         l2Eth = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
@@ -130,14 +124,10 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
         uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
-        if (maxMint > amount) {
-            revert MaxMintExceeded();
-        }
+        if (maxMint > amount) revert MaxMintExceeded();
         wrappedEth.mint(to, amount);
         emit MintWrappedEth(to, amount);
     }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {

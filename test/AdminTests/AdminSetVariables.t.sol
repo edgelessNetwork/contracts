@@ -95,14 +95,12 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     }
 
     function test_withdraw(address randomUser) external {
-        address EthAddress = stakingManager.ETH_ADDRESS();
-
         vm.prank(address(edgelessDeposit));
-        stakingManager.withdraw(EthAddress, 0);
+        stakingManager.withdraw(0);
 
         vm.prank(randomUser);
         vm.expectRevert();
-        stakingManager.withdraw(EthAddress, 0);
+        stakingManager.withdraw(0);
     }
 
     function test_setStaker(address randomStaker, address randomUser) external {

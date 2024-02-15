@@ -12,12 +12,11 @@ contract WrappedToken is ERC20 {
 
     event Mint(address indexed account, uint256 amount);
     event Burn(address indexed account, uint256 amount);
+
     error SenderIsNotMinter();
 
     modifier onlyMinter() {
-        if (msg.sender != minter) {
-            revert SenderIsNotMinter();
-        }
+        if (msg.sender != minter) revert SenderIsNotMinter();
         _;
     }
 
