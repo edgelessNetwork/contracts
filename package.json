@@ -11,6 +11,7 @@
     "@nomicfoundation/hardhat-verify": "^2.0.3",
     "@openzeppelin/contracts": "^5.0.1",
     "@openzeppelin/contracts-upgradeable": "^5.0.1",
+    "cloc": "^1.98.0-cloc",
     "dotenv": "^16.3.1",
     "openzeppelin-foundry-upgrades": "github:OpenZeppelin/openzeppelin-foundry-upgrades"
   },
@@ -48,6 +49,7 @@
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check **/*.{json,md,yml} --ignore-path=.prettierignore",
     "prettier:write": "prettier --write **/*.{json,md,yml} --ignore-path=.prettierignore",
+    "sloc": "cloc src/* src/strategies/*",
     "test": "forge test",
     "test:coverage": "forge coverage",
     "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage"
