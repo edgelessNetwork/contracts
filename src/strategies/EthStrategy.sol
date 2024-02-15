@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
-import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
 
 contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     address public stakingManager;
