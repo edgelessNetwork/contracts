@@ -2,7 +2,8 @@
 
 ## For Auditors
 Relevant Documentation/Design docs are below
-Description:
+
+- SLOC: 377 Lines (`yarn sloc`)
 - In Scope: `src/EdgelessDeposit.sol`, `src/StakingManager.sol`, `src/WrappedToken.sol`, `Constants.sol`, `src/strategies/EthStrategy.sol`
 - Out of Scope:
     - `src/edgeless/*` - forked from optimism
@@ -11,7 +12,8 @@ Description:
 Copied Files
 - `src/edgeless/*`: [IOptimismMintableERC20](https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/universal/IOptimismMintableERC20.sol/), [OptimismMintableERC20](https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/universal/OptimismMintableERC20.sol)
 - `src/interfaces/*`: [IL1ERC20Bridge](https://github.com/oasysgames/l1-l2-bridge-tutorial/blob/main/contracts/L1/messaging/IL1ERC20Bridge.sol), [IWithdrawalQueueERC721](https://github.com/lidofinance/lido-dao/blob/master/contracts/0.8.9/WithdrawalQueueERC721.sol)
-Rough Timeline: Start on 2/19, finish whenever?
+- Rough Timeline: Start on 2/19, finish whenever?
+- Coverage: Over 95% on in scope files https://app.warp.dev/block/lKLociuVyrXOf7Dy7fsNWx
 
 ## Getting Started
 
