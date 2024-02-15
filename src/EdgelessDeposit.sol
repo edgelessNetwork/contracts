@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+
 import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
+import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
-import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
-import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
-import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title EdgelessDeposit
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
+contract EdgelessDeposit is Ownable2StepUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
@@ -136,8 +136,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         wrappedEth.mint(to, amount);
         emit MintWrappedEth(to, amount);
     }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {
