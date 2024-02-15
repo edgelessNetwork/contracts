@@ -64,9 +64,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         uint256 withdrawnAmount;
         if (address(strategy) != address(0)) withdrawnAmount = strategy.withdraw(amount);
         (bool success, bytes memory data) = depositor.call{ value: withdrawnAmount }("");
-        if (!success) {
-            revert TransferFailed(data);
-        }
+        if (!success) revert TransferFailed(data);
         emit Withdraw(ETH_ADDRESS, amount);
     }
 
