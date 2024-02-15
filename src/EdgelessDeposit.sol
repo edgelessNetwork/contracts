@@ -3,7 +3,6 @@ pragma solidity >=0.8.23;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
-
 import { LIDO } from "./Constants.sol";
 import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
 import { StakingManager } from "./StakingManager.sol";
@@ -82,7 +81,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      */
     function withdrawEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
-        stakingManager.withdraw(stakingManager.ETH_ADDRESS(), amount);
+        stakingManager.withdraw(amount);
         (bool success, bytes memory data) = to.call{ value: amount }("");
         if (!success) {
             revert TransferFailed(data);

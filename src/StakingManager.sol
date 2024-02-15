@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
@@ -55,7 +55,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         strategy.deposit{ value: amount }(amount);
     }
 
-    function withdraw(address asset, uint256 amount) external onlyStaker {
+    function withdraw(uint256 amount) external onlyStaker {
         _withdrawEth(amount);
     }
 
@@ -67,6 +67,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         if (!success) {
             revert TransferFailed(data);
         }
+        emit Withdraw(ETH_ADDRESS, amount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
