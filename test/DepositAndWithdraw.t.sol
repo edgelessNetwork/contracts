@@ -35,6 +35,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
     address public constant LIDO_FINALIZE_ROLE_ADDRESS = address(LIDO);
+    address public constant OPTIMISM_GATEWAY_BRIDGE = address(0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1);
 
     address public owner = makeAddr("Edgeless owner");
     address public depositor = makeAddr("Depositor");
@@ -84,7 +85,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         address edgelessDepositImpl = address(new EdgelessDeposit());
         bytes memory edgelessDepositData = abi.encodeCall(
             EdgelessDeposit.initialize,
-            (owner, staker, IL1ERC20Bridge(0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1), stakingManager)
+            (owner, staker, IL1ERC20Bridge(OPTIMISM_GATEWAY_BRIDGE), stakingManager)
         );
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
@@ -113,7 +114,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
         );
         assertEq(
-            wrappedEth.balanceOf(0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1),
+            wrappedEth.balanceOf(OPTIMISM_GATEWAY_BRIDGE),
             amount,
             "Bridge should have `amount` of wrapped Eth"
         );
