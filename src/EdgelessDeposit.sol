@@ -4,7 +4,7 @@ pragma solidity >=0.8.23;
 import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
-import { IL1StandardBridge } from "./interfaces/IL1StandardBridge.sol";
+import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -18,14 +18,14 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
-    IL1StandardBridge public l1standardBridge;
+    IL1ERC20Bridge public l1standardBridge;
     StakingManager public stakingManager;
 
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
     event SetAutoBridge(bool autoBridge);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
-    event SetL1StandardBridge(IL1StandardBridge l1standardBridge);
+    event SetL1StandardBridge(IL1ERC20Bridge l1standardBridge);
     event SetL2Eth(address l2Eth);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
     event BridgeToL2(address indexed from, address indexed to, address indexed l2Address, uint256 amount);
@@ -38,7 +38,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     function initialize(
         address _owner,
         address _staker,
-        IL1StandardBridge _l1standardBridge,
+        IL1ERC20Bridge _l1standardBridge,
         StakingManager _stakingManager
     )
         external
@@ -96,7 +96,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      * @notice Set the address of the L1StandardBridge contract
      * @param _l1standardBridge Address of the L1StandardBridge contract
      */
-    function setL1StandardBridge(IL1StandardBridge _l1standardBridge) external onlyOwner {
+    function setL1StandardBridge(IL1ERC20Bridge _l1standardBridge) external onlyOwner {
         if (address(_l1standardBridge) == address(0)) revert ZeroAddress();
         l1standardBridge = _l1standardBridge;
         emit SetL1StandardBridge(_l1standardBridge);

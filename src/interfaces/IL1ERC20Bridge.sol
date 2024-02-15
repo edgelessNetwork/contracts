@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-interface IL1StandardBridge {
+interface IL1ERC20Bridge {
     /// @notice Deposits some amount of ERC20 tokens into a target account on L2.
     /// @param _l1Token     Address of the L1 token being deposited.
     /// @param _l2Token     Address of the corresponding token on L2.
