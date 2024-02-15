@@ -44,11 +44,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       abi: WrappedTokenArtifact["abi"],
     });
 
-    await save("Edgeless Wrapped USD", {
-      address: await read("EdgelessDeposit", "wrappedUSD"),
-      abi: WrappedTokenArtifact["abi"],
-    });
-
     await execute("StakingManager", { from: owner, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
     await execute(
       "StakingManager",
@@ -90,61 +85,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       await read("StakingManager", "ETH_ADDRESS"),
       0,
     );
-
-    await deploy("DaiStrategy", {
-      from: deployer,
-      proxy: {
-        proxyContract: "UUPS",
-        execute: {
-          init: {
-            methodName: "initialize",
-            args: [owner, (await get("StakingManager")).address],
-          },
-        },
-      },
-      skipIfAlreadyDeployed: true,
-      log: true,
-    });
-
-    await execute(
-      "StakingManager",
-      { from: owner, log: true },
-      "addStrategy",
-      await read("DaiStrategy", "underlyingAsset"),
-      (await get("DaiStrategy")).address,
-    );
-
-    await execute(
-      "StakingManager",
-      { from: owner, log: true },
-      "setActiveStrategy",
-      await read("DaiStrategy", "underlyingAsset"),
-      0,
-    );
-
-    await hre.run("etherscan-verify", {
-      apiKey: process.env.ETHERSCAN_API_KEY,
-    });
-
-    await hre.run("verify:verify", {
-      address: (await get("Edgeless Wrapped ETH")).address,
-      constructorArguments: [
-        (await get("EdgelessDeposit")).address,
-        await read("Edgeless Wrapped ETH", "name"),
-        await read("Edgeless Wrapped ETH", "symbol"),
-      ],
-    });
-    await hre.run("verify:verify", {
-      address: (await get("Edgeless Wrapped USD")).address,
-      constructorArguments: [
-        (await get("EdgelessDeposit")).address,
-        await read("Edgeless Wrapped USD", "name"),
-        await read("Edgeless Wrapped USD", "symbol"),
-      ],
-    });
   } else {
     log("EdgelessDeposit already deployed, skipping...");
   }
+  await hre.run("etherscan-verify", {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  });
+
+  await hre.run("verify:verify", {
+    address: (await get("Edgeless Wrapped ETH")).address,
+    constructorArguments: [
+      (await get("EdgelessDeposit")).address,
+      await read("Edgeless Wrapped ETH", "name"),
+      await read("Edgeless Wrapped ETH", "symbol"),
+    ],
+  });
 };
 export default func;
-func.skip = async () => true;
