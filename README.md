@@ -4,7 +4,10 @@
 Relevant Documentation/Design docs are below
 Description:
 - In Scope: `src/EdgelessDeposit.sol`, `src/StakingManager.sol`, `src/WrappedToken.sol`, `Constants.sol`, `src/strategies/EthStrategy.sol`
-- Out of Scope: `src/edgeless/*` - forked from optimism `src/interfaces/*` - just interface
+- Out of Scope:
+    - `src/edgeless/*` - forked from optimism
+    - `src/interfaces/*` - just interface
+    - Centralization concerns
 Copied Files
 - `src/edgeless/*`: [IOptimismMintableERC20](https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/universal/IOptimismMintableERC20.sol/), [OptimismMintableERC20](https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/universal/OptimismMintableERC20.sol)
 - `src/interfaces/*`: [IL1ERC20Bridge](https://github.com/oasysgames/l1-l2-bridge-tutorial/blob/main/contracts/L1/messaging/IL1ERC20Bridge.sol), [IWithdrawalQueueERC721](https://github.com/lidofinance/lido-dao/blob/master/contracts/0.8.9/WithdrawalQueueERC721.sol)
