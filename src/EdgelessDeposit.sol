@@ -4,7 +4,7 @@ pragma solidity >=0.8.23;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
-import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "./Constants.sol";
+import { LIDO } from "./Constants.sol";
 import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
@@ -33,7 +33,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
     error MaxMintExceeded();
     error TransferFailed(bytes data);
     error ZeroAddress();
-    error L2EthSet();
 
     function initialize(
         address _owner,
@@ -108,7 +107,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
         if (address(_l2Eth) == address(0)) revert ZeroAddress();
-        if (l2Eth != address(0)) revert L2EthSet();
         l2Eth = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
