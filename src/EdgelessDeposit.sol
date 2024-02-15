@@ -45,7 +45,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
         if (address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)) {
             revert ZeroAddress();
         }
-
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
         l1standardBridge = _l1standardBridge;
         autoBridge = false;
@@ -83,9 +82,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
         wrappedEth.burn(msg.sender, amount);
         stakingManager.withdraw(amount);
         (bool success, bytes memory data) = to.call{ value: amount }("");
-        if (!success) {
-            revert TransferFailed(data);
-        }
+        if (!success) revert TransferFailed(data);
         emit WithdrawEth(msg.sender, to, amount, amount);
     }
 
@@ -127,9 +124,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
         uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
-        if (maxMint > amount) {
-            revert MaxMintExceeded();
-        }
+        if (maxMint > amount) revert MaxMintExceeded();
         wrappedEth.mint(to, amount);
         emit MintWrappedEth(to, amount);
     }
