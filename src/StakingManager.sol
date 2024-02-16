@@ -96,13 +96,13 @@ contract StakingManager is Ownable2StepUpgradeable {
 
     function removeStrategy(address asset, uint256 index) external onlyOwner {
         IStakingStrategy strategy = strategies[asset][index];
+        uint256 withdrawnAmount = strategy.withdraw(strategy.underlyingAssetAmount());
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
         if (activeStrategyIndex[asset] == index) {
-            activeStrategyIndex[asset] = lastIndex;
+            activeStrategyIndex[asset] = 0;
         }
-        uint256 withdrawnAmount = strategy.withdraw(strategy.underlyingAssetAmount());
         emit RemoveStrategy(asset, strategy, withdrawnAmount);
     }
 

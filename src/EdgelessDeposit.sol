@@ -124,7 +124,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      */
     function mintEthBasedOnStakedAmount(address to, uint256 amount) external onlyOwner {
         uint256 maxMint = stakingManager.getAssetTotal(stakingManager.ETH_ADDRESS()) - wrappedEth.totalSupply();
-        if (maxMint > amount) revert MaxMintExceeded();
+        if (maxMint < amount) revert MaxMintExceeded();
         wrappedEth.mint(to, amount);
         emit MintWrappedEth(to, amount);
     }
