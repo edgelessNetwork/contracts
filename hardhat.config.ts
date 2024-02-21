@@ -58,12 +58,6 @@ const config: HardhatUserConfig = {
       sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
-    staker: {
-      hardhat: 0,
-      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
-    },
     l1StandardBridge: {
       hardhat: 0,
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",

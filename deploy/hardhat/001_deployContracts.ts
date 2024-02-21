@@ -79,17 +79,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   } else {
     log("EdgelessDeposit already deployed, skipping...");
   }
-  await hre.run("etherscan-verify", {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  });
-
-  await hre.run("verify:verify", {
-    address: (await get("Edgeless Wrapped ETH")).address,
-    constructorArguments: [
-      (await get("EdgelessDeposit")).address,
-      await read("Edgeless Wrapped ETH", "name"),
-      await read("Edgeless Wrapped ETH", "symbol"),
-    ],
-  });
 };
 export default func;
