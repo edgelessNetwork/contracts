@@ -20,6 +20,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     error InsufficientFunds();
     error TransferFailed(bytes data);
     error OnlyStakingManager(address sender);
+    error RequestIdsMustBeSorted();
 
     modifier onlyStakingManager() {
         if (msg.sender != stakingManager) revert OnlyStakingManager(msg.sender);
@@ -82,6 +83,10 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     }
 
     function claimLidoWithdrawals(uint256[] calldata requestIds) external onlyOwner {
+        // Check if requestIds is sorted
+        for (uint256 i = 0; i < requestIds.length - 1; i++) {
+            if (requestIds[i] > requestIds[i + 1]) revert RequestIdsMustBeSorted();
+        }
         uint256 lastCheckpointIndex = LIDO_WITHDRAWAL_ERC721.getLastCheckpointIndex();
         uint256[] memory _hints = LIDO_WITHDRAWAL_ERC721.findCheckpointHints(requestIds, 1, lastCheckpointIndex);
         LIDO_WITHDRAWAL_ERC721.claimWithdrawals(requestIds, _hints);
