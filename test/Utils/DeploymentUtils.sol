@@ -27,8 +27,7 @@ abstract contract DeploymentUtils is PRBTest {
      * autoStake is set to true, and autoBridge is set to false
      */
     function deployContracts(
-        address owner,
-        address staker
+        address owner
     )
         public
         returns (
@@ -40,7 +39,7 @@ abstract contract DeploymentUtils is PRBTest {
     {
         vm.startPrank(owner);
         address stakingManagerImpl = address(new StakingManager());
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner, staker));
+        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
         stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
 
         address edgelessDepositImpl = address(new EdgelessDeposit());

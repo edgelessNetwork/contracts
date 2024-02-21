@@ -39,7 +39,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
     // ----------- Edgeless Deposit ------------
@@ -236,6 +236,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
             urlOrAlias: string(abi.encodePacked("https://Eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 }

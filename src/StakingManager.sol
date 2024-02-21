@@ -38,8 +38,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         _;
     }
 
-    function initialize(address _owner, address _staker) external initializer {
-        staker = _staker;
+    function initialize(address _owner) external initializer {
         __Ownable_init(_owner);
     }
 

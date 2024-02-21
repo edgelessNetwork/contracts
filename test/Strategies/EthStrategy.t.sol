@@ -46,7 +46,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, owner);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
     function test_OwnerCanWithdrawAllAssetsToStakingManager(uint256 amount) external {

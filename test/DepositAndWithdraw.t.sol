@@ -50,7 +50,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, owner);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
     function test_EthDepositAndWithdraw(uint256 amount) external {
@@ -79,7 +79,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         vm.startPrank(owner);
         amount = bound(amount, 1e18, 1e40);
         address stakingManagerImpl = address(new StakingManager());
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner, staker));
+        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
         stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
 
         address edgelessDepositImpl = address(new EdgelessDeposit());
