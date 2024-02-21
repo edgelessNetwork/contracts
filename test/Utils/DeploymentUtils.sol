@@ -49,7 +49,6 @@ abstract contract DeploymentUtils is PRBTest {
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
-        stakingManager.setDepositor(address(edgelessDeposit));
 
         address EthStakingStrategyImpl = address(new EthStrategy());
         bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));

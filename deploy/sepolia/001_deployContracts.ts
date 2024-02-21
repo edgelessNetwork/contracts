@@ -45,15 +45,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     });
 
     await execute("StakingManager", { from: owner, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
-    await execute(
-      "StakingManager",
-      {
-        from: owner,
-        log: true,
-      },
-      "setDepositor",
-      (await get("EdgelessDeposit")).address,
-    );
 
     await deploy("EthStrategy", {
       from: deployer,
