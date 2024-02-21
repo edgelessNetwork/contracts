@@ -18,7 +18,7 @@ import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./Utils/SigUtils.sol";
 import { DeploymentUtils } from "./Utils/DeploymentUtils.sol";
-import { LIDO } from "../src/Constants.sol";
+import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../src/Constants.sol";
 import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
@@ -74,12 +74,12 @@ contract EdgelessE2ETest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(address(stakingManager).balance, 0, "StakingManager should have 0 Eth after withdrawing");
     }
 
-    function test_E2E(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e23);
+    function test_E2EWithLido(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e20);
         vm.prank(owner);
         EthStakingStrategy.setAutoStake(true);
-        vm.startPrank(depositor);
         vm.deal(depositor, amount);
+        vm.prank(depositor);
 
         // Deposit Eth
         edgelessDeposit.depositEth{ value: amount }(depositor);
@@ -91,6 +91,17 @@ contract EdgelessE2ETest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
         isWithinPercentage(LIDO.balanceOf(address(EthStakingStrategy)), amount, 1);
 
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = amount;
+        vm.prank(owner);
+        uint256[] memory requestIds = EthStrategy(payable(address(EthStakingStrategy))).requestLidoWithdrawal(amounts);
+        address FINALIZE_ROLE = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+        vm.prank(FINALIZE_ROLE);
+        LIDO_WITHDRAWAL_ERC721.finalize(requestIds[requestIds.length - 1], 2e27);
+        vm.prank(owner);
+        EthStrategy(payable(address(EthStakingStrategy))).claimLidoWithdrawals(requestIds);
+        console2.log(address(EthStakingStrategy).balance);
+        vm.prank(depositor);
         edgelessDeposit.withdrawEth(depositor, amount);
         // assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
         // assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
