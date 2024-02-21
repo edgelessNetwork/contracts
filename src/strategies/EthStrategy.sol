@@ -102,4 +102,6 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     function underlyingAssetAmount() external view returns (uint256) {
         return address(this).balance + LIDO.balanceOf(address(this));
     }
+
+    receive() external payable { }
 }
