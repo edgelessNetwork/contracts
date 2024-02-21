@@ -34,7 +34,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
     address public owner = makeAddr("Edgeless owner");
-    address public depositor = makeAddr("Depositor");
     address public staker = makeAddr("Staker");
 
     /// @dev A function invoked before each test case is run.
