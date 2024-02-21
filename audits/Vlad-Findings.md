@@ -8,6 +8,9 @@ As a result, ETH can't be withdrawn, and withdrawal NFT can't be transferred eit
 Add function `receive() payable`.
 Also add end-to-end tests to ensure protocol works as expected
 
+### Response
+Added a `receive() payable function`
+
 # 2. High. Funds withdrawn via `EthStrategy.ownerWithdraw()` will stuck in StakingManager
 ## Description
 Owner can withdraw ETH to StakingManager.sol via this function. However funds can't be retrieved from StakingManager contract, there is no such a method.
@@ -22,6 +25,9 @@ Owner can withdraw ETH to StakingManager.sol via this function. However funds ca
 
 ## Recommendation
 Remove function `ownerWithdraw()`. ETH balance in `EthStrategy` belongs to WrappedEth holders, not to owner.
+
+### Response
+The `_withdrawEth()` should be able to withdrawfrom the StakingManager back to the EdgelessDeposit contract
 
 # 3. Medium. Incorrect role management of `address staker` and `address depositor`
 ## Description
@@ -41,6 +47,9 @@ However functions which are called by EdgelessDeposit have `onlyStaker` modifier
 
 ## Recommendation
 Refactor access control
+
+### Response
+Refactored access control, removed the depositor role and only left staker
 
 # 4. Medium. `mintEthBasedOnStakedAmount()` can mint less than expected
 ## Description
