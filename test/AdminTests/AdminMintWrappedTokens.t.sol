@@ -51,7 +51,7 @@ contract AdminMintTests is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     function test_mintWrappedEthFromEth(uint64 amount) external {
         vm.assume(amount != 0);
-        vm.deal(address(edgelessDeposit), amount);
+        vm.deal(address(EthStakingStrategy), amount);
 
         vm.startPrank(owner);
         edgelessDeposit.mintEthBasedOnStakedAmount(owner, amount);

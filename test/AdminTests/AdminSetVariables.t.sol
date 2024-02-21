@@ -211,9 +211,9 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     function test_claimLidoWithdrawals(address randomAddress) external {
         forkMainnetAndDeploy();
-        vm.prank(owner);
-        uint256[] memory requestIds;
-        EthStrategy(payable(address(EthStakingStrategy))).claimLidoWithdrawals(requestIds);
+        uint256[] memory requestIds = new uint256[](2);
+        requestIds[0] = 1;
+        requestIds[1] = 2;
 
         vm.prank(randomAddress);
         vm.expectRevert();
