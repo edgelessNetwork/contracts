@@ -83,10 +83,8 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
 
         address edgelessDepositImpl = address(new EdgelessDeposit());
-        bytes memory edgelessDepositData = abi.encodeCall(
-            EdgelessDeposit.initialize,
-            (owner, staker, IL1ERC20Bridge(OPTIMISM_GATEWAY_BRIDGE), stakingManager)
-        );
+        bytes memory edgelessDepositData =
+            abi.encodeCall(EdgelessDeposit.initialize, (owner, IL1ERC20Bridge(OPTIMISM_GATEWAY_BRIDGE), stakingManager));
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
@@ -113,11 +111,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             0,
             "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
         );
-        assertEq(
-            wrappedEth.balanceOf(OPTIMISM_GATEWAY_BRIDGE),
-            amount,
-            "Bridge should have `amount` of wrapped Eth"
-        );
+        assertEq(wrappedEth.balanceOf(OPTIMISM_GATEWAY_BRIDGE), amount, "Bridge should have `amount` of wrapped Eth");
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {

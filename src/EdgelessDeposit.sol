@@ -35,14 +35,13 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
 
     function initialize(
         address _owner,
-        address _staker,
         IL1ERC20Bridge _l1standardBridge,
         StakingManager _stakingManager
     )
         external
         initializer
     {
-        if (address(_l1standardBridge) == address(0) || _owner == address(0) || _staker == address(0)) {
+        if (address(_l1standardBridge) == address(0) || _owner == address(0)) {
             revert ZeroAddress();
         }
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
