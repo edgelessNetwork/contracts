@@ -95,16 +95,23 @@ contract EdgelessE2ETest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         amounts[0] = amount;
         vm.prank(owner);
         uint256[] memory requestIds = EthStrategy(payable(address(EthStakingStrategy))).requestLidoWithdrawal(amounts);
+
+        // Finalize the withdrawal to allow redemption of Lido Withdrawal ERC721 tokens for Eth
         address FINALIZE_ROLE = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
         vm.prank(FINALIZE_ROLE);
+        // 2e27 is probably a bit too high, the real value should be between 1e27 and 2e27 since lido use 1e27 decimals
+        // of precision
+        // This represents the steth <> eth conversion rate I think, not too sure though
         LIDO_WITHDRAWAL_ERC721.finalize(requestIds[requestIds.length - 1], 2e27);
         vm.prank(owner);
         EthStrategy(payable(address(EthStakingStrategy))).claimLidoWithdrawals(requestIds);
-        console2.log(address(EthStakingStrategy).balance);
+        assertGte(
+            address(EthStakingStrategy).balance, amount, "EthStakingStrategy should have at least `amount` of Eth"
+        );
         vm.prank(depositor);
         edgelessDeposit.withdrawEth(depositor, amount);
-        // assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
-        // assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
+        assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
+        assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
