@@ -73,8 +73,8 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         onlyOwner
         returns (uint256[] memory requestIds)
     {
-        uint256 total = 0;
-        for (uint256 i = 0; i < amounts.length; i++) {
+        uint256 total;
+        for (uint256 i; i < amounts.length; ++i) {
             total += amounts[i];
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
