@@ -19,6 +19,7 @@ contract StakingManager is Ownable2StepUpgradeable {
     address public depositor;
     bool public autoStake;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    uint256[50] private __gap;
 
     event Stake(address indexed asset, uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);

@@ -9,6 +9,7 @@ import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
 contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     address public stakingManager;
     bool public autoStake;
+    uint256[50] private __gap;
 
     event EthStaked(uint256 amount);
     event EthWithdrawn(uint256 amount);

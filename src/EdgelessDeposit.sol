@@ -19,6 +19,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
     WrappedToken public wrappedEth;
     IL1ERC20Bridge public l1standardBridge;
     StakingManager public stakingManager;
+    uint256[50] private __gap;
 
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
