@@ -27,8 +27,7 @@ abstract contract DeploymentUtils is PRBTest {
      * autoStake is set to true, and autoBridge is set to false
      */
     function deployContracts(
-        address owner,
-        address staker
+        address owner
     )
         public
         returns (
@@ -40,16 +39,15 @@ abstract contract DeploymentUtils is PRBTest {
     {
         vm.startPrank(owner);
         address stakingManagerImpl = address(new StakingManager());
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner, staker));
+        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
         stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
 
         address edgelessDepositImpl = address(new EdgelessDeposit());
         bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, staker, IL1ERC20Bridge(address(1)), stakingManager));
+            abi.encodeCall(EdgelessDeposit.initialize, (owner, IL1ERC20Bridge(address(1)), stakingManager));
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
-        stakingManager.setDepositor(address(edgelessDeposit));
 
         address EthStakingStrategyImpl = address(new EthStrategy());
         bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));

@@ -23,7 +23,6 @@ contract StakingManager is Ownable2StepUpgradeable {
     event Stake(address indexed asset, uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
     event SetStaker(address staker);
-    event SetDepositor(address depositor);
     event SetAutoStake(bool autoStake);
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
@@ -39,8 +38,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         _;
     }
 
-    function initialize(address _owner, address _staker) external initializer {
-        staker = _staker;
+    function initialize(address _owner) external initializer {
         __Ownable_init(_owner);
     }
 
@@ -63,7 +61,7 @@ contract StakingManager is Ownable2StepUpgradeable {
         IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
         uint256 withdrawnAmount;
         if (address(strategy) != address(0)) withdrawnAmount = strategy.withdraw(amount);
-        (bool success, bytes memory data) = depositor.call{ value: withdrawnAmount }("");
+        (bool success, bytes memory data) = staker.call{ value: withdrawnAmount }("");
         if (!success) revert TransferFailed(data);
         emit Withdraw(ETH_ADDRESS, amount);
     }
@@ -72,11 +70,6 @@ contract StakingManager is Ownable2StepUpgradeable {
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
         emit SetStaker(_staker);
-    }
-
-    function setDepositor(address _depositor) external onlyOwner {
-        depositor = _depositor;
-        emit SetDepositor(_depositor);
     }
 
     function setAutoStake(bool _autoStake) external onlyOwner {

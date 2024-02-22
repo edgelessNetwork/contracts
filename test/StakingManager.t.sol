@@ -35,8 +35,6 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     address public owner = makeAddr("Edgeless owner");
     address public depositor = makeAddr("Depositor");
-    uint256 public depositorKey = uint256(keccak256(abi.encodePacked("Depositor")));
-    address public staker = makeAddr("Staker");
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
@@ -46,7 +44,7 @@ contract EthStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             blockNumber: FORK_BLOCK_NUMBER
         });
 
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, owner);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
     function test_EthDepositAndWithdraw(uint256 amount) external {

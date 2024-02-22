@@ -12,7 +12,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
 
     event EthStaked(uint256 amount);
     event EthWithdrawn(uint256 amount);
-    event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amount);
+    event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
     event ClaimedLidoWithdrawals(uint256[] requestIds);
     event SetStakingManager(address stakingManager);
     event SetAutoStake(bool autoStake);
@@ -20,6 +20,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     error InsufficientFunds();
     error TransferFailed(bytes data);
     error OnlyStakingManager(address sender);
+    error RequestIdsMustBeSorted();
 
     modifier onlyStakingManager() {
         if (msg.sender != stakingManager) revert OnlyStakingManager(msg.sender);
@@ -67,21 +68,25 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
         return amount;
     }
 
-    function requestLidoWithdrawal(uint256[] calldata amount)
+    function requestLidoWithdrawal(uint256[] calldata amounts)
         external
         onlyOwner
         returns (uint256[] memory requestIds)
     {
         uint256 total = 0;
-        for (uint256 i = 0; i < amount.length; i++) {
-            total += amount[i];
+        for (uint256 i = 0; i < amounts.length; i++) {
+            total += amounts[i];
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
-        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amount, address(this));
-        emit RequestedLidoWithdrawals(requestIds, amount);
+        requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amounts, address(this));
+        emit RequestedLidoWithdrawals(requestIds, amounts);
     }
 
     function claimLidoWithdrawals(uint256[] calldata requestIds) external onlyOwner {
+        // Check if requestIds is sorted
+        for (uint256 i = 0; i < requestIds.length - 1; i++) {
+            if (requestIds[i] > requestIds[i + 1]) revert RequestIdsMustBeSorted();
+        }
         uint256 lastCheckpointIndex = LIDO_WITHDRAWAL_ERC721.getLastCheckpointIndex();
         uint256[] memory _hints = LIDO_WITHDRAWAL_ERC721.findCheckpointHints(requestIds, 1, lastCheckpointIndex);
         LIDO_WITHDRAWAL_ERC721.claimWithdrawals(requestIds, _hints);
@@ -102,4 +107,6 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable {
     function underlyingAssetAmount() external view returns (uint256) {
         return address(this).balance + LIDO.balanceOf(address(this));
     }
+
+    receive() external payable { }
 }

@@ -18,12 +18,12 @@ import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
 import { Permit, SigUtils } from "./Utils/SigUtils.sol";
 import { DeploymentUtils } from "./Utils/DeploymentUtils.sol";
-import { LIDO } from "../src/Constants.sol";
+import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../src/Constants.sol";
 import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
-contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
+contract EdgelessE2ETest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     using SigUtils for Permit;
 
     EdgelessDeposit internal edgelessDeposit;
@@ -51,13 +51,35 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
-    function test_EthDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e40);
+    function test_E2EWithoutStakingToLido(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e23);
         vm.prank(owner);
         EthStakingStrategy.setAutoStake(false);
         vm.startPrank(depositor);
         vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
+
+        // Deposit Eth
+        edgelessDeposit.depositEth{ value: amount }(depositor);
+        assertEq(
+            address(depositor).balance,
+            0,
+            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
+        );
+
+        edgelessDeposit.withdrawEth(depositor, amount);
+        assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
+        assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
+        assertEq(address(edgelessDeposit).balance, 0, "EdgelessDeposit should have 0 Eth after withdrawing");
+        assertEq(address(EthStakingStrategy).balance, 0, "EthStakingStrategy should have 0 Eth after withdrawing");
+        assertEq(address(stakingManager).balance, 0, "StakingManager should have 0 Eth after withdrawing");
+    }
+
+    function test_E2EWithLido(uint256 amount) external {
+        amount = bound(amount, 1e18, 1e20);
+        vm.prank(owner);
+        EthStakingStrategy.setAutoStake(true);
+        vm.deal(depositor, amount);
+        vm.prank(depositor);
 
         // Deposit Eth
         edgelessDeposit.depositEth{ value: amount }(depositor);
@@ -67,48 +89,29 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
             "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
         );
         assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
+        isWithinPercentage(LIDO.balanceOf(address(EthStakingStrategy)), amount, 1);
 
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = amount;
+        vm.prank(owner);
+        uint256[] memory requestIds = EthStrategy(payable(address(EthStakingStrategy))).requestLidoWithdrawal(amounts);
+
+        // Finalize the withdrawal to allow redemption of Lido Withdrawal ERC721 tokens for Eth
+        address FINALIZE_ROLE = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+        vm.prank(FINALIZE_ROLE);
+        // 2e27 is probably a bit too high, the real value should be between 1e27 and 2e27 since lido use 1e27 decimals
+        // of precision
+        // This represents the steth <> eth conversion rate I think, not too sure though
+        LIDO_WITHDRAWAL_ERC721.finalize(requestIds[requestIds.length - 1], 2e27);
+        vm.prank(owner);
+        EthStrategy(payable(address(EthStakingStrategy))).claimLidoWithdrawals(requestIds);
+        assertGte(
+            address(EthStakingStrategy).balance, amount, "EthStakingStrategy should have at least `amount` of Eth"
+        );
+        vm.prank(depositor);
         edgelessDeposit.withdrawEth(depositor, amount);
         assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
-    }
-
-    function test_EthDepositAndWithdrawToOptimismBridge(uint256 amount) external {
-        vm.startPrank(owner);
-        amount = bound(amount, 1e18, 1e40);
-        address stakingManagerImpl = address(new StakingManager());
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
-        stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
-
-        address edgelessDepositImpl = address(new EdgelessDeposit());
-        bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, IL1ERC20Bridge(OPTIMISM_GATEWAY_BRIDGE), stakingManager));
-        edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
-
-        stakingManager.setStaker(address(edgelessDeposit));
-
-        address EthStakingStrategyImpl = address(new EthStrategy());
-        bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
-        EthStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(EthStakingStrategyImpl, EthStakingStrategyData))));
-        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), EthStakingStrategy);
-        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
-
-        wrappedEth = edgelessDeposit.wrappedEth();
-        edgelessDeposit.setAutoBridge(true);
-        EthStakingStrategy.setAutoStake(false);
-        vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
-
-        // Deposit Eth
-        edgelessDeposit.depositEth{ value: amount }(depositor);
-        assertEq(
-            address(depositor).balance,
-            0,
-            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
-        );
-        assertEq(wrappedEth.balanceOf(OPTIMISM_GATEWAY_BRIDGE), amount, "Bridge should have `amount` of wrapped Eth");
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {

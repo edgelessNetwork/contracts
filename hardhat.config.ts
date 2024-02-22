@@ -58,12 +58,6 @@ const config: HardhatUserConfig = {
       sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
-    staker: {
-      hardhat: 0,
-      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
-    },
     l1StandardBridge: {
       hardhat: 0,
       goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
@@ -82,23 +76,11 @@ const config: HardhatUserConfig = {
       sepolia: "0x15353D8e704D218280E7A3F5563DF4E4149F040b",
       edgelessSepoliaTestnet: "0x15353D8e704D218280E7A3F5563DF4E4149F040b"
     },
-    l1USD: {
-      hardhat: 0,
-      goerli: "",
-      sepolia: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad",
-      edgelessSepoliaTestnet: "0xA17FC8B7F9A0F76aE16107DBaE091b49831B39ad"
-    },
     l2Eth: {
       hardhat: 0,
       goerli: "",
       sepolia: "0x0000000000000000000000000000000000000000",
       edgelessSepoliaTestnet: "0x0000000000000000000000000000000000000000"
-    },
-    l2USD: {
-      hardhat: 0,
-      goerli: "",
-      sepolia: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2",
-      edgelessSepoliaTestnet: "0xeBD311957f4C974adf5E9D9a73E2D1bfC41e5fF2"
     }
   },
   paths: {

@@ -34,12 +34,11 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
     address public owner = makeAddr("Edgeless owner");
-    address public depositor = makeAddr("Depositor");
     address public staker = makeAddr("Staker");
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 
     // ----------- Edgeless Deposit ------------
@@ -111,16 +110,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.prank(randomUser);
         vm.expectRevert();
         stakingManager.setStaker(randomStaker);
-    }
-
-    function test_setDepositor(address randomDepositor, address randomUser) external {
-        vm.prank(owner);
-        stakingManager.setDepositor(randomDepositor);
-        assertEq(stakingManager.depositor(), randomDepositor);
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        stakingManager.setDepositor(randomDepositor);
     }
 
     function test_setAutoStake(bool autoStake, address randomUser) external {
@@ -202,22 +191,22 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         forkMainnetAndDeploy();
         vm.prank(owner);
         uint256[] memory amounts;
-        EthStrategy(address(EthStakingStrategy)).requestLidoWithdrawal(amounts);
+        EthStrategy(payable(address(EthStakingStrategy))).requestLidoWithdrawal(amounts);
 
         vm.prank(randomAddress);
         vm.expectRevert();
-        EthStrategy(address(EthStakingStrategy)).requestLidoWithdrawal(amounts);
+        EthStrategy(payable(address(EthStakingStrategy))).requestLidoWithdrawal(amounts);
     }
 
     function test_claimLidoWithdrawals(address randomAddress) external {
         forkMainnetAndDeploy();
-        vm.prank(owner);
-        uint256[] memory requestIds;
-        EthStrategy(address(EthStakingStrategy)).claimLidoWithdrawals(requestIds);
+        uint256[] memory requestIds = new uint256[](2);
+        requestIds[0] = 1;
+        requestIds[1] = 2;
 
         vm.prank(randomAddress);
         vm.expectRevert();
-        EthStrategy(address(EthStakingStrategy)).claimLidoWithdrawals(requestIds);
+        EthStrategy(payable(address(EthStakingStrategy))).claimLidoWithdrawals(requestIds);
     }
 
     function test_setStakingManagerEth(address newStakingManager, address randomUser) external {
@@ -246,6 +235,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
             urlOrAlias: string(abi.encodePacked("https://Eth-mainnet.g.alchemy.com/v2/", alchemyApiKey)),
             blockNumber: FORK_BLOCK_NUMBER
         });
-        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner, staker);
+        (stakingManager, edgelessDeposit, wrappedEth, EthStakingStrategy) = deployContracts(owner);
     }
 }
