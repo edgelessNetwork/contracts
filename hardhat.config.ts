@@ -21,12 +21,6 @@ const config: HardhatUserConfig = {
     hardhat: {
       deploy: ["./deploy/hardhat/"],
     },
-    goerli: {
-      deploy: ["./deploy/goerli/"],
-      url: "https://eth-goerli.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
-      chainId: 5,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
-    },
     sepolia: {
       deploy: ["./deploy/sepolia/"],
       url: "https://eth-sepolia.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
@@ -48,37 +42,21 @@ const config: HardhatUserConfig = {
   namedAccounts: {
     deployer: {
       hardhat: 0,
-      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
+      sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     owner: {
       hardhat: 0,
-      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
-      sepolia: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
+      sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
     },
     l1StandardBridge: {
       hardhat: 0,
-      goerli: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
       sepolia: "0xfF591f2f96697F4D852C775B74830282d97D2c37",
       edgelessSepoliaTestnet: "0xfF591f2f96697F4D852C775B74830282d97D2c37"
     },
-    l2StandardBridge: {
-      hardhat: 0,
-      goerli: "0x4200000000000000000000000000000000000010",
-      sepolia: "0x4200000000000000000000000000000000000010",
-      edgelessSepoliaTestnet: "0x4200000000000000000000000000000000000010"
-    },
-    l1Eth: {
-      hardhat: 0,
-      goerli: "",
-      sepolia: "0x15353D8e704D218280E7A3F5563DF4E4149F040b",
-      edgelessSepoliaTestnet: "0x15353D8e704D218280E7A3F5563DF4E4149F040b"
-    },
     l2Eth: {
       hardhat: 0,
-      goerli: "",
       sepolia: "0x0000000000000000000000000000000000000000",
       edgelessSepoliaTestnet: "0x0000000000000000000000000000000000000000"
     }
@@ -88,7 +66,6 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      goerli: process.env.ETHERSCAN_API_KEY!,
       sepolia: process.env.ETHERSCAN_API_KEY!,
       edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter "
     },
