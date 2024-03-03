@@ -5,7 +5,7 @@ import * as WrappedTokenArtifact from "../../artifacts/src/WrappedToken.sol/Wrap
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy, execute, get, getOrNull, log, read, save } = deployments;
-  const { deployer, owner, l1StandardBridge } = await getNamedAccounts();
+  const { deployer, l1StandardBridge } = await getNamedAccounts();
 
   const EdgelessDeposit = await getOrNull("EdgelessDeposit");
   if (!EdgelessDeposit) {
@@ -16,7 +16,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         proxyContract: "OpenZeppelinTransparentProxy", // default to "EIP173Proxy"
         execute: {
           methodName: "initialize",
-          args: [owner],
+          args: [deployer],
         },
       },
     });
@@ -28,7 +28,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         proxyContract: "OpenZeppelinTransparentProxy", // default to "EIP173Proxy"
         execute: {
           methodName: "initialize",
-          args: [owner, l1StandardBridge, (await get("StakingManager")).address],
+          args: [deployer, l1StandardBridge, (await get("StakingManager")).address],
         },
       },
       skipIfAlreadyDeployed: true,
@@ -39,7 +39,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       abi: WrappedTokenArtifact["abi"],
     });
 
-    await execute("StakingManager", { from: owner, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
+    await execute("StakingManager", { from: deployer, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
 
     await deploy("EthStrategy", {
       from: deployer,
@@ -48,7 +48,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         execute: {
           init: {
             methodName: "initialize",
-            args: [owner, (await get("StakingManager")).address],
+            args: [deployer, (await get("StakingManager")).address],
           },
         },
       },
@@ -58,7 +58,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     await execute(
       "StakingManager",
-      { from: owner, log: true },
+      { from: deployer, log: true },
       "addStrategy",
       await read("StakingManager", "ETH_ADDRESS"),
       (await get("EthStrategy")).address,
@@ -66,7 +66,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     await execute(
       "StakingManager",
-      { from: owner, log: true },
+      { from: deployer, log: true },
       "setActiveStrategy",
       await read("StakingManager", "ETH_ADDRESS"),
       0,
