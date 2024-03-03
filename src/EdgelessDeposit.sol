@@ -3,6 +3,7 @@ pragma solidity >=0.8.23;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { LIDO } from "./Constants.sol";
 import { IERC20Inbox } from "./interfaces/IERC20Inbox.sol";
 import { StakingManager } from "./StakingManager.sol";
@@ -13,7 +14,7 @@ import { WrappedToken } from "./WrappedToken.sol";
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is Ownable2StepUpgradeable {
+contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
@@ -49,7 +50,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
         l1standardBridge = _l1standardBridge;
         autoBridge = false;
         stakingManager = _stakingManager;
-        __Ownable_init(_owner);
+        __Ownable_init_unchained(_owner);
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
@@ -149,4 +150,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
             wrappedEth.mint(to, amount);
         }
     }
+
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 }

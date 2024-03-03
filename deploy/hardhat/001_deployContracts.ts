@@ -10,33 +10,28 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const EdgelessDeposit = await getOrNull("EdgelessDeposit");
   if (!EdgelessDeposit) {
     await deploy("StakingManager", {
-      from: deployer,
+      from: deployer, // address that will perform the transaction.
+      log: true,
       proxy: {
-        proxyContract: "UUPS",
+        proxyContract: "OpenZeppelinTransparentProxy", // default to "EIP173Proxy"
         execute: {
-          init: {
-            methodName: "initialize",
-            args: [owner],
-          },
+          methodName: "initialize",
+          args: [owner],
         },
       },
-      skipIfAlreadyDeployed: true,
-      log: true,
     });
 
     await deploy("EdgelessDeposit", {
-      from: deployer,
+      from: deployer, // address that will perform the transaction.
+      log: true,
       proxy: {
-        proxyContract: "UUPS",
+        proxyContract: "OpenZeppelinTransparentProxy", // default to "EIP173Proxy"
         execute: {
-          init: {
-            methodName: "initialize",
-            args: [owner, l1StandardBridge, (await get("StakingManager")).address],
-          },
+          methodName: "initialize",
+          args: [owner, l1StandardBridge, (await get("StakingManager")).address],
         },
       },
       skipIfAlreadyDeployed: true,
-      log: true,
     });
 
     await save("Edgeless Wrapped ETH", {
@@ -49,7 +44,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deploy("EthStrategy", {
       from: deployer,
       proxy: {
-        proxyContract: "UUPS",
+        proxyContract: "OpenZeppelinTransparentProxy",
         execute: {
           init: {
             methodName: "initialize",
