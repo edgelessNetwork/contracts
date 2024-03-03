@@ -12,7 +12,7 @@ import { StakingManager } from "../../src/StakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
 
-import { IL1ERC20Bridge } from "../../src/interfaces/IL1ERC20Bridge.sol";
+import { IERC20Inbox } from "../../src/interfaces/IERC20Inbox.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
 import { LIDO } from "../../src/Constants.sol";
@@ -27,7 +27,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    IL1ERC20Bridge internal l1standardBridge;
+    IERC20Inbox internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
 
@@ -45,12 +45,12 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     function test_setL1StandardBridge(address randomL1StandardBridge, address randomUser) external {
         vm.assume(randomL1StandardBridge != address(0));
         vm.prank(owner);
-        edgelessDeposit.setL1StandardBridge(IL1ERC20Bridge(randomL1StandardBridge));
+        edgelessDeposit.setL1StandardBridge(IERC20Inbox(randomL1StandardBridge));
         assertEq(address(edgelessDeposit.l1standardBridge()), randomL1StandardBridge);
 
         vm.prank(randomUser);
         vm.expectRevert();
-        edgelessDeposit.setL1StandardBridge(IL1ERC20Bridge(randomL1StandardBridge));
+        edgelessDeposit.setL1StandardBridge(IERC20Inbox(randomL1StandardBridge));
     }
 
     function test_setL2Eth(address randomL2Eth, address randomUser) external {
