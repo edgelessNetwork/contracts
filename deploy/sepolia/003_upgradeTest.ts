@@ -16,8 +16,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer, // address that will perform the transaction.
       log: true,
     });
-    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
-    const signer = new ethers.Wallet("0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d", provider);
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://eth-sepolia.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
+    );
+    const signer = new ethers.Wallet("0x9fca6851974a3d725b3a53ef514149dd183857267d464bedede8dd8700a115c1", provider);
     const StakingManager = new ethers.Contract(
       (await get("StakingManager")).address,
       StakingManagerArtifact.abi,
@@ -29,18 +31,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await get("StakingManagerImpl")).address,
       stakingManagerData,
     );
-    // await execute(
-    //   "StakingManager",
-    //   {
-    //     from: deployer,
-    //     log: true,
-    //   },
-    //   "upgradeToAndCall",
-    //   (await get("StakingManagerImpl")).address,
-    //   stakingManagerData,
-    // );
   } else {
     log("EdgelessDeposit already deployed, skipping...");
   }
+  await hre.run("etherscan-verify", {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  });
 };
 export default func;
