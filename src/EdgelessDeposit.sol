@@ -149,5 +149,5 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         }
     }
 
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyOwner { }
 }

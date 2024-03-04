@@ -8,9 +8,12 @@ import { StdCheats } from "forge-std/src/StdCheats.sol";
 import { StdUtils } from "forge-std/src/StdUtils.sol";
 
 import { EdgelessDeposit } from "../../src/EdgelessDeposit.sol";
+import { UpgradedEdgelessDeposit } from "../../src/upgrade-tests/UpgradedEdgelessDeposit.sol";
 import { StakingManager } from "../../src/StakingManager.sol";
+import { UpgradedStakingManager } from "../../src/upgrade-tests/UpgradedStakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
+import { UpgradedEthStrategy } from "../../src/upgrade-tests/UpgradedEthStrategy.sol";
 
 import { IERC20Inbox } from "../../src/interfaces/IERC20Inbox.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
@@ -45,31 +48,27 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
     function test_upgradeEdgelessDeposit() public {
         // deploy
         vm.startPrank(owner);
-        address edgelessDepositImpl = address(new EdgelessDeposit());
+        address edgelessDepositImpl = address(new UpgradedEdgelessDeposit());
 
-        vm.expectRevert();
-        bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, IERC20Inbox(address(1)), stakingManager));
+        bytes memory edgelessDepositData = abi.encodeCall(UpgradedEdgelessDeposit.doNothing, ());
         edgelessDeposit.upgradeToAndCall(edgelessDepositImpl, edgelessDepositData);
     }
 
     function test_upgradeStakingManager() public {
         // deploy
         vm.startPrank(owner);
-        address stakingManagerImpl = address(new StakingManager());
+        address stakingManagerImpl = address(new UpgradedStakingManager());
 
-        vm.expectRevert();
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
+        bytes memory stakingManagerData = abi.encodeCall(UpgradedStakingManager.doNothing, ());
         stakingManager.upgradeToAndCall(stakingManagerImpl, stakingManagerData);
     }
 
     function test_upgradeEthStakingStrategy() public {
         // deploy
         vm.startPrank(owner);
-        address EthStakingStrategyImpl = address(new EthStrategy());
+        address EthStakingStrategyImpl = address(new UpgradedEthStrategy());
 
-        vm.expectRevert();
-        bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
+        bytes memory EthStakingStrategyData = abi.encodeCall(UpgradedEthStrategy.doNothing, ());
         stakingManager.upgradeToAndCall(EthStakingStrategyImpl, EthStakingStrategyData);
     }
 
