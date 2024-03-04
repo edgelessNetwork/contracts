@@ -93,7 +93,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      * @param _l1standardBridge Address of the L1StandardBridge contract
      */
     function setL1StandardBridge(IERC20Inbox _l1standardBridge) external onlyOwner {
-        if (address(_l1standardBridge) == address(0)) revert ZeroAddress();
         l1standardBridge = _l1standardBridge;
         emit SetL1StandardBridge(_l1standardBridge);
     }
@@ -103,7 +102,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      * @param _l2Eth Address of the L2 Wrapped Eth contract
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
-        if (address(_l2Eth) == address(0)) revert ZeroAddress();
         l2Eth = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
