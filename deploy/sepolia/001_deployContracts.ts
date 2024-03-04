@@ -21,35 +21,24 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           init: {
             methodName: "initialize",
             args: [deployer],
-          }
+          },
         },
         proxyContract: "OpenZeppelinTransparentProxy",
       },
     });
-    await save("StakingManager", {
-      address: (await get("StakingManager")).address,
-      abi: StakingManagerArtifact["abi"],
-    });
 
-    await deploy("EdgelessDepositImpl", { from: deployer, log: true, contract: "EdgelessDeposit" });
-    const EdgelessDeposit = new ethers.Contract(
-      (await get("EdgelessDepositImpl")).address,
-      EdgelessDepositArtifact.abi,
-    );
-    const edgelessDepositData = EdgelessDeposit.interface.encodeFunctionData("initialize", [
-      deployer,
-      l1StandardBridge,
-      (await get("StakingManager")).address,
-    ]);
     await deploy("EdgelessDeposit", {
       from: deployer,
       log: true,
-      contract: "ERC1967Proxy",
-      args: [(await get("EdgelessDepositImpl")).address, edgelessDepositData],
-    });
-    await save("EdgelessDeposit", {
-      address: (await get("EdgelessDeposit")).address,
-      abi: EdgelessDepositArtifact["abi"],
+      proxy: {
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [deployer, l1StandardBridge, (await get("StakingManager")).address],
+          },
+        },
+        proxyContract: "OpenZeppelinTransparentProxy",
+      },
     });
 
     await save("Edgeless Wrapped ETH", {
@@ -59,21 +48,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     await execute("StakingManager", { from: deployer, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
 
-    await deploy("EthStrategyImpl", { from: deployer, log: true, contract: "EthStrategy" });
-    const EthStrategy = new ethers.Contract((await get("EthStrategyImpl")).address, EthStrategyArtifact.abi);
-    const ethStrategyData = EthStrategy.interface.encodeFunctionData("initialize", [
-      deployer,
-      (await get("StakingManager")).address,
-    ]);
     await deploy("EthStrategy", {
       from: deployer,
       log: true,
-      contract: "ERC1967Proxy",
-      args: [(await get("EthStrategyImpl")).address, ethStrategyData],
-    });
-    await save("EthStrategy", {
-      address: (await get("EthStrategy")).address,
-      abi: EthStrategyArtifact["abi"],
+      proxy: {
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [deployer, (await get("StakingManager")).address],
+          },
+        },
+        proxyContract: "OpenZeppelinTransparentProxy",
+      },
     });
 
     await execute(
@@ -94,5 +80,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   } else {
     log("EdgelessDeposit already deployed, skipping...");
   }
+  await hre.run("etherscan-verify", {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  });
+
+  await hre.run("verify:verify", {
+    address: (await get("Edgeless Wrapped ETH")).address,
+    constructorArguments: [
+      (await get("EdgelessDeposit")).address,
+      await read("Edgeless Wrapped ETH", "name"),
+      await read("Edgeless Wrapped ETH", "symbol"),
+    ],
+  });
 };
 export default func;
