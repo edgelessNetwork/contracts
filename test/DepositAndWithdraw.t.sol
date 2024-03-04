@@ -12,7 +12,7 @@ import { StakingManager } from "../src/StakingManager.sol";
 import { WrappedToken } from "../src/WrappedToken.sol";
 import { EthStrategy } from "../src/strategies/EthStrategy.sol";
 
-import { IL1ERC20Bridge } from "../src/interfaces/IL1ERC20Bridge.sol";
+import { IERC20Inbox } from "../src/interfaces/IERC20Inbox.sol";
 import { IWithdrawalQueueERC721 } from "../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../src/interfaces/IStakingStrategy.sol";
 
@@ -28,7 +28,7 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    IL1ERC20Bridge internal l1standardBridge;
+    IERC20Inbox internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
 
@@ -71,44 +71,6 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         edgelessDeposit.withdrawEth(depositor, amount);
         assertEq(address(depositor).balance, amount, "Depositor should have `amount` of Eth after withdrawing");
         assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
-    }
-
-    function test_EthDepositAndWithdrawToOptimismBridge(uint256 amount) external {
-        vm.startPrank(owner);
-        amount = bound(amount, 1e18, 1e40);
-        address stakingManagerImpl = address(new StakingManager());
-        bytes memory stakingManagerData = abi.encodeCall(StakingManager.initialize, (owner));
-        stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
-
-        address edgelessDepositImpl = address(new EdgelessDeposit());
-        bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, IL1ERC20Bridge(OPTIMISM_GATEWAY_BRIDGE), stakingManager));
-        edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
-
-        stakingManager.setStaker(address(edgelessDeposit));
-
-        address EthStakingStrategyImpl = address(new EthStrategy());
-        bytes memory EthStakingStrategyData = abi.encodeCall(EthStrategy.initialize, (owner, address(stakingManager)));
-        EthStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(EthStakingStrategyImpl, EthStakingStrategyData))));
-        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), EthStakingStrategy);
-        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
-
-        wrappedEth = edgelessDeposit.wrappedEth();
-        edgelessDeposit.setAutoBridge(true);
-        EthStakingStrategy.setAutoStake(false);
-        vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
-
-        // Deposit Eth
-        edgelessDeposit.depositEth{ value: amount }(depositor);
-        assertEq(
-            address(depositor).balance,
-            0,
-            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
-        );
-        assertEq(wrappedEth.balanceOf(OPTIMISM_GATEWAY_BRIDGE), amount, "Bridge should have `amount` of wrapped Eth");
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {

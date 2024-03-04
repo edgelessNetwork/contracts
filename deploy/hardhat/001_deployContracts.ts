@@ -5,38 +5,40 @@ import * as WrappedTokenArtifact from "../../artifacts/src/WrappedToken.sol/Wrap
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy, execute, get, getOrNull, log, read, save } = deployments;
-  const { deployer, owner, l1StandardBridge } = await getNamedAccounts();
+  const { deployer, l1StandardBridge } = await getNamedAccounts();
 
   const EdgelessDeposit = await getOrNull("EdgelessDeposit");
   if (!EdgelessDeposit) {
     await deploy("StakingManager", {
       from: deployer,
+      log: true,
       proxy: {
-        proxyContract: "UUPS",
         execute: {
           init: {
             methodName: "initialize",
-            args: [owner],
-          },
+            args: [deployer],
+          }
         },
+        proxyContract: "OpenZeppelinTransparentProxy",
       },
-      skipIfAlreadyDeployed: true,
-      log: true,
     });
 
     await deploy("EdgelessDeposit", {
       from: deployer,
+      log: true,
       proxy: {
-        proxyContract: "UUPS",
         execute: {
           init: {
             methodName: "initialize",
-            args: [owner, l1StandardBridge, (await get("StakingManager")).address],
-          },
+            args: [
+              deployer,
+              l1StandardBridge,
+              (await get("StakingManager")).address,
+            ],
+          }
         },
+        proxyContract: "OpenZeppelinTransparentProxy",
       },
-      skipIfAlreadyDeployed: true,
-      log: true,
     });
 
     await save("Edgeless Wrapped ETH", {
@@ -44,26 +46,28 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       abi: WrappedTokenArtifact["abi"],
     });
 
-    await execute("StakingManager", { from: owner, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
+    await execute("StakingManager", { from: deployer, log: true }, "setStaker", (await get("EdgelessDeposit")).address);
 
     await deploy("EthStrategy", {
       from: deployer,
+      log: true,
       proxy: {
-        proxyContract: "UUPS",
         execute: {
           init: {
             methodName: "initialize",
-            args: [owner, (await get("StakingManager")).address],
-          },
+            args: [
+              deployer,
+              (await get("StakingManager")).address,
+            ],
+          }
         },
+        proxyContract: "OpenZeppelinTransparentProxy",
       },
-      skipIfAlreadyDeployed: true,
-      log: true,
     });
 
     await execute(
       "StakingManager",
-      { from: owner, log: true },
+      { from: deployer, log: true },
       "addStrategy",
       await read("StakingManager", "ETH_ADDRESS"),
       (await get("EthStrategy")).address,
@@ -71,7 +75,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     await execute(
       "StakingManager",
-      { from: owner, log: true },
+      { from: deployer, log: true },
       "setActiveStrategy",
       await read("StakingManager", "ETH_ADDRESS"),
       0,

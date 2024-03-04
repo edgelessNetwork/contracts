@@ -3,8 +3,9 @@ pragma solidity >=0.8.23;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { LIDO } from "./Constants.sol";
-import { IL1ERC20Bridge } from "./interfaces/IL1ERC20Bridge.sol";
+import { IERC20Inbox } from "./interfaces/IERC20Inbox.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
 
@@ -13,11 +14,11 @@ import { WrappedToken } from "./WrappedToken.sol";
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
-contract EdgelessDeposit is Ownable2StepUpgradeable {
+contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
-    IL1ERC20Bridge public l1standardBridge;
+    IERC20Inbox public l1standardBridge;
     StakingManager public stakingManager;
     uint256[50] private __gap;
 
@@ -25,10 +26,10 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
     event MintWrappedEth(address indexed to, uint256 amount);
     event SetAutoBridge(bool autoBridge);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
-    event SetL1StandardBridge(IL1ERC20Bridge l1standardBridge);
+    event SetL1StandardBridge(IERC20Inbox l1standardBridge);
     event SetL2Eth(address l2Eth);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
-    event BridgeToL2(address indexed from, address indexed to, address indexed l2Address, uint256 amount);
+    event BridgeToL2(uint256 amount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
@@ -36,7 +37,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
 
     function initialize(
         address _owner,
-        IL1ERC20Bridge _l1standardBridge,
+        IERC20Inbox _l1standardBridge,
         StakingManager _stakingManager
     )
         external
@@ -49,7 +50,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
         l1standardBridge = _l1standardBridge;
         autoBridge = false;
         stakingManager = _stakingManager;
-        __Ownable_init(_owner);
+        __Ownable_init_unchained(_owner);
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
@@ -69,7 +70,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
         uint256 amount = msg.value;
         _mintWrappedEth(to, amount);
         stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
-        _bridgeToL2(wrappedEth, l2Eth, to, amount);
+        _bridgeToL2(wrappedEth, amount);
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
@@ -91,8 +92,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      * @notice Set the address of the L1StandardBridge contract
      * @param _l1standardBridge Address of the L1StandardBridge contract
      */
-    function setL1StandardBridge(IL1ERC20Bridge _l1standardBridge) external onlyOwner {
-        if (address(_l1standardBridge) == address(0)) revert ZeroAddress();
+    function setL1StandardBridge(IERC20Inbox _l1standardBridge) external onlyOwner {
         l1standardBridge = _l1standardBridge;
         emit SetL1StandardBridge(_l1standardBridge);
     }
@@ -102,7 +102,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
      * @param _l2Eth Address of the L2 Wrapped Eth contract
      */
     function setL2Eth(address _l2Eth) external onlyOwner {
-        if (address(_l2Eth) == address(0)) revert ZeroAddress();
         l2Eth = _l2Eth;
         emit SetL2Eth(_l2Eth);
     }
@@ -130,11 +129,11 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
     }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
-    function _bridgeToL2(WrappedToken wrappedToken, address l2WrappedToken, address to, uint256 amount) internal {
+    function _bridgeToL2(WrappedToken wrappedToken, uint256 amount) internal {
         if (autoBridge) {
             wrappedToken.approve(address(l1standardBridge), amount);
-            l1standardBridge.depositERC20To(address(wrappedToken), l2WrappedToken, to, amount, 0, "");
-            emit BridgeToL2(address(wrappedToken), l2WrappedToken, to, amount);
+            l1standardBridge.depositERC20(amount);
+            emit BridgeToL2(amount);
         }
     }
 
@@ -149,4 +148,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable {
             wrappedEth.mint(to, amount);
         }
     }
+
+    function _authorizeUpgrade(address) internal override onlyOwner { }
 }

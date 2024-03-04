@@ -13,7 +13,7 @@ import { StakingManager } from "../../src/StakingManager.sol";
 import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
 
-import { IL1ERC20Bridge } from "../../src/interfaces/IL1ERC20Bridge.sol";
+import { IERC20Inbox } from "../../src/interfaces/IERC20Inbox.sol";
 import { ILido } from "../../src/interfaces/ILido.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
@@ -26,9 +26,7 @@ abstract contract DeploymentUtils is PRBTest {
      * This also sets the two staking strategies as active in the staking manager
      * autoStake is set to true, and autoBridge is set to false
      */
-    function deployContracts(
-        address owner
-    )
+    function deployContracts(address owner)
         public
         returns (
             StakingManager stakingManager,
@@ -44,7 +42,7 @@ abstract contract DeploymentUtils is PRBTest {
 
         address edgelessDepositImpl = address(new EdgelessDeposit());
         bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, IL1ERC20Bridge(address(1)), stakingManager));
+            abi.encodeCall(EdgelessDeposit.initialize, (owner, IERC20Inbox(address(1)), stakingManager));
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
