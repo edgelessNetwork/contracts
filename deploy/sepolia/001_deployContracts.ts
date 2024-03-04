@@ -1,10 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import * as WrappedTokenArtifact from "../../artifacts/src/WrappedToken.sol/WrappedToken.json";
-import { ethers } from "ethers";
-import * as EdgelessDepositArtifact from "../../artifacts/src/EdgelessDeposit.sol/EdgelessDeposit.json";
-import * as StakingManagerArtifact from "../../artifacts/src/StakingManager.sol/StakingManager.json";
-import * as EthStrategyArtifact from "../../artifacts/src/strategies/EthStrategy.sol/EthStrategy.json";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
