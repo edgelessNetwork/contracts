@@ -67,6 +67,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       contract: "ERC1967Proxy",
       args: [(await get("EthStrategyImpl")).address, ethStrategyData],
     });
+    await save("EthStrategy", {
+      address: (await get("EthStrategy")).address,
+      abi: EthStrategyArtifact["abi"],
+    });
 
     await execute(
       "StakingManager",
