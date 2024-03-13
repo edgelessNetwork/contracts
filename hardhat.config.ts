@@ -52,8 +52,8 @@ const config: HardhatUserConfig = {
     },
     l1StandardBridge: {
       hardhat: 0,
-      sepolia: "0xfF591f2f96697F4D852C775B74830282d97D2c37",
-      edgelessSepoliaTestnet: "0xfF591f2f96697F4D852C775B74830282d97D2c37"
+      sepolia: "0x7076291CF598cc12aa162c36c47dbC5C971EAF95",
+      edgelessSepoliaTestnet: "0x7076291CF598cc12aa162c36c47dbC5C971EAF95"
     },
     l2Eth: {
       hardhat: 0,
