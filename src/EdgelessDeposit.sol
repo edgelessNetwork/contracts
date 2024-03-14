@@ -5,14 +5,11 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { LIDO } from "./Constants.sol";
-import { IERC20Inbox } from "./interfaces/IERC20Inbox.sol";
 import { StakingManager } from "./StakingManager.sol";
 import { WrappedToken } from "./WrappedToken.sol";
 
 /**
- * @title EdgelessDeposit
- * @notice EdgelessDeposit is a contract that allows users to deposit Eth and
- * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
+ * @notice EdgelessDeposit is a contract that allows users to deposit Eth and receive wrapped tokens
  */
 contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     address public l2Eth;
@@ -31,9 +28,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     error ZeroAddress();
 
     function initialize(address _owner, StakingManager _stakingManager) external initializer {
-        if (_owner == address(0)) {
-            revert ZeroAddress();
-        }
+        if (_owner == address(0)) revert ZeroAddress();
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
         stakingManager = _stakingManager;
         __Ownable_init_unchained(_owner);

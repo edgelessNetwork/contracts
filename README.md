@@ -3,15 +3,16 @@
 ## For Auditors
 Documentation is below the Getting Started section
 
-- SLOC: 377 Lines (`yarn sloc`)
+- SLOC: 378 Lines (`yarn sloc`)
 - In Scope:
     - `src/EdgelessDeposit.sol`
     - `src/StakingManager.sol`
     - `src/WrappedToken.sol`
     - `src/Constants.sol`
-    - `src/strategies/EthStrategy.sol`
+    - `src/strategies/*`
 - Out of Scope:
     - `src/interfaces/*` - just interfaces
+    - `src/upgrade-tests/*` - just testing files
     - Centralization concerns
 - Copied files
     - `src/interfaces/*`: [IL1ERC20Bridge](https://github.com/oasysgames/l1-l2-bridge-tutorial/blob/main/contracts/L1/messaging/IL1ERC20Bridge.sol), [IWithdrawalQueueERC721](https://github.com/lidofinance/lido-dao/blob/master/contracts/0.8.9/WithdrawalQueueERC721.sol)

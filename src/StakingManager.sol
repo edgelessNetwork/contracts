@@ -34,9 +34,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     error TransferFailed(bytes data);
 
     modifier onlyStaker() {
-        if (msg.sender != staker) {
-            revert OnlyStaker(msg.sender);
-        }
+        if (msg.sender != staker) revert OnlyStaker(msg.sender);
         _;
     }
 
@@ -99,9 +97,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
-        if (activeStrategyIndex[asset] == index) {
-            activeStrategyIndex[asset] = 0;
-        }
+        if (activeStrategyIndex[asset] == index) activeStrategyIndex[asset] = 0;
         emit RemoveStrategy(asset, strategy, withdrawnAmount);
     }
 
