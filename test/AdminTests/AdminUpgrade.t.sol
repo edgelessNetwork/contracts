@@ -30,7 +30,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    IERC20Inbox internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
 
