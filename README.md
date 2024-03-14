@@ -15,9 +15,8 @@ Documentation is below the Getting Started section
     - `src/upgrade-tests/*` - just testing files
     - Centralization concerns
 - Copied files
-    - `src/interfaces/*`: [IL1ERC20Bridge](https://github.com/oasysgames/l1-l2-bridge-tutorial/blob/main/contracts/L1/messaging/IL1ERC20Bridge.sol), [IWithdrawalQueueERC721](https://github.com/lidofinance/lido-dao/blob/master/contracts/0.8.9/WithdrawalQueueERC721.sol)
-- Rough Timeline: Start on 2/19, finish whenever?
-- Coverage: Over 95% on in scope files https://app.warp.dev/block/lKLociuVyrXOf7Dy7fsNWx
+    - `src/interfaces/*`: [IWithdrawalQueueERC721](https://github.com/lidofinance/lido-dao/blob/master/contracts/0.8.9/WithdrawalQueueERC721.sol)
+- Coverage: Over 90% on in scope files https://app.warp.dev/block/ijNP6MzDaIxBrWuhZgYFgb
 
 ## Getting Started
 
@@ -43,8 +42,6 @@ Use Cases: There are many use cases where charging no transaction fee naturally 
 ### Withdrawal Flow
 
 <img width="1117" alt="image" src="https://github.com/edgelessNetwork/contracts/assets/156271310/a1c214a9-17b9-4641-b374-20d92271fb58">
-
-
 
 # Contract Design
 
@@ -161,29 +158,4 @@ simply copy paste the path):
 
 ```sh
 $ npm run test:coverage:report
-```
-
-### Deploy
-There are four steps to the deployment process
-
-For this script to work, you need to have a valid `.env` file. Copy the `.env.example` file to get started
-
-
-1. Deploy contracts to the base chain, ie Ethereum or Goerli
-```sh
-$ npx hardhat deploy --network sepolia
-```
-
-2. Add the `l1Eth` addresses to namedAccounts in your `hardhat.config.ts`
-
-3. Deploy the OptimismMintableTokens on the layer two, ie Edgeless
-```sh
-$ npx hardhat deploy --network edgelessSepoliaTestnet
-```
-
-4. Add the `l2Eth` contracts that you just deployed to `hardhat.config.ts`
-
-5. Comment out the `func.skip` and run `002_setL2TokenAddresses.ts`
-```sh
-$ npx hardhat deploy --network sepolia
 ```
