@@ -5,7 +5,7 @@ import * as WrappedTokenArtifact from "../../artifacts/src/WrappedToken.sol/Wrap
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy, execute, get, getOrNull, log, read, save } = deployments;
-  const { deployer, l1StandardBridge } = await getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
   const EdgelessDeposit = await getOrNull("EdgelessDeposit");
   if (!EdgelessDeposit) {
@@ -32,7 +32,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             methodName: "initialize",
             args: [
               deployer,
-              l1StandardBridge,
               (await get("StakingManager")).address,
             ],
           }
