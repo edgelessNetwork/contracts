@@ -15,7 +15,6 @@ import { WrappedToken } from "../../src/WrappedToken.sol";
 import { EthStrategy } from "../../src/strategies/EthStrategy.sol";
 import { UpgradedEthStrategy } from "../../src/upgrade-tests/UpgradedEthStrategy.sol";
 
-import { IERC20Inbox } from "../../src/interfaces/IERC20Inbox.sol";
 import { IWithdrawalQueueERC721 } from "../../src/interfaces/IWithdrawalQueueERC721.sol";
 import { IStakingStrategy } from "../../src/interfaces/IStakingStrategy.sol";
 import { LIDO } from "../../src/Constants.sol";

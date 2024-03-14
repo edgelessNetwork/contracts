@@ -5,7 +5,6 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { LIDO } from "../Constants.sol";
-import { IERC20Inbox } from "../interfaces/IERC20Inbox.sol";
 import { StakingManager } from "../StakingManager.sol";
 import { WrappedToken } from "../WrappedToken.sol";
 /**
