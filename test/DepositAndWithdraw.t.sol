@@ -28,14 +28,12 @@ contract EdgelessDepositTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
     EdgelessDeposit internal edgelessDeposit;
     WrappedToken internal wrappedEth;
-    IERC20Inbox internal l1standardBridge;
     StakingManager internal stakingManager;
     IStakingStrategy internal EthStakingStrategy;
 
     uint32 public constant FORK_BLOCK_NUMBER = 18_950_000;
 
     address public constant LIDO_FINALIZE_ROLE_ADDRESS = address(LIDO);
-    address public constant OPTIMISM_GATEWAY_BRIDGE = address(0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1);
 
     address public owner = makeAddr("Edgeless owner");
     address public depositor = makeAddr("Depositor");

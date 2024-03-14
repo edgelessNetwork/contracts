@@ -8,7 +8,7 @@ import * as EthStakingArtifact from "../../artifacts/src/strategies/EthStrategy.
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy, execute, get, getOrNull, log, read } = deployments;
-  const { deployer, l1StandardBridge } = await getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
   await deploy("NewStakingManagerImpl", {
     contract: "StakingManager",
@@ -34,7 +34,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
   const EdgelessDeposit = new ethers.Contract((await get("EdgelessDeposit")).address, EdgelessDepositArtifact.abi);
-  const edgelessDepositData = EdgelessDeposit.interface.encodeFunctionData("setAutoBridge", [false]);
+  const edgelessDepositData = EdgelessDeposit.interface.encodeFunctionData("upgrade", []);
   await execute(
     "EdgelessDeposit",
     {

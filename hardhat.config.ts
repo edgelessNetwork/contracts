@@ -34,32 +34,24 @@ const config: HardhatUserConfig = {
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
       verify: {
         etherscan: {
-          apiUrl: "https://edgeless-testnet.explorer.caldera.xyz/"
-        }
-      }
-    }
+          apiUrl: "https://edgeless-testnet.explorer.caldera.xyz/",
+        },
+      },
+    },
   },
   namedAccounts: {
     deployer: {
       hardhat: 0,
+      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
     owner: {
       hardhat: 0,
+      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44"
+      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
-    l1StandardBridge: {
-      hardhat: 0,
-      sepolia: "0xfF591f2f96697F4D852C775B74830282d97D2c37",
-      edgelessSepoliaTestnet: "0xfF591f2f96697F4D852C775B74830282d97D2c37"
-    },
-    l2Eth: {
-      hardhat: 0,
-      sepolia: "0x0000000000000000000000000000000000000000",
-      edgelessSepoliaTestnet: "0x0000000000000000000000000000000000000000"
-    }
   },
   paths: {
     sources: "./src",
@@ -67,7 +59,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY!,
-      edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter "
+      edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter ",
     },
     customChains: [
       {
@@ -75,12 +67,11 @@ const config: HardhatUserConfig = {
         chainId: 202,
         urls: {
           apiURL: "https://edgeless-testnet.explorer.caldera.xyz/api/",
-          browserURL: "https://edgeless-testnet.explorer.caldera.xyz/"
-        }
-      }
-    ]
-
-  }
+          browserURL: "https://edgeless-testnet.explorer.caldera.xyz/",
+        },
+      },
+    ],
+  },
 };
 
 export default config;

@@ -15,10 +15,8 @@ import { WrappedToken } from "../WrappedToken.sol";
  */
 
 contract UpgradedEdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
-    bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
-    IERC20Inbox public l1standardBridge;
     StakingManager public stakingManager;
     uint256[50] private __gap;
 

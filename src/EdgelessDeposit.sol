@@ -15,40 +15,26 @@ import { WrappedToken } from "./WrappedToken.sol";
  * receive wrapped tokens in return. The wrapped tokens can be used to bridge to the Edgeless L2
  */
 contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
-    bool public autoBridge;
     address public l2Eth;
     WrappedToken public wrappedEth;
-    IERC20Inbox public l1standardBridge;
     StakingManager public stakingManager;
     uint256[50] private __gap;
 
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
-    event SetAutoBridge(bool autoBridge);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
-    event SetL1StandardBridge(IERC20Inbox l1standardBridge);
     event SetL2Eth(address l2Eth);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
-    event BridgeToL2(uint256 amount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
     error ZeroAddress();
 
-    function initialize(
-        address _owner,
-        IERC20Inbox _l1standardBridge,
-        StakingManager _stakingManager
-    )
-        external
-        initializer
-    {
-        if (address(_l1standardBridge) == address(0) || _owner == address(0)) {
+    function initialize(address _owner, StakingManager _stakingManager) external initializer {
+        if (_owner == address(0)) {
             revert ZeroAddress();
         }
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");
-        l1standardBridge = _l1standardBridge;
-        autoBridge = false;
         stakingManager = _stakingManager;
         __Ownable_init_unchained(_owner);
     }
@@ -70,7 +56,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         uint256 amount = msg.value;
         _mintWrappedEth(to, amount);
         stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
-        _bridgeToL2(wrappedEth, amount);
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
@@ -89,33 +74,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     /**
-     * @notice Set the address of the L1StandardBridge contract
-     * @param _l1standardBridge Address of the L1StandardBridge contract
-     */
-    function setL1StandardBridge(IERC20Inbox _l1standardBridge) external onlyOwner {
-        l1standardBridge = _l1standardBridge;
-        emit SetL1StandardBridge(_l1standardBridge);
-    }
-
-    /**
-     * @notice Set the address of the L2 Wrapped Eth contract
-     * @param _l2Eth Address of the L2 Wrapped Eth contract
-     */
-    function setL2Eth(address _l2Eth) external onlyOwner {
-        l2Eth = _l2Eth;
-        emit SetL2Eth(_l2Eth);
-    }
-
-    /**
-     * @notice Pause autobridging of wrapped tokens to the Edgeless L2
-     * @param _autoBridge True to pause autobridging, false to unpause
-     */
-    function setAutoBridge(bool _autoBridge) external onlyOwner {
-        autoBridge = _autoBridge;
-        emit SetAutoBridge(_autoBridge);
-    }
-
-    /**
      * @notice Mint wrapped tokens based on the amount of Eth staked
      * @dev The owner can only mint up to the amount of Eth deposited + Eth staking rewards from Lido
      * @param to Address to mint wrapped tokens to
@@ -128,25 +86,15 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit MintWrappedEth(to, amount);
     }
 
-    /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
-    function _bridgeToL2(WrappedToken wrappedToken, uint256 amount) internal {
-        if (autoBridge) {
-            wrappedToken.approve(address(l1standardBridge), amount);
-            l1standardBridge.depositERC20(amount);
-            emit BridgeToL2(amount);
-        }
-    }
+    function upgrade() external onlyOwner { }
 
+    /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     /**
      * @dev If autobridge, we mint thhe wrapped token to this contract so we can transfer it from '
      * this contract to the l1standardbridge contract. Otherwise, we mint it to the user
      */
     function _mintWrappedEth(address to, uint256 amount) internal {
-        if (autoBridge) {
-            wrappedEth.mint(address(this), amount);
-        } else {
-            wrappedEth.mint(to, amount);
-        }
+        wrappedEth.mint(to, amount);
     }
 
     function _authorizeUpgrade(address) internal override onlyOwner { }

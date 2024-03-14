@@ -24,7 +24,7 @@ abstract contract DeploymentUtils is PRBTest {
     /**
      * @dev Deploy the staking manager, Edgeless Deposit, Eth Lido Strategy, and Dai Staking Strategy
      * This also sets the two staking strategies as active in the staking manager
-     * autoStake is set to true, and autoBridge is set to false
+     * autoStake is set to true
      */
     function deployContracts(address owner)
         public
@@ -41,8 +41,7 @@ abstract contract DeploymentUtils is PRBTest {
         stakingManager = StakingManager(payable(address(new ERC1967Proxy(stakingManagerImpl, stakingManagerData))));
 
         address edgelessDepositImpl = address(new EdgelessDeposit());
-        bytes memory edgelessDepositData =
-            abi.encodeCall(EdgelessDeposit.initialize, (owner, IERC20Inbox(address(1)), stakingManager));
+        bytes memory edgelessDepositData = abi.encodeCall(EdgelessDeposit.initialize, (owner, stakingManager));
         edgelessDeposit = EdgelessDeposit(payable(address(new ERC1967Proxy(edgelessDepositImpl, edgelessDepositData))));
 
         stakingManager.setStaker(address(edgelessDeposit));
@@ -55,7 +54,6 @@ abstract contract DeploymentUtils is PRBTest {
         stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 0);
 
         wrappedEth = edgelessDeposit.wrappedEth();
-        edgelessDeposit.setAutoBridge(false);
         vm.stopPrank();
 
         vm.label(address(wrappedEth), "wrappedEth");
