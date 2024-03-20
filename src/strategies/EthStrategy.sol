@@ -37,9 +37,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
     function deposit(uint256 amount) external payable onlyStakingManager {
         if (!autoStake) return;
-        if (amount > address(this).balance) revert InsufficientFunds();
-        LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount);
+        _deposit(amount);
     }
 
     function withdraw(uint256 amount) external onlyStakingManager returns (uint256 withdrawnAmount) {
@@ -49,6 +47,17 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         } else {
             withdrawnAmount = amount;
         }
+        return _withdraw(withdrawnAmount);
+    }
+
+    /// --------------------------------- 🛠️ Internal Functions 🛠️ ---------------------------------
+    function _deposit(uint256 amount) internal {
+        if (amount > address(this).balance) revert InsufficientFunds();
+        LIDO.submit{ value: amount }(address(0));
+        emit EthStaked(amount);
+    }
+
+    function _withdraw(uint256 withdrawnAmount) internal returns (uint256) {
         (bool success, bytes memory data) = stakingManager.call{ value: withdrawnAmount }("");
         if (!success) revert TransferFailed(data);
         emit EthWithdrawn(withdrawnAmount);
@@ -57,16 +66,11 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     function ownerDeposit(uint256 amount) external payable onlyOwner {
-        if (amount > address(this).balance) revert InsufficientFunds();
-        LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount);
+        _deposit(amount);
     }
 
     function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
-        (bool success, bytes memory data) = stakingManager.call{ value: amount }("");
-        if (!success) revert TransferFailed(data);
-        emit EthWithdrawn(amount);
-        return amount;
+        return _withdraw(amount);
     }
 
     function requestLidoWithdrawal(uint256[] calldata amounts)
@@ -111,5 +115,5 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
 
     receive() external payable { }
 
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyOwner { }
 }
