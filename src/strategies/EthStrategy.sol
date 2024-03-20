@@ -12,7 +12,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     uint256 public ethUnderWithdrawal;
     uint256[50] private __gap;
 
-    event EthStaked(uint256 amount);
+    event EthStaked(uint256 amount, uint256 sharesGenerated);
     event EthWithdrawn(uint256 amount);
     event RequestedLidoWithdrawals(uint256[] requestIds, uint256[] amounts);
     event ClaimedLidoWithdrawals(uint256[] requestIds);
@@ -54,8 +54,8 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     /// --------------------------------- 🛠️ Internal Functions 🛠️ ---------------------------------
     function _deposit(uint256 amount) internal {
         if (amount > address(this).balance) revert InsufficientFunds();
-        LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount);
+        uint256 sharesGenerated = LIDO.submit{ value: amount }(address(0));
+        emit EthStaked(amount,sharesGenerated);
     }
 
     function _withdraw(uint256 withdrawnAmount) internal returns (uint256) {
