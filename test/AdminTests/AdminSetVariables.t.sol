@@ -118,7 +118,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         assertEq(address(stakingManager.strategies(asset, 0)), address(EthStakingStrategy));
         assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
 
-        stakingManager.removeStrategy(asset, 0);
+        stakingManager.removeStrategy(asset, 0, 0);
         assertEq(address(stakingManager.strategies(asset, 0)), address(stakingStrategy));
 
         stakingManager.addStrategy(asset, stakingStrategy);
@@ -127,7 +127,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.stopPrank();
         vm.startPrank(randomUser);
         vm.expectRevert();
-        stakingManager.removeStrategy(asset, 0);
+        stakingManager.removeStrategy(asset, 0, 0);
     }
 
     // ----------- Eth Strategy ------------

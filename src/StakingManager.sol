@@ -9,7 +9,6 @@ import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
- * Upon withdrawal, all assets go to the depositor. The depositor needs to be set after deployment
  */
 contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     using SafeERC20 for IERC20;
@@ -67,7 +66,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         }
         (bool success, bytes memory data) = staker.call{ value: withdrawnAmount }("");
         if (!success) revert TransferFailed(data);
-        emit Withdraw(ETH_ADDRESS, amount);
+        emit Withdraw(ETH_ADDRESS, withdrawnAmount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
@@ -99,12 +98,12 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit Withdraw(staker, withdrawnAmount);
     }
 
-    function removeStrategy(address asset, uint256 index) external onlyOwner {
+    function removeStrategy(address asset, uint256 index, uint256 newActiveStrategyIndex) external onlyOwner {
         IStakingStrategy strategy = strategies[asset][index];
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
-        if (activeStrategyIndex[asset] == index) activeStrategyIndex[asset] = 0;
+        if (activeStrategyIndex[asset] == index) activeStrategyIndex[asset] = newActiveStrategyIndex;
         emit RemoveStrategy(asset, strategy);
     }
 
