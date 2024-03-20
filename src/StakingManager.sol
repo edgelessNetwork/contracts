@@ -9,7 +9,6 @@ import { IStakingStrategy } from "./interfaces/IStakingStrategy.sol";
 
 /**
  * @notice The purpose of this contract is solely to take in assets and send them to strategies.
- * Upon withdrawal, all assets go to the depositor. The depositor needs to be set after deployment
  */
 contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     using SafeERC20 for IERC20;
