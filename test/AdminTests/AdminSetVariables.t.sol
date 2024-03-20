@@ -89,8 +89,9 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setAutoStake(autoStake);
     }
 
-    function test_addStrategy(address asset, IStakingStrategy strategy, address randomUser) external {
+    function test_addStrategy( IStakingStrategy strategy, address randomUser) external {
         vm.prank(owner);
+        address asset = stakingManager.ETH_ADDRESS();
         stakingManager.addStrategy(asset, strategy);
         assertEq(address(stakingManager.strategies(asset, 0)), address(strategy));
 
@@ -109,10 +110,11 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setActiveStrategy(asset, index);
     }
 
-    function test_removeStrategy(address asset, IStakingStrategy stakingStrategy, address randomUser) external {
+    function test_removeStrategy( IStakingStrategy stakingStrategy, address randomUser) external {
         forkMainnetAndDeploy();
 
         vm.startPrank(owner);
+        address asset = stakingManager.ETH_ADDRESS();
         stakingManager.addStrategy(asset, EthStakingStrategy);
         stakingManager.addStrategy(asset, stakingStrategy);
         assertEq(address(stakingManager.strategies(asset, 0)), address(EthStakingStrategy));
