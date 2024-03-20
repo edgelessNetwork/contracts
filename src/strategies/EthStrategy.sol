@@ -78,7 +78,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         for (uint256 i; i < amounts.length; ++i) {
             total += amounts[i];
         }
-        LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
+        require(LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total), "approve failed");
         requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amounts, address(this));
         emit RequestedLidoWithdrawals(requestIds, amounts);
     }
@@ -111,5 +111,5 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
 
     receive() external payable { }
 
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyOwner { }
 }
