@@ -85,8 +85,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     /**
-     * @dev If autobridge, we mint thhe wrapped token to this contract so we can transfer it from '
-     * this contract to the l1standardbridge contract. Otherwise, we mint it to the user
+     * @dev We mint wrapped eth to the user
      */
     function _mintWrappedEth(address to, uint256 amount) internal {
         wrappedEth.mint(to, amount);
