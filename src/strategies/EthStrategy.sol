@@ -9,6 +9,7 @@ import { LIDO, LIDO_WITHDRAWAL_ERC721 } from "../Constants.sol";
 contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeable {
     address public stakingManager;
     bool public autoStake;
+    uint256 public ethUnderWithdrawal;
     uint256[50] private __gap;
 
     event EthStaked(uint256 amount);
@@ -74,12 +75,14 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         onlyOwner
         returns (uint256[] memory requestIds)
     {
+        require(ethUnderWithdrawal == 0, "EthStrategy: Withdrawal already in progress");
         uint256 total;
         for (uint256 i; i < amounts.length; ++i) {
             total += amounts[i];
         }
         LIDO.approve(address(LIDO_WITHDRAWAL_ERC721), total);
         requestIds = LIDO_WITHDRAWAL_ERC721.requestWithdrawals(amounts, address(this));
+        ethUnderWithdrawal += total;
         emit RequestedLidoWithdrawals(requestIds, amounts);
     }
 
@@ -91,6 +94,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         uint256 lastCheckpointIndex = LIDO_WITHDRAWAL_ERC721.getLastCheckpointIndex();
         uint256[] memory _hints = LIDO_WITHDRAWAL_ERC721.findCheckpointHints(requestIds, 1, lastCheckpointIndex);
         LIDO_WITHDRAWAL_ERC721.claimWithdrawals(requestIds, _hints);
+        ethUnderWithdrawal = 0;
         emit ClaimedLidoWithdrawals(requestIds);
     }
 
@@ -106,10 +110,10 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
     function underlyingAssetAmount() external view returns (uint256) {
-        return address(this).balance + LIDO.balanceOf(address(this));
+        return address(this).balance + LIDO.balanceOf(address(this)) + ethUnderWithdrawal;
     }
 
     receive() external payable { }
 
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyOwner { }
 }
