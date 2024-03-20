@@ -8,7 +8,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * @notice This represents the wrapped tokens that are bridged to the Edgeless L2
  */
 contract WrappedToken is ERC20 {
-    address public minter;
+    address immutable public minter;
 
     event Mint(address indexed account, uint256 amount);
     event Burn(address indexed account, uint256 amount);
