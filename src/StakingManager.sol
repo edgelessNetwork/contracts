@@ -66,7 +66,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         }
         (bool success, bytes memory data) = staker.call{ value: withdrawnAmount }("");
         if (!success) revert TransferFailed(data);
-        emit Withdraw(ETH_ADDRESS, amount);
+        emit Withdraw(ETH_ADDRESS, withdrawnAmount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
