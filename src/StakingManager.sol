@@ -81,6 +81,9 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {
         require(ETH_ADDRESS == asset, "Unsupported asset");
+        for (uint256 i = 0; i < strategies[asset].length; i++) {
+            require(address(strategies[asset][i]) != address(strategy), "Strategy already exists");
+        }
         strategies[asset].push(strategy);
         emit AddStrategy(asset, strategy);
     }

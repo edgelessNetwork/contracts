@@ -115,16 +115,14 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
 
         vm.startPrank(owner);
         address asset = stakingManager.ETH_ADDRESS();
-        stakingManager.addStrategy(asset, EthStakingStrategy);
         stakingManager.addStrategy(asset, stakingStrategy);
-        assertEq(address(stakingManager.strategies(asset, 1)), address(EthStakingStrategy));
-        assertEq(address(stakingManager.strategies(asset, 2)), address(stakingStrategy));
+        assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
 
         stakingManager.removeStrategy(asset, 0, 0);
         assertEq(address(stakingManager.strategies(asset, 0)), address(stakingStrategy));
 
-        stakingManager.addStrategy(asset, stakingStrategy);
-        assertEq(address(stakingManager.strategies(asset, 2)), address(stakingStrategy));
+        stakingManager.addStrategy(asset, EthStakingStrategy);
+        assertEq(address(stakingManager.strategies(asset, 1)), address(EthStakingStrategy));
 
         vm.stopPrank();
         vm.startPrank(randomUser);
