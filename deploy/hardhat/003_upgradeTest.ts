@@ -16,7 +16,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
   const StakingManager = new ethers.Contract((await get("StakingManager")).address, StakingManagerArtifact.abi);
-  const stakingManagerData = StakingManager.interface.encodeFunctionData("setAutoStake", [false]);
+  const stakingManagerData = StakingManager.interface.encodeFunctionData("setStaker", [deployer]);
   await execute(
     "StakingManager",
     {
