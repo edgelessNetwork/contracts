@@ -27,6 +27,10 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     error TransferFailed(bytes data);
     error ZeroAddress();
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _owner, StakingManager _stakingManager) external initializer {
         if (_owner == address(0)) revert ZeroAddress();
         wrappedEth = new WrappedToken(address(this), "Edgeless Wrapped Eth", "ewEth");

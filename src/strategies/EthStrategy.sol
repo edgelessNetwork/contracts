@@ -29,6 +29,10 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
         autoStake = true;
@@ -55,7 +59,7 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     function _deposit(uint256 amount) internal {
         if (amount > address(this).balance) revert InsufficientFunds();
         uint256 sharesGenerated = LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount,sharesGenerated);
+        emit EthStaked(amount, sharesGenerated);
     }
 
     function _withdraw(uint256 withdrawnAmount) internal returns (uint256) {
