@@ -15,6 +15,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
+    mapping(address => IStakingStrategy) public allStrategies;
     address public staker;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     uint256[50] private __gap;
@@ -80,9 +81,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {
         require(ETH_ADDRESS == asset, "Unsupported asset");
-        for (uint256 i = 0; i < strategies[asset].length; i++) {
-            require(address(strategies[asset][i]) != address(strategy), "Strategy already exists");
-        }
+        require(allStrategies[address(strategy)] == IStakingStrategy(address(0)), "Strategy already exists");
         strategies[asset].push(strategy);
         emit AddStrategy(asset, strategy);
     }
@@ -107,6 +106,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
         activeStrategyIndex[asset] = newActiveStrategyIndex;
+        allStrategies[address(strategy)] = IStakingStrategy(address(0));
         emit RemoveStrategy(asset, strategy);
     }
 
