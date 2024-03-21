@@ -135,7 +135,16 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         }
     }
 
-    receive() external payable { }
+    receive() external payable {
+        bool validSender = false;
+        for (uint256 i = 0; i < strategies[ETH_ADDRESS].length; i++) {
+            if (msg.sender == address(strategies[ETH_ADDRESS][i])) {
+                validSender = true;
+                break;
+            }
+        }
+        require(validSender, "Invalid sender");
+    }
 
     function _authorizeUpgrade(address) internal override onlyOwner { }
 }
