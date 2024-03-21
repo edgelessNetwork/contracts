@@ -25,7 +25,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     event SetStaker(address staker);
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
-    event RemoveStrategy(address indexed asset, IStakingStrategy indexed strategy);
+    event RemoveStrategy(address indexed asset, IStakingStrategy indexed strategy, uint256 newActiveStrategyIndex);
 
     error OnlyStaker(address sender);
     error TransferFailed(bytes data);
@@ -101,13 +101,14 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     }
 
     function removeStrategy(address asset, uint256 index, uint256 newActiveStrategyIndex) public onlyOwner {
+        require(newActiveStrategyIndex < strategies[asset].length - 1, "Invalid index");
         IStakingStrategy strategy = strategies[asset][index];
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
         activeStrategyIndex[asset] = newActiveStrategyIndex;
         allStrategies[address(strategy)] = IStakingStrategy(address(0));
-        emit RemoveStrategy(asset, strategy);
+        emit RemoveStrategy(asset, strategy, newActiveStrategyIndex);
     }
 
     function withdrawAndRemoveStrategy(
