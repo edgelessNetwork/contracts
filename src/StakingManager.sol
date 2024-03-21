@@ -43,7 +43,8 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     /// -------------------------------- 📝 Staker Functions 📝 --------------------------------
     function stake(address asset, uint256 amount) external payable onlyStaker {
-        _stakeEth(msg.value);
+        require(asset == ETH_ADDRESS, "Unsupported asset");
+        _stakeEth(amount);
         emit Stake(asset, amount);
     }
 
