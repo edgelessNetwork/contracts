@@ -41,14 +41,14 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: {
-      hardhat: 0,
-      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
+      hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
     owner: {
-      hardhat: 0,
-      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
+      hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
