@@ -52,13 +52,12 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         strategy.deposit{ value: amount }(amount);
     }
 
-    function withdraw(uint256 amount) external onlyStaker {
-        _withdrawEth(amount);
+    function withdraw(uint256 amount) external onlyStaker returns (uint256) {
+        return _withdrawEth(amount);
     }
 
-    function _withdrawEth(uint256 amount) internal {
+    function _withdrawEth(uint256 amount) internal returns (uint256 withdrawnAmount) {
         IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
-        uint256 withdrawnAmount;
         if (address(strategy) != address(0)) {
             withdrawnAmount = strategy.withdraw(amount);
         } else {

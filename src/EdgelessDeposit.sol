@@ -61,7 +61,8 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
      */
     function withdrawEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
-        stakingManager.withdraw(amount);
+        uint256 withdrawnAmount = stakingManager.withdraw(amount);
+        require(withdrawnAmount == amount, "EdgelessDeposit: Withdrawal amount does not match");
         (bool success, bytes memory data) = to.call{ value: amount }("");
         if (!success) revert TransferFailed(data);
         emit WithdrawEth(msg.sender, to, amount, amount);
