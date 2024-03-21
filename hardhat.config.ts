@@ -49,14 +49,14 @@ const config: HardhatUserConfig = {
     deployer: {
       hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
-      sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
+      sepolia: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      edgelessSepoliaTestnet: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
     },
     owner: {
       hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
-      sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
-      edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
+      sepolia: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      edgelessSepoliaTestnet: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
     },
   },
   paths: {
@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      ethereum: process.env.ETHERSCAN_API_KEY!,
+      mainnet: process.env.ETHERSCAN_API_KEY!,
       sepolia: process.env.ETHERSCAN_API_KEY!,
       edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter ",
     },
