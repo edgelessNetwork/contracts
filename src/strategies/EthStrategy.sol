@@ -36,7 +36,9 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     function initialize(address _owner, address _stakingManager) external initializer {
         stakingManager = _stakingManager;
         autoStake = true;
-        __Ownable_init(_owner);
+        __Ownable2Step_init();
+        __UUPSUpgradeable_init();
+        _transferOwnership(_owner);
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------

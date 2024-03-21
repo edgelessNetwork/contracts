@@ -42,7 +42,9 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     }
 
     function initialize(address _owner) external initializer {
-        __Ownable_init(_owner);
+        __Ownable2Step_init();
+        __UUPSUpgradeable_init();
+        _transferOwnership(_owner);
     }
 
     /// -------------------------------- 📝 Staker Functions 📝 --------------------------------
