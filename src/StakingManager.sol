@@ -89,6 +89,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     }
 
     function setActiveStrategy(address asset, uint256 index) external onlyOwner {
+        require(index < strategies[asset].length, "Invalid index");
         activeStrategyIndex[asset] = index;
         emit SetActiveStrategy(asset, index);
     }

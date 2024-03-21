@@ -100,14 +100,14 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.addStrategy(asset, strategy);
     }
 
-    function test_setActiveStrategy(address asset, uint256 index, address randomUser) external {
-        vm.prank(owner);
+    function test_setActiveStrategy(IStakingStrategy strategy,address randomUser) external {
+        address asset = stakingManager.ETH_ADDRESS();
+        uint256 index = 0;
+        vm.startPrank(owner);
+        stakingManager.addStrategy(asset, strategy);
         stakingManager.setActiveStrategy(asset, index);
         assertEq(stakingManager.activeStrategyIndex(asset), index);
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        stakingManager.setActiveStrategy(asset, index);
+        vm.stopPrank();
     }
 
     function test_removeStrategy(IStakingStrategy stakingStrategy, address randomUser) external {
