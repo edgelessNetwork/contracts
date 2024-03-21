@@ -13,7 +13,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 1,
+        runs: 100000,
       },
     },
   },
@@ -38,6 +38,12 @@ const config: HardhatUserConfig = {
         },
       },
     },
+    ethereum: {
+      deploy: ["./deploy/ethereum/"],
+      url: "https://eth-mainnet.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
+      chainId: 1,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    }
   },
   namedAccounts: {
     deployer: {
@@ -58,6 +64,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
+      ethereum: process.env.ETHERSCAN_API_KEY!,
       sepolia: process.env.ETHERSCAN_API_KEY!,
       edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter ",
     },
