@@ -13,7 +13,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 1,
+        runs: 100000,
       },
     },
   },
@@ -38,17 +38,23 @@ const config: HardhatUserConfig = {
         },
       },
     },
+    ethereum: {
+      deploy: ["./deploy/ethereum/"],
+      url: "https://eth-mainnet.g.alchemy.com/v2/" + process.env.API_KEY_ALCHEMY,
+      chainId: 1,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    }
   },
   namedAccounts: {
     deployer: {
-      hardhat: 0,
-      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
+      hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
     owner: {
-      hardhat: 0,
-      ethereum: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
+      hardhat: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
+      ethereum: "0xcB58d1142e53e37aDE44E1F125248FbfAc99352A",
       sepolia: "0x45389224caF19e6d4c5424d6Aa441D5119b501Df",
       edgelessSepoliaTestnet: "0x08C6fBA53BF2Ae19DBdC330E258B510c1C148e44",
     },
@@ -58,6 +64,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
+      ethereum: process.env.ETHERSCAN_API_KEY!,
       sepolia: process.env.ETHERSCAN_API_KEY!,
       edgelessSepoliaTestnet: "You can enter any api key here, it doesn't matter ",
     },

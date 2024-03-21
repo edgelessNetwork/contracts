@@ -17,7 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           init: {
             methodName: "initialize",
             args: [deployer],
-          }
+          },
         },
         proxyContract: "OpenZeppelinTransparentProxy",
       },
@@ -30,11 +30,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         execute: {
           init: {
             methodName: "initialize",
-            args: [
-              deployer,
-              (await get("StakingManager")).address,
-            ],
-          }
+            args: [deployer, (await get("StakingManager")).address],
+          },
         },
         proxyContract: "OpenZeppelinTransparentProxy",
       },
@@ -54,11 +51,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         execute: {
           init: {
             methodName: "initialize",
-            args: [
-              deployer,
-              (await get("StakingManager")).address,
-            ],
-          }
+            args: [deployer, (await get("StakingManager")).address],
+          },
         },
         proxyContract: "OpenZeppelinTransparentProxy",
       },
