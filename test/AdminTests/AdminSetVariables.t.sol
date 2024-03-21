@@ -89,11 +89,11 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setAutoStake(autoStake);
     }
 
-    function test_addStrategy( IStakingStrategy strategy, address randomUser) external {
-        vm.prank(owner);
+    function test_addStrategy(IStakingStrategy strategy, address randomUser) external {
         address asset = stakingManager.ETH_ADDRESS();
+        vm.prank(owner);
         stakingManager.addStrategy(asset, strategy);
-        assertEq(address(stakingManager.strategies(asset, 0)), address(strategy));
+        assertEq(address(stakingManager.strategies(asset, 1)), address(strategy));
 
         vm.prank(randomUser);
         vm.expectRevert();
@@ -110,21 +110,21 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setActiveStrategy(asset, index);
     }
 
-    function test_removeStrategy( IStakingStrategy stakingStrategy, address randomUser) external {
+    function test_removeStrategy(IStakingStrategy stakingStrategy, address randomUser) external {
         forkMainnetAndDeploy();
 
         vm.startPrank(owner);
         address asset = stakingManager.ETH_ADDRESS();
         stakingManager.addStrategy(asset, EthStakingStrategy);
         stakingManager.addStrategy(asset, stakingStrategy);
-        assertEq(address(stakingManager.strategies(asset, 0)), address(EthStakingStrategy));
-        assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
+        assertEq(address(stakingManager.strategies(asset, 1)), address(EthStakingStrategy));
+        assertEq(address(stakingManager.strategies(asset, 2)), address(stakingStrategy));
 
         stakingManager.removeStrategy(asset, 0, 0);
         assertEq(address(stakingManager.strategies(asset, 0)), address(stakingStrategy));
 
         stakingManager.addStrategy(asset, stakingStrategy);
-        assertEq(address(stakingManager.strategies(asset, 1)), address(stakingStrategy));
+        assertEq(address(stakingManager.strategies(asset, 2)), address(stakingStrategy));
 
         vm.stopPrank();
         vm.startPrank(randomUser);
