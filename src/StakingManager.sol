@@ -93,7 +93,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit SetActiveStrategy(asset, index);
     }
 
-    function withdrawToStaker(address asset, uint256 index, uint256 amount) external onlyOwner {
+    function withdrawToStaker(address asset, uint256 index, uint256 amount) public onlyOwner {
         IStakingStrategy strategy = strategies[asset][index];
         uint256 withdrawnAmount = strategy.withdraw(amount);
         (bool success, bytes memory data) = staker.call{ value: withdrawnAmount }("");
@@ -101,13 +101,26 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit Withdraw(staker, withdrawnAmount);
     }
 
-    function removeStrategy(address asset, uint256 index, uint256 newActiveStrategyIndex) external onlyOwner {
+    function removeStrategy(address asset, uint256 index, uint256 newActiveStrategyIndex) public onlyOwner {
         IStakingStrategy strategy = strategies[asset][index];
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
         activeStrategyIndex[asset] = newActiveStrategyIndex;
         emit RemoveStrategy(asset, strategy);
+    }
+
+    function withdrawAndRemoveStrategy(
+        address asset,
+        uint256 index,
+        uint256 amount,
+        uint256 newActiveStrategyIndex
+    )
+        public
+        onlyOwner
+    {
+        withdrawToStaker(asset, index, amount);
+        removeStrategy(asset, index, newActiveStrategyIndex);
     }
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
