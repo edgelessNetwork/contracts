@@ -36,12 +36,12 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
-    function deposit(uint256 amount) external payable onlyStakingManager {
+    function deposit(uint256 amount) external payable override onlyStakingManager {
         if (!autoStake) return;
         _deposit(amount);
     }
 
-    function withdraw(uint256 amount) external onlyStakingManager returns (uint256 withdrawnAmount) {
+    function withdraw(uint256 amount) external override onlyStakingManager returns (uint256 withdrawnAmount) {
         uint256 balance = address(this).balance;
         if (amount > balance) {
             withdrawnAmount = balance;
@@ -66,11 +66,11 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
-    function ownerDeposit(uint256 amount) external payable onlyOwner {
+    function ownerDeposit(uint256 amount) external payable override onlyOwner {
         _deposit(amount);
     }
 
-    function ownerWithdraw(uint256 amount) external onlyOwner returns (uint256 withdrawnAmount) {
+    function ownerWithdraw(uint256 amount) external override onlyOwner returns (uint256 withdrawnAmount) {
         return _withdraw(amount);
     }
 
@@ -102,18 +102,18 @@ contract EthStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeab
         emit ClaimedLidoWithdrawals(requestIds);
     }
 
-    function setStakingManager(address _stakingManager) external onlyOwner {
+    function setStakingManager(address _stakingManager) external override onlyOwner {
         stakingManager = _stakingManager;
         emit SetStakingManager(_stakingManager);
     }
 
-    function setAutoStake(bool _autoStake) external onlyOwner {
+    function setAutoStake(bool _autoStake) external override onlyOwner {
         autoStake = _autoStake;
         emit SetAutoStake(_autoStake);
     }
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
-    function underlyingAssetAmount() external view returns (uint256) {
+    function underlyingAssetAmount() external view override returns (uint256) {
         return address(this).balance + LIDO.balanceOf(address(this)) + ethUnderWithdrawal;
     }
 
