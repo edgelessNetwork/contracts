@@ -15,7 +15,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
-    mapping(address => IStakingStrategy) public allStrategies;
+    mapping(IStakingStrategy => bool) public isActiveStrategy;
     address public staker;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     uint256[50] private __gap;
@@ -81,8 +81,9 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {
         require(ETH_ADDRESS == asset, "Unsupported asset");
-        require(allStrategies[address(strategy)] == IStakingStrategy(address(0)), "Strategy already exists");
+        require(!isActiveStrategy[strategy], "Strategy already exists");
         strategies[asset].push(strategy);
+        isActiveStrategy[strategy] = true;
         emit AddStrategy(asset, strategy);
     }
 
@@ -107,7 +108,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
         activeStrategyIndex[asset] = newActiveStrategyIndex;
-        allStrategies[address(strategy)] = IStakingStrategy(address(0));
+        isActiveStrategy[strategy] = false;
         emit RemoveStrategy(asset, strategy, newActiveStrategyIndex);
     }
 
@@ -137,14 +138,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     }
 
     receive() external payable {
-        bool validSender = false;
-        for (uint256 i = 0; i < strategies[ETH_ADDRESS].length; i++) {
-            if (msg.sender == address(strategies[ETH_ADDRESS][i])) {
-                validSender = true;
-                break;
-            }
-        }
-        require(validSender, "Invalid sender");
+        require(isActiveStrategy[IStakingStrategy(msg.sender)], "Invalid sender");
     }
 
     function _authorizeUpgrade(address) internal override onlyOwner { }
