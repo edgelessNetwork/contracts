@@ -16,15 +16,12 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     mapping(address => IStakingStrategy[]) public strategies;
     mapping(address => uint256) public activeStrategyIndex;
     address public staker;
-    address public depositor;
-    bool public autoStake;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     uint256[50] private __gap;
 
     event Stake(address indexed asset, uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
     event SetStaker(address staker);
-    event SetAutoStake(bool autoStake);
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
     event RemoveStrategy(address indexed asset, IStakingStrategy indexed strategy);
@@ -79,11 +76,6 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
         emit SetStaker(_staker);
-    }
-
-    function setAutoStake(bool _autoStake) external onlyOwner {
-        autoStake = _autoStake;
-        emit SetAutoStake(_autoStake);
     }
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {

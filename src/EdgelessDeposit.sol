@@ -12,7 +12,6 @@ import { WrappedToken } from "./WrappedToken.sol";
  * @notice EdgelessDeposit is a contract that allows users to deposit Eth and receive wrapped tokens
  */
 contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
-    address public l2Eth;
     WrappedToken public wrappedEth;
     StakingManager public stakingManager;
     uint256[50] private __gap;
@@ -20,7 +19,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
-    event SetL2Eth(address l2Eth);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
 
     error MaxMintExceeded();
