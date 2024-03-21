@@ -50,12 +50,12 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         vm.deal(address(edgelessDeposit), amount);
 
         vm.prank(address(edgelessDeposit));
-        stakingManager.stake{ value: amount }(EthAddress, amount);
+        stakingManager.stake{ value: amount }(EthAddress);
 
         vm.deal(randomUser, amount);
         vm.expectRevert();
         vm.prank(randomUser);
-        stakingManager.stake{ value: amount }(EthAddress, amount);
+        stakingManager.stake{ value: amount }(EthAddress);
     }
 
     function test_withdraw(address randomUser) external {

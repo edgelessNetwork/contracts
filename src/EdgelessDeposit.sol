@@ -54,7 +54,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     function depositEth(address to) public payable {
         uint256 amount = msg.value;
         _mintWrappedEth(to, amount);
-        stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS(), amount);
+        stakingManager.stake{ value: amount }(stakingManager.ETH_ADDRESS());
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
