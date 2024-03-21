@@ -77,7 +77,6 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.setStaker(randomStaker);
     }
 
-
     function test_addStrategy(IStakingStrategy strategy, address randomUser) external {
         address asset = stakingManager.ETH_ADDRESS();
         vm.prank(owner);
@@ -89,7 +88,7 @@ contract AdminFunctionalityTest is PRBTest, StdCheats, StdUtils, DeploymentUtils
         stakingManager.addStrategy(asset, strategy);
     }
 
-    function test_setActiveStrategy(IStakingStrategy strategy,address randomUser) external {
+    function test_setActiveStrategy(IStakingStrategy strategy) external {
         address asset = stakingManager.ETH_ADDRESS();
         uint256 index = 0;
         vm.startPrank(owner);
