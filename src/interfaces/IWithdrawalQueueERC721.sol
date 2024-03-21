@@ -27,7 +27,6 @@ interface IWithdrawalQueueERC721 {
         external
         view
         returns (uint256[] memory hintIds);
-    function finalize(uint256 _lastRequestIdToBeFinalized, uint256 _maxShareRate) external payable;
     function getLastCheckpointIndex() external view returns (uint256);
     function getWithdrawalStatus(uint256[] calldata _requestIds)
         external
