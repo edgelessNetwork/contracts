@@ -106,7 +106,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         uint256 lastIndex = strategies[asset].length - 1;
         strategies[asset][index] = strategies[asset][lastIndex];
         strategies[asset].pop();
-        if (activeStrategyIndex[asset] == index) activeStrategyIndex[asset] = newActiveStrategyIndex;
+        activeStrategyIndex[asset] = newActiveStrategyIndex;
         emit RemoveStrategy(asset, strategy);
     }
 
