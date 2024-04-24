@@ -6,6 +6,8 @@ import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { IRenzo } from "../interfaces/IRenzo.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { LIDO } from "../Constants.sol";
+import { ISwapRouter } from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgradeable {
     address public stakingManager;
@@ -13,6 +15,7 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
     uint256 public ethUnderWithdrawal;
     IRenzo public renzo;
     IERC20 public ezETH;
+    ISwapRouter public swapRouter;
     uint256[48] private __gap;
 
     event EthStaked(uint256 amount, uint256 sharesGenerated);
@@ -42,6 +45,7 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
         _transferOwnership(_owner);
         renzo = IRenzo(0x74a09653A083691711cF8215a6ab074BB4e99ef5);
         ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
+        swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
@@ -100,8 +104,25 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
         emit SetAutoStake(_autoStake);
     }
 
-    function swapStethToEzEth() external onlyOwner {
-        
+    function swapStethToEzEth() external onlyOwner returns (uint256 amountOut) {
+        // Approve the router to spend DAI.
+        uint256 amountIn = LIDO.balanceOf(address(this));
+        TransferHelper.safeApprove(address(LIDO), address(swapRouter), amountIn);
+
+        // We also set the sqrtPriceLimitx96 to be 0 to ensure we swap our exact input amount.
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+            tokenIn: address(LIDO),
+            tokenOut: address(ezETH),
+            recipient: address(this),
+            deadline: block.timestamp,
+            amountIn: amountIn,
+            amountOutMinimum: amountIn * 90 / 100,
+            limitSqrtPrice: 0
+        });
+
+        // The call to `exactInputSingle` executes the swap.
+        amountOut = swapRouter.exactInputSingle(params);
+        return amountOut;
     }
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
