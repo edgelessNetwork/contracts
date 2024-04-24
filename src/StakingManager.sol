@@ -22,6 +22,7 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     uint256[49] private __gap;
 
     event Stake(address indexed asset, uint256 amount);
+    event StakeEzEth(uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
     event WithdrawEzEth(address indexed asset, uint256 amount);
     event SetStaker(address staker);
@@ -57,6 +58,16 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     function _stakeEth(uint256 amount) internal {
         IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
         strategy.deposit{ value: amount }(amount);
+    }
+
+    function stakeEzEth(uint256 amount) external payable onlyStaker {
+        _stakeEzEth(amount);
+        emit StakeEzEth(amount);
+    }
+
+    function _stakeEzEth(uint256 amount) internal {
+        IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
+        ezETH.transfer(address(strategy), amount);
     }
 
     function withdraw(uint256 amount) external onlyStaker returns (uint256) {

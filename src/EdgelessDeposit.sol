@@ -21,7 +21,7 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     event MintWrappedEth(address indexed to, uint256 amount);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
-    event WithdrawEzEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
+    event WithdrawEzEth(address indexed from, address indexed to, uint256 EzEthAmountWithdrew, uint256 burnAmount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
@@ -60,19 +60,26 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
-    /**
-     * @notice Withdraw Eth from the Eth pool
-     * @param to Address to withdraw Eth to
-     * @param amount  Amount to withdraw
-     */
-    function withdrawEth(address to, uint256 amount) external {
-        wrappedEth.burn(msg.sender, amount);
-        uint256 withdrawnAmount = stakingManager.withdraw(amount);
-        require(withdrawnAmount == amount, "EdgelessDeposit: Withdrawal amount does not match");
-        (bool success, bytes memory data) = to.call{ value: amount }("");
-        if (!success) revert TransferFailed(data);
-        emit WithdrawEth(msg.sender, to, amount, amount);
+    function depositEzEth(address to, uint256 amount) external {
+        wrappedEth.mint(to, amount);
+        ezETH.transferFrom(msg.sender, address(stakingManager), amount);
+        stakingManager.stakeEzEth(amount);
+        emit DepositEth(to, msg.sender, amount, amount);
     }
+
+    // /**
+    //  * @notice Withdraw Eth from the Eth pool
+    //  * @param to Address to withdraw Eth to
+    //  * @param amount  Amount to withdraw
+    //  */
+    // function withdrawEth(address to, uint256 amount) external {
+    //     wrappedEth.burn(msg.sender, amount);
+    //     uint256 withdrawnAmount = stakingManager.withdraw(amount);
+    //     require(withdrawnAmount == amount, "EdgelessDeposit: Withdrawal amount does not match");
+    //     (bool success, bytes memory data) = to.call{ value: amount }("");
+    //     if (!success) revert TransferFailed(data);
+    //     emit WithdrawEth(msg.sender, to, amount, amount);
+    // }
 
     /**
      * @notice Withdraw Eth from the Eth pool
@@ -82,8 +89,8 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     function withdrawEzEth(address to, uint256 amount) external {
         wrappedEth.burn(msg.sender, amount);
         uint256 withdrawnAmount = stakingManager.withdrawEzEth(amount);
-        ezETH.transfer(to, amount);
-        emit WithdrawEzEth(msg.sender, to, amount, amount);
+        ezETH.transfer(to, withdrawnAmount);
+        emit WithdrawEzEth(msg.sender, to, withdrawnAmount, amount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------

@@ -35,7 +35,7 @@ contract RenzoStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     uint32 public constant FORK_BLOCK_NUMBER = 19_722_752;
 
     address public owner = 0xcB58d1142e53e37aDE44E1F125248FbfAc99352A;
-    address public depositor = makeAddr("Depositor");
+    address public depositor = 0x22162DbBa43fE0477cdC5234E248264eC7C6EA7c;
     IERC20 ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
 
     /// @dev A function invoked before each test case is run.
@@ -64,26 +64,23 @@ contract RenzoStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
         vm.stopPrank();
     }
 
-    function test_DepositToRenzo(uint256 amount) external {
-        // amount = bound(amount, 1 ether, 100 ether);
-        // vm.prank(owner);
-        // renzoStrategy.setAutoStake(true);
-        // vm.startPrank(depositor);
-        // vm.deal(depositor, amount);
+    function test_DepositToRenzo() external {
+        vm.prank(owner);
+        uint256 amountOut = ethStakingStrategy.swapStethToEzEth();
+        console2.log("Ez Eth initial strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
+        console2.log("Ez Eth initial depositor balance: ", ezETH.balanceOf(ethStakingStrategy));
+        // Make sure users can deposit and withdraw funds
+        vm.startPrank(depositor);
+        ezETH.approve(address(edgelessDeposit), amountOut);
+        edgelessDeposit.depositEzETH(1e18);
+        console2.log("Ez Eth post deposit strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
+        console2.log("Ez Eth post deposit strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
 
-        // // Deposit Eth
-        // edgelessDeposit.depositEth{ value: amount }(depositor);
-        // assertEq(
-        //     address(depositor).balance,
-        //     0,
-        //     "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
-        // );
-        // assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
-        // assertEq(address(renzoStrategy).balance, 0, "EthStrategy should have 0 Eth");
-        // assertTrue(
-        //     isWithinPercentage(ezETH.balanceOf(address(renzoStrategy)), amount, 5), "EthStrategy should have 0 Eth"
-        // );
-        // vm.stopPrank();
+        console2.log("Ez Eth balance: ", ezETH.balanceOf(address(edgelessDeposit)));
+
+        edgelessDeposit.withdrawEzEth(depositor, 1e18);
+
+
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {
