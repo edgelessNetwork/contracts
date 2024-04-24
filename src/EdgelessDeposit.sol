@@ -67,19 +67,19 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit DepositEth(to, msg.sender, amount, amount);
     }
 
-    // /**
-    //  * @notice Withdraw Eth from the Eth pool
-    //  * @param to Address to withdraw Eth to
-    //  * @param amount  Amount to withdraw
-    //  */
-    // function withdrawEth(address to, uint256 amount) external {
-    //     wrappedEth.burn(msg.sender, amount);
-    //     uint256 withdrawnAmount = stakingManager.withdraw(amount);
-    //     require(withdrawnAmount == amount, "EdgelessDeposit: Withdrawal amount does not match");
-    //     (bool success, bytes memory data) = to.call{ value: amount }("");
-    //     if (!success) revert TransferFailed(data);
-    //     emit WithdrawEth(msg.sender, to, amount, amount);
-    // }
+    /**
+     * @notice Withdraw Eth from the Eth pool
+     * @param to Address to withdraw Eth to
+     * @param amount  Amount to withdraw
+     */
+    function withdrawEth(address to, uint256 amount) external {
+        wrappedEth.burn(msg.sender, amount);
+        uint256 withdrawnAmount = stakingManager.withdraw(amount);
+        require(withdrawnAmount == amount, "EdgelessDeposit: Withdrawal amount does not match");
+        (bool success, bytes memory data) = to.call{ value: amount }("");
+        if (!success) revert TransferFailed(data);
+        emit WithdrawEth(msg.sender, to, amount, amount);
+    }
 
     /**
      * @notice Withdraw Eth from the Eth pool

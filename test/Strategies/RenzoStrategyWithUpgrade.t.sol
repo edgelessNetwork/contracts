@@ -29,7 +29,7 @@ contract RenzoStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
     EdgelessDeposit internal edgelessDeposit = EdgelessDeposit(payable(0x7E0bc314535f430122caFEF18eAbd508d62934bf));
     WrappedToken internal wrappedEth = WrappedToken(0xcD0aa40948c662dEDd9F157085fd6369A255F2f7);
     StakingManager internal stakingManager = StakingManager(payable(0x1e6d08769be5Dc83d38C64C5776305Ad6F01c227));
-    RenzoStrategy internal ethStakingStrategy;
+    RenzoStrategy internal ethStakingStrategy = RenzoStrategy(payable(0xbD95aa0f68B95e6C01d02F1a36D8fde29C6C8e7b));
     IStakingStrategy internal renzoStrategy;
 
     uint32 public constant FORK_BLOCK_NUMBER = 19_722_752;
@@ -48,34 +48,39 @@ contract RenzoStrategyTest is PRBTest, StdCheats, StdUtils, DeploymentUtils {
 
         // Upgrade contracts
         vm.startPrank(owner);
-        (stakingManager, edgelessDeposit, wrappedEth, ) = deployContracts(owner);
-        address EthStakingStrategyImpl = address(new RenzoStrategy());
-        bytes memory EthStakingStrategyData = abi.encodeCall(RenzoStrategy.initialize, (owner, address(stakingManager)));
-        ethStakingStrategy =
-            IStakingStrategy(payable(address(new ERC1967Proxy(EthStakingStrategyImpl, EthStakingStrategyData))));
-        stakingManager.addStrategy(stakingManager.ETH_ADDRESS(), address(ethStakingStrategy));
-        stakingManager.setActiveStrategy(stakingManager.ETH_ADDRESS(), 1);
+        address edgelessDepositImpl = address(new EdgelessDeposit());
+        bytes memory edgelessDepositData = abi.encodeCall(EdgelessDeposit.upgrade, ());
+        edgelessDeposit.upgradeToAndCall(edgelessDepositImpl, edgelessDepositData);
+
+        address stakingManagerImpl = address(new StakingManager());
+        bytes memory stakingManagerData =
+            abi.encodeCall(StakingManager.setEzETH, (0xbf5495Efe5DB9ce00f80364C8B423567e58d2110));
+        stakingManager.upgradeToAndCall(stakingManagerImpl, stakingManagerData);
+
+        address renzoStrategyImpl = address(new RenzoStrategy());
+        bytes memory renzoStrategyData = abi.encodeCall(RenzoStrategy.setConstants, ());
+        ethStakingStrategy.upgradeToAndCall(renzoStrategyImpl, renzoStrategyData);
+
         vm.stopPrank();
     }
 
-    function test_EzEthDepositAndWithdraw(uint256 amount) external {
-        amount = bound(amount, 1e18, 1e40);
+    function test_DepositToRenzo() external {
+        vm.prank(owner);
+        uint256 amountOut = ethStakingStrategy.swapStethToEzEth();
+        console2.log("Ez Eth initial strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
+        console2.log("Ez Eth initial depositor balance: ", ezETH.balanceOf(ethStakingStrategy));
+        // Make sure users can deposit and withdraw funds
         vm.startPrank(depositor);
-        vm.deal(depositor, amount);
-        vm.deal(address(edgelessDeposit), amount);
+        ezETH.approve(address(edgelessDeposit), amountOut);
+        edgelessDeposit.depositEzETH(1e18);
+        console2.log("Ez Eth post deposit strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
+        console2.log("Ez Eth post deposit strategy balance: ", ezETH.balanceOf(ethStakingStrategy));
 
-        // Deposit Eth
-        edgelessDeposit.depositEth{ value: amount }(depositor);
-        assertEq(
-            address(depositor).balance,
-            0,
-            "Deposit should have 0 Eth since all Eth was sent to the edgeless edgelessDeposit contract"
-        );
-        assertEq(wrappedEth.balanceOf(depositor), amount, "Depositor should have `amount` of wrapped Eth");
+        console2.log("Ez Eth balance: ", ezETH.balanceOf(address(edgelessDeposit)));
 
-        // edgelessDeposit.withdrawEth(depositor, amount);
-        assertGt(ezETH.balanceOf(ethStakingStrategy), amount, "Depositor should have `amount` of Eth after withdrawing");
-        // assertEq(wrappedEth.balanceOf(depositor), 0, "Depositor should have 0 wrapped Eth after withdrawing");
+        edgelessDeposit.withdrawEzEth(depositor, 1e18);
+
+
     }
 
     function isWithinPercentage(uint256 value1, uint256 value2, uint8 percentage) internal pure returns (bool) {

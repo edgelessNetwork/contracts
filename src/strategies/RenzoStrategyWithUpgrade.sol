@@ -17,7 +17,10 @@ contract RenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgrade
     uint256 public ethUnderWithdrawal;
     IRenzo public renzo;
     IERC20 public ezETH;
-    uint256[48] private __gap;
+    IWETH public WETH;
+    uint24 public STETH_WETH_POOL_FEE;
+    ISwapRouter public swapRouter;
+    uint256[45] private __gap;
 
     event EthStaked(uint256 amount, uint256 sharesGenerated);
     event EzEthWithdrawn(uint256 amount);
@@ -28,7 +31,6 @@ contract RenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgrade
     error TransferFailed(bytes data);
     error OnlyStakingManager(address sender);
     error RequestIdsMustBeSorted();
-    error WithdrawalsNotImplemented();
 
     modifier onlyStakingManager() {
         if (msg.sender != stakingManager) revert OnlyStakingManager(msg.sender);
@@ -47,6 +49,9 @@ contract RenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgrade
         _transferOwnership(_owner);
         renzo = IRenzo(0x74a09653A083691711cF8215a6ab074BB4e99ef5);
         ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
+        swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+        WETH = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        STETH_WETH_POOL_FEE = 10_000;
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
@@ -77,7 +82,9 @@ contract RenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgrade
     }
 
     function _withdraw(uint256 withdrawnAmount) internal returns (uint256) {
-        revert WithdrawalsNotImplemented();
+        ezETH.transfer(address(stakingManager), withdrawnAmount);
+        emit EzEthWithdrawn(withdrawnAmount);
+        return withdrawnAmount;
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
@@ -101,6 +108,36 @@ contract RenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgrade
     function setAutoStake(bool _autoStake) external override onlyOwner {
         autoStake = _autoStake;
         emit SetAutoStake(_autoStake);
+    }
+
+    function swapStethToEzEth() external onlyOwner returns (uint256 amountOut) {
+        // Approve the router to spend DAI.
+        uint256 amountIn = LIDO.balanceOf(address(this));
+        TransferHelper.safeApprove(address(LIDO), address(swapRouter), amountIn);
+
+        // We also set the sqrtPriceLimitx96 to be 0 to ensure we swap our exact input amount.
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
+            path: abi.encodePacked(address(LIDO), STETH_WETH_POOL_FEE, address(WETH)),
+            recipient: address(this),
+            deadline: block.timestamp,
+            amountIn: amountIn,
+            amountOutMinimum: amountIn * 90 / 100
+        });
+
+        // The call to `exactInputSingle` executes the swap.
+        amountOut = swapRouter.exactInput(params);
+        WETH.withdraw(WETH.balanceOf(address(this)));
+        _deposit(address(this).balance);
+        // Convert WETH to EzETH
+        return amountOut;
+    }
+
+    function setConstants() external onlyOwner {
+        renzo = IRenzo(0x74a09653A083691711cF8215a6ab074BB4e99ef5);
+        ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
+        swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+        WETH = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        STETH_WETH_POOL_FEE = 10_000;
     }
 
     /// --------------------------------- 🔎 View Functions 🔍 ---------------------------------
