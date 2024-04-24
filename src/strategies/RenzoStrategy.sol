@@ -5,6 +5,7 @@ import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/acc
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { IStakingStrategy } from "../interfaces/IStakingStrategy.sol";
 import { IRenzo } from "../interfaces/IRenzo.sol";
+import { IWETH } from "../interfaces/IWETH.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { LIDO } from "../Constants.sol";
 import { ISwapRouter } from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
@@ -16,7 +17,7 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
     uint256 public ethUnderWithdrawal;
     IRenzo public renzo;
     IERC20 public ezETH;
-    IERC20 public WETH;
+    IWETH public WETH;
     uint24 public EZETH_WETH_POOL_FEE;
     uint24 public STETH_WETH_POOL_FEE;
     ISwapRouter public swapRouter;
@@ -50,7 +51,7 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
         renzo = IRenzo(0x74a09653A083691711cF8215a6ab074BB4e99ef5);
         ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
         swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
-        WETH = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        WETH = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
         EZETH_WETH_POOL_FEE = 100;
         STETH_WETH_POOL_FEE = 10_000;
     }
@@ -78,8 +79,8 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
     /// --------------------------------- 🛠️ Internal Functions 🛠️ ---------------------------------
     function _deposit(uint256 amount) internal {
         if (amount > address(this).balance) revert InsufficientFunds();
-        uint256 sharesGenerated = LIDO.submit{ value: amount }(address(0));
-        emit EthStaked(amount, sharesGenerated);
+        renzo.depositETH{ value: amount }();
+        emit EthStaked(amount, amount);
     }
 
     function _withdraw(uint256 withdrawnAmount) internal returns (uint256) {
@@ -118,7 +119,7 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
 
         // We also set the sqrtPriceLimitx96 to be 0 to ensure we swap our exact input amount.
         ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
-            path: abi.encodePacked(address(LIDO), STETH_WETH_POOL_FEE, address(WETH), EZETH_WETH_POOL_FEE, address(ezETH)),
+            path: abi.encodePacked(address(LIDO), STETH_WETH_POOL_FEE, address(WETH)),
             recipient: address(this),
             deadline: block.timestamp,
             amountIn: amountIn,
@@ -127,6 +128,9 @@ contract NewRenzoStrategy is IStakingStrategy, Ownable2StepUpgradeable, UUPSUpgr
 
         // The call to `exactInputSingle` executes the swap.
         amountOut = swapRouter.exactInput(params);
+        WETH.withdraw(WETH.balanceOf(address(this)));
+        _deposit(address(this).balance);
+        // Convert WETH to EzETH
         return amountOut;
     }
 
