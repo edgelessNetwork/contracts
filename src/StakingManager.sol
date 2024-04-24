@@ -92,6 +92,10 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit SetStaker(_staker);
     }
 
+    function setEzETH(address _ezETH) external onlyOwner {
+        ezETH = IERC20(_ezETH);
+    }
+
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {
         require(ETH_ADDRESS == asset, "Unsupported asset");
         require(!isActiveStrategy[strategy], "Strategy already exists");

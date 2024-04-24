@@ -38,7 +38,6 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         __Ownable2Step_init();
         __UUPSUpgradeable_init();
         _transferOwnership(_owner);
-        ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
     }
 
     /// -------------------------------- 📝 External Functions 📝 --------------------------------
@@ -101,7 +100,9 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit MintWrappedEth(to, amount);
     }
 
-    function upgrade() external onlyOwner { }
+    function upgrade() external onlyOwner {
+        ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
+    }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     /**
