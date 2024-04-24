@@ -18,10 +18,13 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     mapping(IStakingStrategy => bool) public isActiveStrategy;
     address public staker;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    uint256[50] private __gap;
+    IERC20 public ezETH;
+    uint256[49] private __gap;
 
     event Stake(address indexed asset, uint256 amount);
+    event StakeEzEth(uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
+    event WithdrawEzEth(address indexed asset, uint256 amount);
     event SetStaker(address staker);
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
@@ -57,6 +60,16 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         strategy.deposit{ value: amount }(amount);
     }
 
+    function stakeEzEth(uint256 amount) external payable onlyStaker {
+        _stakeEzEth(amount);
+        emit StakeEzEth(amount);
+    }
+
+    function _stakeEzEth(uint256 amount) internal {
+        IStakingStrategy strategy = getActiveStrategy(ETH_ADDRESS);
+        ezETH.transfer(address(strategy), amount);
+    }
+
     function withdraw(uint256 amount) external onlyStaker returns (uint256) {
         return _withdrawEth(amount);
     }
@@ -73,10 +86,25 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit Withdraw(ETH_ADDRESS, withdrawnAmount);
     }
 
+    function withdrawEzEth(uint256 amount) external onlyStaker returns (uint256) {
+        return _withdrawEzEth(amount);
+    }
+
+    function _withdrawEzEth(uint256 amount) internal returns (uint256 withdrawnAmount) {
+        IStakingStrategy strategy = getActiveStrategy(address(ezETH));
+        strategy.withdraw(amount);
+        ezETH.transfer(staker, amount);
+        emit WithdrawEzEth(ETH_ADDRESS, withdrawnAmount);
+    }
+
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
     function setStaker(address _staker) external onlyOwner {
         staker = _staker;
         emit SetStaker(_staker);
+    }
+
+    function setEzETH(address _ezETH) external onlyOwner {
+        ezETH = IERC20(_ezETH);
     }
 
     function addStrategy(address asset, IStakingStrategy strategy) external onlyOwner {

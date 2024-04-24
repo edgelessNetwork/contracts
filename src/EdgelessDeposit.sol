@@ -14,12 +14,14 @@ import { WrappedToken } from "./WrappedToken.sol";
 contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
     WrappedToken public wrappedEth;
     StakingManager public stakingManager;
-    uint256[50] private __gap;
+    IERC20 public ezETH;
+    uint256[49] private __gap;
 
     event DepositEth(address indexed to, address indexed from, uint256 EthAmount, uint256 mintAmount);
     event MintWrappedEth(address indexed to, uint256 amount);
     event ReceivedStakingManagerWithdrawal(uint256 amount);
     event WithdrawEth(address indexed from, address indexed to, uint256 EthAmountWithdrew, uint256 burnAmount);
+    event WithdrawEzEth(address indexed from, address indexed to, uint256 EzEthAmountWithdrew, uint256 burnAmount);
 
     error MaxMintExceeded();
     error TransferFailed(bytes data);
@@ -58,6 +60,13 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit DepositEth(to, msg.sender, msg.value, amount);
     }
 
+    function depositEzEth(address to, uint256 amount) external {
+        wrappedEth.mint(to, amount);
+        ezETH.transferFrom(msg.sender, address(stakingManager), amount);
+        stakingManager.stakeEzEth(amount);
+        emit DepositEth(to, msg.sender, amount, amount);
+    }
+
     /**
      * @notice Withdraw Eth from the Eth pool
      * @param to Address to withdraw Eth to
@@ -70,6 +79,18 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         (bool success, bytes memory data) = to.call{ value: amount }("");
         if (!success) revert TransferFailed(data);
         emit WithdrawEth(msg.sender, to, amount, amount);
+    }
+
+    /**
+     * @notice Withdraw Eth from the Eth pool
+     * @param to Address to withdraw Eth to
+     * @param amount  Amount to withdraw
+     */
+    function withdrawEzEth(address to, uint256 amount) external {
+        wrappedEth.burn(msg.sender, amount);
+        uint256 withdrawnAmount = stakingManager.withdrawEzEth(amount);
+        ezETH.transfer(to, withdrawnAmount);
+        emit WithdrawEzEth(msg.sender, to, withdrawnAmount, amount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
@@ -86,7 +107,9 @@ contract EdgelessDeposit is Ownable2StepUpgradeable, UUPSUpgradeable {
         emit MintWrappedEth(to, amount);
     }
 
-    function upgrade() external onlyOwner { }
+    function upgrade() external onlyOwner {
+        ezETH = IERC20(0xbf5495Efe5DB9ce00f80364C8B423567e58d2110);
+    }
 
     /// -------------------------------- 🏗️ Internal Functions 🏗️ --------------------------------
     /**
