@@ -18,10 +18,12 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
     mapping(IStakingStrategy => bool) public isActiveStrategy;
     address public staker;
     address public constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    uint256[50] private __gap;
+    IERC20 public ezETH;
+    uint256[49] private __gap;
 
     event Stake(address indexed asset, uint256 amount);
     event Withdraw(address indexed asset, uint256 amount);
+    event WithdrawEzEth(address indexed asset, uint256 amount);
     event SetStaker(address staker);
     event AddStrategy(address indexed asset, IStakingStrategy indexed strategy);
     event SetActiveStrategy(address indexed asset, uint256 index);
@@ -71,6 +73,17 @@ contract StakingManager is Ownable2StepUpgradeable, UUPSUpgradeable {
         (bool success, bytes memory data) = staker.call{ value: withdrawnAmount }("");
         if (!success) revert TransferFailed(data);
         emit Withdraw(ETH_ADDRESS, withdrawnAmount);
+    }
+
+    function withdrawEzEth(uint256 amount) external onlyStaker returns (uint256) {
+        return _withdrawEzEth(amount);
+    }
+
+    function _withdrawEzEth(uint256 amount) internal returns (uint256 withdrawnAmount) {
+        IStakingStrategy strategy = getActiveStrategy(address(ezETH));
+        strategy.withdraw(amount);
+        ezETH.transfer(staker, amount);
+        emit WithdrawEzEth(ETH_ADDRESS, withdrawnAmount);
     }
 
     /// ---------------------------------- 🔓 Admin Functions 🔓 ----------------------------------
